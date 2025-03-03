@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Dig350Final.sln"
+    "dotnet.defaultSolution": "DIG-350-Goats.sln"
 }
