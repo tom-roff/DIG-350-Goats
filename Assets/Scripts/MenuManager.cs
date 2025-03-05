@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Unity.Services.Lobbies.Models;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class MenuManager : MonoBehaviour
 
         hostButton.onClick.AddListener(HostGame);
         joinButton.onClick.AddListener(JoinGame);
+        startGameButton.onClick.AddListener(StartGame);
         startGameButton.gameObject.SetActive(false);
         playerCountText.gameObject.SetActive(false);
     }
@@ -81,14 +83,6 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    private void OnLobbyChanged(ILobbyChanges changes)
-    {
-        if (changes.PlayerJoined.Changed || changes.PlayerLeft.Changed)
-        {
-            UpdatePlayerCountDisplay();
-        }
-    }
-
     private void OnPlayerJoined(List<LobbyPlayerJoined> newPlayers)
     {
         foreach (var player in newPlayers)
@@ -113,4 +107,49 @@ public class MenuManager : MonoBehaviour
         int maxPlayers = isHost ? currentLobby.MaxPlayers - 1 : currentLobby.MaxPlayers;
         playerCountText.text = $"Players: {playerCount}/{maxPlayers}";
     }
+
+    private async void StartGame()
+    {
+        if (!isHost)
+        {
+            Debug.LogWarning("Only the host can start the game.");
+            return;
+        }
+
+        try
+        {
+            // Update the lobby to indicate the game is starting
+            var updateOptions = new UpdateLobbyOptions();
+            updateOptions.Data = new Dictionary<string, DataObject>()
+            {
+                {"GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "true")}
+            };
+            await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, updateOptions);
+
+            // The scene loading will be handled in OnLobbyChanged for all players, including the host
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError($"Failed to start the game: {e.Message}");
+        }
+    }
+
+    private void OnLobbyChanged(ILobbyChanges changes)
+    {
+        if (changes.Data.Changed)
+        {
+            if (currentLobby.Data.ContainsKey("GameStarted") && 
+                currentLobby.Data["GameStarted"].Value == "true")
+            {
+                // Load the game scene for all players
+                SceneManager.LoadScene("TestScene");
+            }
+        }
+
+        if (changes.PlayerJoined.Changed || changes.PlayerLeft.Changed)
+        {
+            UpdatePlayerCountDisplay();
+        }
+    }
+
 }
