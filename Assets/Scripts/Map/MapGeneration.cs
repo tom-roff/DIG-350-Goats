@@ -57,6 +57,9 @@ public class MapGeneration : MonoBehaviour
 
                     switch(map[i,j]) 
                     {
+                    case 1:
+                        tileInstance.GetComponent<Image>().color = Color.white;
+                        break;
                     case 0:
                         tileInstance.GetComponent<Image>().color = Color.gray;
                         break;

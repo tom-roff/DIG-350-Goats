@@ -41,6 +41,10 @@ public class PlayerBehavior_Map : MonoBehaviour
             playerX = i;
             playerY = j;
             this.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+            if(mapReference.map[i, j] == 0){
+                mapReference.map[i, j] = 1;
+                mapReference.tiles[i, j].GetComponent<Image>().color = Color.white;
+            }
         }
     }
 
