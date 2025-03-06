@@ -51,19 +51,12 @@ public class MenuManager : MonoBehaviour
 
     private async void JoinGame()
     {
-        try
-        {
-            currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCodeInput.text);
-            Debug.Log($"Joined lobby: {currentLobby.Name}");
-            SubscribeToLobbyEvents();
-            isHost = false;
-            UpdatePlayerCountDisplay();
-            playerCountText.gameObject.SetActive(true);
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError($"Failed to join lobby: {e.Message}");
-        }
+        currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCodeInput.text);
+        Debug.Log($"Joined lobby: {currentLobby.Name}");
+        SubscribeToLobbyEvents();
+        isHost = false;
+        UpdatePlayerCountDisplay();
+        playerCountText.gameObject.SetActive(true);
     }
 
     private async void SubscribeToLobbyEvents()
@@ -73,14 +66,7 @@ public class MenuManager : MonoBehaviour
         callbacks.PlayerJoined += OnPlayerJoined;
         callbacks.PlayerLeft += OnPlayerLeft;
 
-        try
-        {
-            await LobbyService.Instance.SubscribeToLobbyEventsAsync(currentLobby.Id, callbacks);
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError($"Failed to subscribe to lobby events: {e.Message}");
-        }
+        await LobbyService.Instance.SubscribeToLobbyEventsAsync(currentLobby.Id, callbacks);
     }
 
     private void OnPlayerJoined(List<LobbyPlayerJoined> newPlayers)
@@ -103,35 +89,19 @@ public class MenuManager : MonoBehaviour
 
     private void UpdatePlayerCountDisplay()
     {
-        playerCount = currentLobby.Players.Count;
-        int maxPlayers = isHost ? currentLobby.MaxPlayers - 1 : currentLobby.MaxPlayers;
+        playerCount = currentLobby.Players.Count - 1;
+        int maxPlayers = currentLobby.MaxPlayers;
         playerCountText.text = $"Players: {playerCount}/{maxPlayers}";
     }
 
     private async void StartGame()
     {
-        if (!isHost)
+        var updateOptions = new UpdateLobbyOptions();
+        updateOptions.Data = new Dictionary<string, DataObject>()
         {
-            Debug.LogWarning("Only the host can start the game.");
-            return;
-        }
-
-        try
-        {
-            // Update the lobby to indicate the game is starting
-            var updateOptions = new UpdateLobbyOptions();
-            updateOptions.Data = new Dictionary<string, DataObject>()
-            {
-                {"GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "true")}
-            };
-            await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, updateOptions);
-
-            // The scene loading will be handled in OnLobbyChanged for all players, including the host
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError($"Failed to start the game: {e.Message}");
-        }
+            {"GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "true")}
+        };
+        await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, updateOptions);
     }
 
     private void OnLobbyChanged(ILobbyChanges changes)
@@ -151,5 +121,4 @@ public class MenuManager : MonoBehaviour
             UpdatePlayerCountDisplay();
         }
     }
-
 }
