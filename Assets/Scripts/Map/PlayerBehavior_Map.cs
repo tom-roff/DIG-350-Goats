@@ -41,6 +41,7 @@ public class PlayerBehavior_Map : MonoBehaviour
             playerX = i;
             playerY = j;
             this.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+            mapReference.CheckPosition(playerX, playerY);
         }
     }
 
