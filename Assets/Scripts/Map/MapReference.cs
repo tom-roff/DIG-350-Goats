@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MapReference : MonoBehaviour
 {
@@ -85,11 +86,24 @@ public class MapReference : MonoBehaviour
 
     void CheckVisited(Vector2 pos)
     {
-        if(map[(int)pos.x,(int)pos.y] == 0)
+        switch(map[(int)pos.x,(int)pos.y])
         {
-            map[(int)pos.x,(int)pos.y] = 1;
-            ChangeColor(pos);
+            case 0:
+                map[(int)pos.x,(int)pos.y] = 1;
+                ChangeColor(pos);
+                break;
+            case 2:
+                Debug.Log("Minigame");
+                SceneManager.LoadScene("TEST_MapMinigame");
+                break;
+            case 3:
+                Debug.Log("Item");
+                break;
+            default:
+                break;
         }
+
+        
         
     }
 
