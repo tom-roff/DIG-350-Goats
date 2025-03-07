@@ -70,6 +70,9 @@ public class MapReference : MonoBehaviour
             }
     }
 
+
+
+
     void CheckVisited(Vector2 pos)
     {
         if(map[(int)pos.x,(int)pos.y] == 0)
