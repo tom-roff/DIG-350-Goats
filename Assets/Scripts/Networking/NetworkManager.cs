@@ -1,38 +1,26 @@
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
-using UnityEngine;
-using UnityEngine.UI;
 using Unity.Services.Lobbies.Models;
-using TMPro;
+using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class MenuManager : MonoBehaviour
+public class NetworkManager : MonoBehaviour
 {
-    public Button hostButton;
-    public TMP_Text joinCodeText;
-    public TMP_InputField joinCodeInput;
-    public Button joinButton;
-    public TMP_Text playerCountText;
-    public Button startGameButton;
-    private int playerCount = 0;
     private Lobby currentLobby;
     private bool isHost = false;
+    private MenuManager menuManager;
 
-    private async void Start()
+    public async void Initialize(MenuManager manager)
     {
+        menuManager = manager;
+
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-        hostButton.onClick.AddListener(HostGame);
-        joinButton.onClick.AddListener(JoinGame);
-        startGameButton.onClick.AddListener(StartGame);
-        startGameButton.gameObject.SetActive(false);
-        playerCountText.gameObject.SetActive(false);
     }
 
-    private async void HostGame()
+    public async void HostGame()
     {
         var lobbyOptions = new CreateLobbyOptions
         {
@@ -40,23 +28,21 @@ public class MenuManager : MonoBehaviour
         };
 
         currentLobby = await LobbyService.Instance.CreateLobbyAsync("My Game", 8, lobbyOptions);
-        joinCodeText.text = $"Join Code: {currentLobby.LobbyCode}";
+        menuManager.UpdateJoinCodeDisplay(currentLobby.LobbyCode);
         Debug.Log($"Lobby created with code: {currentLobby.LobbyCode}");
         SubscribeToLobbyEvents();
         isHost = true;
-        UpdatePlayerCountDisplay();
-        startGameButton.gameObject.SetActive(true);
-        playerCountText.gameObject.SetActive(true);
+        UpdatePlayerCount();
+        menuManager.ShowStartButton(true);
     }
 
-    private async void JoinGame()
+    public async void JoinGame(string joinCode)
     {
-        currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCodeInput.text);
+        currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode);
         Debug.Log($"Joined lobby: {currentLobby.Name}");
         SubscribeToLobbyEvents();
         isHost = false;
-        UpdatePlayerCountDisplay();
-        playerCountText.gameObject.SetActive(true);
+        UpdatePlayerCount();
     }
 
     private async void SubscribeToLobbyEvents()
@@ -75,7 +61,7 @@ public class MenuManager : MonoBehaviour
         {
             Debug.Log($"Player joined: {player.Player.Id} at index {player.PlayerIndex}");
         }
-        UpdatePlayerCountDisplay();
+        UpdatePlayerCount();
     }
 
     private void OnPlayerLeft(List<int> leftPlayerIndices)
@@ -84,17 +70,17 @@ public class MenuManager : MonoBehaviour
         {
             Debug.Log($"Player left at index: {playerIndex}");
         }
-        UpdatePlayerCountDisplay();
+        UpdatePlayerCount();
     }
 
-    private void UpdatePlayerCountDisplay()
+    private void UpdatePlayerCount()
     {
-        playerCount = currentLobby.Players.Count - 1;
+        int playerCount = currentLobby.Players.Count - 1;
         int maxPlayers = currentLobby.MaxPlayers;
-        playerCountText.text = $"Players: {playerCount}/{maxPlayers}";
+        menuManager.UpdatePlayerCountDisplay(playerCount, maxPlayers);
     }
 
-    private async void StartGame()
+    public async void StartGame()
     {
         var updateOptions = new UpdateLobbyOptions();
         updateOptions.Data = new Dictionary<string, DataObject>()
@@ -111,14 +97,13 @@ public class MenuManager : MonoBehaviour
             if (currentLobby.Data.ContainsKey("GameStarted") && 
                 currentLobby.Data["GameStarted"].Value == "true")
             {
-                // Load the game scene for all players
-                SceneManager.LoadScene("TestScene");
+                SceneManager.LoadScene("LaserMinigame");
             }
         }
 
         if (changes.PlayerJoined.Changed || changes.PlayerLeft.Changed)
         {
-            UpdatePlayerCountDisplay();
+            UpdatePlayerCount();
         }
     }
 }
