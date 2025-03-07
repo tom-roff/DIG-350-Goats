@@ -1,17 +1,21 @@
 using UnityEngine;
 
-public class MatchPhoneRot : MonoBehaviour
+public class GyroRotation : MonoBehaviour
 {
     private Gyroscope gyro;
-    private Quaternion rotation;
+    private Quaternion initialRotation;
+    private bool gyroAvailable = false;
 
     void Start()
     {
-        // Check if the device supports the gyroscope
         if (SystemInfo.supportsGyroscope)
         {
             gyro = Input.gyro;
-            gyro.enabled = true;  // Enable the gyroscope
+            gyro.enabled = true;
+            gyroAvailable = true;
+            
+            // Capture the initial rotation as an inverse, so we can apply it as an offset
+            initialRotation = Quaternion.Inverse(ConvertGyroRotation(gyro.attitude));
         }
         else
         {
@@ -21,11 +25,16 @@ public class MatchPhoneRot : MonoBehaviour
 
     void Update()
     {
-        if (gyro != null)
+        if (gyroAvailable)
         {
-            // Get the rotation data from the gyroscope and apply it to the object's rotation
-            rotation = gyro.attitude; // Get the gyroscope's attitude (rotation in space)
-            transform.rotation = new Quaternion(rotation.x, rotation.y, -rotation.z, -rotation.w); // Adjust for Unity's coordinate system
+            // Apply the offset so the object starts with zeroed rotation
+            transform.rotation = initialRotation * ConvertGyroRotation(gyro.attitude);
         }
+    }
+
+    // Convert the gyroscope rotation to Unity's coordinate system
+    private Quaternion ConvertGyroRotation(Quaternion q)
+    {
+        return new Quaternion(q.x, q.y, -q.z, -q.w);
     }
 }
