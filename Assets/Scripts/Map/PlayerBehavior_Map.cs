@@ -65,4 +65,6 @@ public class PlayerBehavior_Map : MonoBehaviour
         if(i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
         return false;
     }
+
+    
 }
