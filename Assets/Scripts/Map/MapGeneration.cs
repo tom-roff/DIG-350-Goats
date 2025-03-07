@@ -60,8 +60,8 @@ public class MapGeneration : MonoBehaviour
                     case 4:
                         tileInstance.GetComponent<Image>().color = Color.green;
                         break;
-                    case 5:
-                        tileInstance.GetComponent<Image>().color = Color.red;
+                    case 3:
+                        tileInstance.GetComponent<Image>().color = Color.yellow;
                         break;
                     default:
                         tileInstance.GetComponent<Image>().color = Color.black;
