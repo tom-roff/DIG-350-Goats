@@ -5,9 +5,11 @@ public class LeverController : MonoBehaviour
     private Animator animator;
     private bool isPulled = false;
 
-    public GameObject TVCamera;
+    //public GameObject TVCamera;
 
-    public GameObject PhoneCamera;
+    //public GameObject PhoneCamera;
+
+    private NetworkManager network;
 
     void Start()
     {
@@ -17,7 +19,7 @@ public class LeverController : MonoBehaviour
             Debug.LogError("Animator component missing from lever!");
         }
 
-        if (IsMainScreen())
+        /*if (IsMainScreen())
         {
             TVCamera.SetActive(true);
             PhoneCamera.SetActive(false);
@@ -26,7 +28,7 @@ public class LeverController : MonoBehaviour
         {
             TVCamera.SetActive(false);
             PhoneCamera.SetActive(true);
-        }
+        }*/
     }
 
     void Update()
@@ -53,8 +55,14 @@ public class LeverController : MonoBehaviour
         }
     }
 
-    bool IsMainScreen()
+    /*bool IsMainScreen()
     {
-        return false;
-    }
+        if (network.isHost){
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    }*/
 }
