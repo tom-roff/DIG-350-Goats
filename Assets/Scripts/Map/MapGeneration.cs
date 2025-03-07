@@ -57,22 +57,21 @@ public class MapGeneration : MonoBehaviour
 
                     switch(map[i,j]) 
                     {
-                    case 1:
-                        tileInstance.GetComponent<Image>().color = Color.white;
-                        break;
-                    case 0:
-                        tileInstance.GetComponent<Image>().color = Color.gray;
-                        break;
                     case 4:
                         tileInstance.GetComponent<Image>().color = Color.green;
                         break;
-                    default:
+                    case 5:
                         tileInstance.GetComponent<Image>().color = Color.red;
+                        break;
+                    default:
+                        tileInstance.GetComponent<Image>().color = Color.black;
                         break;
                     }
                 }
             }
         }
     }
+
+    
 
 }
