@@ -102,7 +102,26 @@ public class MapReference : MonoBehaviour
     }
 
 
-
+    double ExploredCounter(int[,] map){
+        int total = 0;
+        int explored = 0;
+        int map_discovered = 0;
+        for (int i = 0; i < map.GetLength(1); i++){
+            for (int j = 0; j < map.GetLength(0); j++){
+                if(map[i, j] == 0 || map[i, j] == 1){
+                    total += 1;
+                }
+                if(map[i, j] == 1){
+                    explored += 1;
+                }
+            }
+        }
+        map_discovered = explored / total;
+        if (map_discovered == 1){
+            Debug.Log("You discovered the whole map !!");
+        }
+        return map_discovered;
+    }
 
     void CheckVisited(Vector2 pos)
     {
@@ -122,10 +141,7 @@ public class MapReference : MonoBehaviour
                 break;
             default:
                 break;
-        }
-
-        
-        
+        }       
     }
 
     public void CheckPosition(int x, int y)
