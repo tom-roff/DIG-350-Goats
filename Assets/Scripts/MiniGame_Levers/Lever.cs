@@ -9,7 +9,7 @@ public class LeverController : MonoBehaviour
 
     //public GameObject PhoneCamera;
 
-    private NetworkManager network;
+    private OurNetwork network;
 
     void Start()
     {
