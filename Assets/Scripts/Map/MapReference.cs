@@ -122,32 +122,30 @@ public class MapReference : MonoBehaviour
     }
 
 
-    // double ExploredCounter(int[,] map)
-    // {
-    //     int total = 0;
-    //     int explored = 0;
-    //     int map_discovered = 0;
-    //     for (int i = 0; i < map.GetLength(1); i++)
-    //     {
-    //         for (int j = 0; j < map.GetLength(0); j++)
-    //         {
-    //             if (map[i, j] == Tiles.Unexplored || map[i, j] == Tiles.Explored || map[i,j] == Tiles.Peaked)
-    //             {
-    //                 total += 1;
-    //             }
-    //             if (map[i, j] == Tiles.Explored)
-    //             {
-    //                 explored += 1;
-    //             }
-    //         }
-    //     }
-    //     map_discovered = explored / total;
-    //     if (map_discovered == 1)
-    //     {
-    //         Debug.Log("You discovered the whole map !!");
-    //     }
-    //     return map_discovered;
-    // }
+    void ExploredCounter()
+    {
+        int total = 0;
+        int explored = 0;
+        int map_discovered = 0;
+        for (int i = 0; i < mapHeight; i++)
+        {
+            for (int j = 0; j < mapWidth; j++)
+            {
+                if (tiles[i,j] != null)
+                {
+                    total += 1;
+                }
+                if (map[i, j].ToString().Contains("Explored"))
+                {
+                    explored += 1;
+                }
+            }
+        }
+        total-=2; // end and start tiles
+        map_discovered = explored / total;
+        if (map_discovered == 1) Debug.Log("You discovered the whole map !!");
+        
+    }
 
     void CheckVisited(Vector2 pos)
     {
@@ -202,6 +200,7 @@ public class MapReference : MonoBehaviour
         if (InBounds(x, y - 1) && tiles[x, y - 1] != null) CheckSurrounding(new Vector2(x, y - 1)); // left
 
         CheckVisited(new Vector2(x, y));
+        ExploredCounter();
     }
 
     bool InBounds(int i, int j)
