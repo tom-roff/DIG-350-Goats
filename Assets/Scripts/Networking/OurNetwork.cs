@@ -6,10 +6,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class NetworkManager : MonoBehaviour
+public class OurNetwork : MonoBehaviour
 {
     private Lobby currentLobby;
-    private bool isHost = false;
+    public bool isHost = false;
     private MenuManager menuManager;
 
     public async void Initialize(MenuManager manager)

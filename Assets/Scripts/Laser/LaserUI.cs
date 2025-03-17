@@ -3,19 +3,15 @@ using UnityEngine;
 
 public class LaserUI : NetworkBehaviour
 {
-    public override void OnNetworkSpawn()
+    void Awake()
     {
-        if (!IsHost)
+        if (GameManager.Instance.OurNetwork.isHost)
         {
-            gameObject.SetActive(false);
+            this.gameObject.SetActive(true);
         }
-    }
-
-    void Update()
-    {
-        if (!IsHost)
+        else
         {
-            gameObject.SetActive(false);
+            this.gameObject.SetActive(false);
         }
     }
 }
