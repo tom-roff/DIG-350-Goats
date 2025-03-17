@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class PlayerBehavior_Map : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] public MapReference mapReference;
     int mapWidth;
     int mapHeight;
     public int playerX;
@@ -14,8 +13,8 @@ public class PlayerBehavior_Map : MonoBehaviour
     [SerializeField] public GameObject startButton;
     public void OnStart()
     {
-        mapWidth = mapReference.map.GetLength(1);
-        mapHeight = mapReference.map.GetLength(0);
+        mapWidth = MapReference.Instance.map.GetLength(1);
+        mapHeight = MapReference.Instance.map.GetLength(0);
         FindStart();
         startButton.SetActive(false);
         playing = true;
@@ -23,25 +22,35 @@ public class PlayerBehavior_Map : MonoBehaviour
 
     void FindStart()
     {
-        for(int j = 0; j < mapWidth; j++)
+        if(MapReference.Instance.playerPosition.x == Vector2.positiveInfinity.x)
         {
-            if(mapReference.map[0,j] == 4)
-            {
-                MovePlayer(0,j);
-            }
             
+            for(int j = 0; j < mapWidth; j++)
+            {
+                if(MapReference.Instance.map[0,j] == 4)
+                {
+                    MovePlayer(0,j);
+                }
+                
+            }
         }
+        else
+        {
+            MovePlayer((int)MapReference.Instance.playerPosition.x, (int)MapReference.Instance.playerPosition.y);
+        }
+        
     }
 
     void MovePlayer(int i, int j)
     {
-        if(InBounds(i,j) && mapReference.map[i, j] != -1)
+        if(InBounds(i,j) && MapReference.Instance.map[i, j] != -1)
         {
-            this.transform.SetParent(mapReference.tiles[i,j].transform);
+            this.transform.SetParent(MapReference.Instance.tiles[i,j].transform);
             playerX = i;
             playerY = j;
+            MapReference.Instance.SetPlayerPosition(i,j);
             this.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-            mapReference.CheckPosition(playerX, playerY);
+            MapReference.Instance.CheckPosition(playerX, playerY);
         }
     }
 

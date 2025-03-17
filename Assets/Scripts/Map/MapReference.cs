@@ -7,8 +7,27 @@ using UnityEngine.SceneManagement;
 public class MapReference : MonoBehaviour
 {
 
+    private static MapReference _Instance;
+	public static MapReference Instance
+	{
+		get
+		{
+			if (!_Instance)
+			{
+				_Instance = new GameObject().AddComponent<MapReference>();
+				// name it for easy recognition
+				_Instance.name = _Instance.GetType().ToString();
+				// mark root as DontDestroyOnLoad();
+				DontDestroyOnLoad(_Instance.gameObject);
+			}
+			return _Instance;
+		}
+	}
+
+
     public GameObject[,] tiles;
-    
+    public Vector2 playerPosition = Vector2.positiveInfinity;
+
    /*
    Map Syntax:
    -1 = wall
@@ -18,6 +37,7 @@ public class MapReference : MonoBehaviour
    3 = item
    4 = start
    5 = end
+   
    This may be changed later
    */
 
@@ -33,24 +53,24 @@ public class MapReference : MonoBehaviour
     //               { -1, 0, 0,0,0},    
     //               { -1, -1, 5,-1,-1}};
 
-/*     public int[,] map = {{ -1, -1, 4,-1,-1,-1,-1,-1,-1},
+     public int[,] map = {{ -1, -1, 4,-1,-1,-1,-1,-1,-1},
                   { -1, 0, 0,-1,0,-1,-1,-1,-1},    
                   { -1, 0, -1,-1,0,0,0,0,0},    
                   { 3, 0, -1,-1,0,-1,-1,-1,-1},    
                   { -1, 0, -1,-1,0,-1,-1,-1,-1},    
                   { -1, 0, -1,-1,0,-1,-1,-1,-1},    
                   { -1, 0, 0,0,0,2,-1,-1,-1},    
-                  { -1, -1, 5,-1,-1,-1,-1,-1,-1}}; */
+                  { -1, -1, 5,-1,-1,-1,-1,-1,-1}}; 
 
-    public int[,] map = {{ 0, 3, -1, 4, -1, 5, 0, 0, 0, -1},
-                  { 0, -1, 0, 0, -1, -1, -1, -1, 0, -1},    
-                  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                  { -1, -1, -1, 0, -1, -1, -1, -1, 0, -1},
-                  { -1, 0, 0, 0, -1, -1, 0, 0, 0, -1},
-                  { -1, -1, -1, 0, -1, -1, 0, -1, 0, -1},
-                  { 0, 3, -1, 0, 0, 0, 0, -1, 0, -1},    
-                  { 0, -1, -1, 0, -1, 0, -1, -1, 0, -1},    
-                  { 0, 0, 0, 0, 0, 0, -1, -1, 0, 3}};
+    // public int[,] map = {{ 0, 3, -1, 4, -1, 5, 0, 0, 0, -1},
+    //               { 0, -1, 0, 0, -1, -1, -1, -1, 0, -1},    
+    //               { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    //               { -1, -1, -1, 0, -1, -1, -1, -1, 0, -1},
+    //               { -1, 0, 0, 0, -1, -1, 0, 0, 0, -1},
+    //               { -1, -1, -1, 0, -1, -1, 0, -1, 0, -1},
+    //               { 0, 3, -1, 0, 0, 0, 0, -1, 0, -1},    
+    //               { 0, -1, -1, 0, -1, 0, -1, -1, 0, -1},    
+    //               { 0, 0, 0, 0, 0, 0, -1, -1, 0, 3}};
 
 
 
@@ -94,6 +114,7 @@ public class MapReference : MonoBehaviour
                 break;
             case 2:
                 Debug.Log("Minigame");
+                map[(int)pos.x,(int)pos.y] = 1;
                 SceneManager.LoadScene("TEST_MapMinigame");
                 break;
             case 3:
@@ -121,6 +142,12 @@ public class MapReference : MonoBehaviour
     {
         if(i > -1 && i < map.GetLength(0) && j > -1 && j < map.GetLength(1)) return true;
         return false;
+    }
+
+    public void SetPlayerPosition(int x, int y)
+    {
+        playerPosition.x = x;
+        playerPosition.y = y;
     }
 
 }

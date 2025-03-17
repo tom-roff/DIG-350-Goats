@@ -12,7 +12,6 @@ public class MapGeneration : MonoBehaviour
     int mapHeight;
 
     [Header("References")]
-    [SerializeField] public MapReference mapReference;
     [SerializeField] public GameObject tileParent;
     [SerializeField] public GameObject tilePrefab;
 
@@ -25,13 +24,13 @@ public class MapGeneration : MonoBehaviour
 
     void Start()
     {
-        map = mapReference.map;
+        map = MapReference.Instance.map;
         mapWidth = map.GetLength(1);
         mapHeight = map.GetLength(0);
         tileWidth = (1-(xMargin*2)) / mapWidth;
         tileHeight = (1-(yMargin*2)) / mapHeight;
 
-        mapReference.tiles = new GameObject[mapHeight, mapWidth];
+        MapReference.Instance.tiles = new GameObject[mapHeight, mapWidth];
 
         GenerateMap();
     }
@@ -54,7 +53,7 @@ public class MapGeneration : MonoBehaviour
                     tileInstance.GetComponent<RectTransform>().offsetMin = new Vector2(0,0);
                     tileInstance.GetComponent<RectTransform>().offsetMax = new Vector2(0,0);
                     tileInstance.name = i + ", " + j;
-                    mapReference.tiles[i,j] = tileInstance;
+                    MapReference.Instance.tiles[i,j] = tileInstance;
 
                     switch(map[i,j]) 
                     {
