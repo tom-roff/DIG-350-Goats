@@ -35,6 +35,6 @@ public class GyroRotation : MonoBehaviour
     // Convert the gyroscope rotation to Unity's coordinate system
     private Quaternion ConvertGyroRotation(Quaternion q)
     {
-        return new Quaternion(q.x, q.y, -q.z, -q.w);
+        return new Quaternion(q.x, q.z, q.y, -q.w);
     }
 }
