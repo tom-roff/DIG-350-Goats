@@ -121,4 +121,31 @@ public class OurNetwork : MonoBehaviour
     {
         return AuthenticationService.Instance.PlayerId;
     }
+
+    public void SendVibrationSignal(int playerToVibrate)
+    {
+        foreach (var player in playerIndexMap)
+        {
+            string playerID = player.Key;
+            int playerIndex = player.Value;
+
+            if (playerIndex == playerToVibrate)
+            {
+                RpcVibratePhone(playerID); // Send a remote command to vibrate
+            }
+        }
+    }
+    
+    [Unity.Netcode.ClientRpc] // or [ServerRpc] depending on your setup
+    public void RpcVibratePhone(string targetPlayerId)
+    {
+        // Only vibrate if this is the correct player
+        if (GetLocalPlayerId() == targetPlayerId)
+        {
+    #if UNITY_ANDROID || UNITY_IOS
+            Handheld.Vibrate(); // Vibrates on mobile devices
+            Debug.Log($"Vibrating phone for player {targetPlayerId}");
+    #endif
+        }
+    }
 }

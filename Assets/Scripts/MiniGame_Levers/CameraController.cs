@@ -6,10 +6,15 @@ public class CameraController : MonoBehaviour
     private string playerId;
     private OurNetwork network;
 
+
     public GameObject[] playerCameras; // Array of cameras for each player index
 
     public GameObject TVCamera;
     private bool isHost;
+
+
+    public int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
+    private int currentLeverIndex = 0;
     void Start()
     {
         for (int i = 0; i < playerCameras.Length; i++){
@@ -51,5 +56,57 @@ public class CameraController : MonoBehaviour
         }
 
         Debug.Log($"Camera assigned for player index {playerIndex}");
+
+                // Start listening for vibration if this is the next lever to be pulled
+        if (playerIndex == leverOrder[currentLeverIndex])
+        {
+            VibratePhone();
+        }
+    }
+
+    // Host starts the sequence
+    void StartLeverSequence()
+    {
+        Debug.Log("Starting lever sequence...");
+        currentLeverIndex = 0;
+        SendVibrationToPlayer(leverOrder[currentLeverIndex]);
+    }
+
+    // Sends vibration to the correct player
+    void SendVibrationToPlayer(int playerToVibrate)
+    {
+        network.SendVibrationSignal(playerToVibrate); // Send signal to vibrate
+    }
+
+    // Called by the lever when it is pulled correctly
+    public void OnLeverPulled(int pulledLeverIndex)
+    {
+        if (pulledLeverIndex == leverOrder[currentLeverIndex])
+        {
+            Debug.Log($"Lever {pulledLeverIndex} pulled correctly!");
+            currentLeverIndex++;
+
+            if (currentLeverIndex < leverOrder.Length)
+            {
+                SendVibrationToPlayer(leverOrder[currentLeverIndex]);
+            }
+            else
+            {
+                Debug.Log("All levers have been pulled in order!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Incorrect lever pulled! Try again.");
+        }
+    }
+
+
+    void VibratePhone()
+    {
+#if UNITY_ANDROID
+        Handheld.Vibrate(); // Vibrates on Android devices
+#endif
+        Debug.Log($"Phone vibrated for player {playerIndex}");
     }
 }
