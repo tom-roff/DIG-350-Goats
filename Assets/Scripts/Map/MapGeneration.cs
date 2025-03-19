@@ -8,8 +8,6 @@ public class MapGeneration : MonoBehaviour
 {
     float tileWidth;
     float tileHeight;
-    int mapWidth;
-    int mapHeight;
 
     [Header("References")]
     [SerializeField] public GameObject tileParent;
@@ -23,23 +21,21 @@ public class MapGeneration : MonoBehaviour
 
     void OnEnable()
     {
-        mapWidth = MapReference.Instance.map.GetLength(1);
-        mapHeight = MapReference.Instance.map.GetLength(0);
-        tileWidth = (1-(xMargin*2)) / mapWidth;
-        tileHeight = (1-(yMargin*2)) / mapHeight;
+        tileWidth = (1-(xMargin*2)) / MapManager.Instance.mapWidth;
+        tileHeight = (1-(yMargin*2)) / MapManager.Instance.mapHeight;
 
-        MapReference.Instance.tiles = new GameObject[mapHeight, mapWidth];
+        MapManager.Instance.tiles = new GameObject[MapManager.Instance.mapHeight, MapManager.Instance.mapWidth];
 
         GenerateMap();
     }
 
     void GenerateMap()
     {
-        for (int i = 0; i < mapHeight; i++)
+        for (int i = 0; i < MapManager.Instance.mapHeight; i++)
         {
-            for (int j = 0; j < mapWidth; j++)
+            for (int j = 0; j < MapManager.Instance.mapWidth; j++)
             {
-                if (MapReference.Instance.map[i, j] != MapReference.Tiles.Wall)
+                if (MapManager.Instance.map[i, j] != MapManager.Tiles.Wall)
                 {
                     float xStart = xMargin + (j * tileWidth);
                     float yStart = yMargin + (i * tileHeight);
@@ -51,9 +47,9 @@ public class MapGeneration : MonoBehaviour
                     tileInstance.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
                     tileInstance.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
                     tileInstance.name = i + ", " + j;
-                    MapReference.Instance.tiles[i, j] = tileInstance;
+                    MapManager.Instance.tiles[i, j] = tileInstance;
 
-                    MapReference.Instance.ChangeColor(new Vector2(i, j));
+                    MapManager.Instance.ChangeColor(new Vector2(i, j));
                 }
             }
         }
