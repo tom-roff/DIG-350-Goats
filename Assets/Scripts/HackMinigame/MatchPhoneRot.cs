@@ -19,6 +19,7 @@ public class GyroRotation : NetworkBehaviour
             gyro = Input.gyro;
             gyro.enabled = true;
             gyroAvailable = true;
+
             
             // Capture the initial rotation as an inverse, so we can apply it as an offset
             initialRotation = Quaternion.Inverse(ConvertGyroRotation(gyro.attitude));
@@ -31,10 +32,10 @@ public class GyroRotation : NetworkBehaviour
 
     void Update()
     {
-        if(IsServer == true)
+        // if(IsServer == true)
             // Apply the offset so the object starts with zeroed rotation
-
-            avg = gyro_inputs.Average<Quaternion>();
+            Debug.Log(gyro.attitude);
+            // avg = gyro_inputs.Average<Quaternion>();
             transform.rotation = initialRotation * ConvertGyroRotation(gyro.attitude);
     }
 
