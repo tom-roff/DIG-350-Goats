@@ -121,4 +121,20 @@ public class OurNetwork : MonoBehaviour
     {
         return AuthenticationService.Instance.PlayerId;
     }
+
+    public void SendVibrationSignal(int playerToVibrate)
+    {
+        foreach (var player in connectedPlayers)
+        {
+            if (player.PlayerIndex == playerToVibrate)
+            {
+                player.RpcVibratePhone(); // Send a remote command to vibrate
+            }
+        }
+    }
+    public void RpcVibratePhone()
+    {
+        Handheld.Vibrate(); // Vibrates the player's phone
+        Debug.Log("Vibrating phone...");
+    }
 }
