@@ -5,11 +5,8 @@ public class LeverController : MonoBehaviour
     private Animator animator;
     private bool isPulled = false;
 
-    //public GameObject TVCamera;
-
-    //public GameObject PhoneCamera;
-
-    private OurNetwork network;
+    public int PlayerID;
+    private CameraController cameraController;
 
     void Start()
     {
@@ -19,15 +16,10 @@ public class LeverController : MonoBehaviour
             Debug.LogError("Animator component missing from lever!");
         }
 
-        /*if (IsMainScreen())
+        /*cameraController = FindObjectOfType<CameraController>();
+        if (cameraController == null)
         {
-            TVCamera.SetActive(true);
-            PhoneCamera.SetActive(false);
-        }
-        else
-        {
-            TVCamera.SetActive(false);
-            PhoneCamera.SetActive(true);
+            Debug.LogError("CameraController not found in the scene!");
         }*/
     }
 
