@@ -12,6 +12,8 @@ public class OurNetwork : MonoBehaviour
     public bool isHost = false;
     private MenuManager menuManager;
 
+    private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+
     public async void Initialize(MenuManager manager)
     {
         menuManager = manager;
@@ -60,6 +62,7 @@ public class OurNetwork : MonoBehaviour
         foreach (var player in newPlayers)
         {
             Debug.Log($"Player joined: {player.Player.Id} at index {player.PlayerIndex}");
+            playerIndexMap[player.Player.Id] = player.PlayerIndex;
         }
         UpdatePlayerCount();
     }
@@ -105,5 +108,17 @@ public class OurNetwork : MonoBehaviour
         {
             UpdatePlayerCount();
         }
+    }
+
+    // Public method to get PlayerIndex
+    public int GetPlayerIndex(string playerId)
+    {
+        return playerIndexMap.ContainsKey(playerId) ? playerIndexMap[playerId] : -1;
+    }
+
+    // Public method to get local player's ID
+    public string GetLocalPlayerId()
+    {
+        return AuthenticationService.Instance.PlayerId;
     }
 }

@@ -1,10 +1,16 @@
+using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
 
-public class GyroRotation : MonoBehaviour
+public class GyroRotation : NetworkBehaviour
 {
     private Gyroscope gyro;
     private Quaternion initialRotation;
     private bool gyroAvailable = false;
+    private List<Quaternion> gyro_inputs = new List<Quaternion>();
+
+    private Quaternion avg;
 
     void Start()
     {
@@ -25,11 +31,11 @@ public class GyroRotation : MonoBehaviour
 
     void Update()
     {
-        if (gyroAvailable)
-        {
+        if(IsServer == true)
             // Apply the offset so the object starts with zeroed rotation
+
+            avg = gyro_inputs.Average<Quaternion>();
             transform.rotation = initialRotation * ConvertGyroRotation(gyro.attitude);
-        }
     }
 
     // Convert the gyroscope rotation to Unity's coordinate system
