@@ -131,21 +131,38 @@ public class OurNetwork : MonoBehaviour
 
             if (playerIndex == playerToVibrate)
             {
-                RpcVibratePhone(playerID); // Send a remote command to vibrate
+                // Find the targeted client's network ID
+                ulong targetClientId = GetClientIdByPlayerId(playerID);
+                if (targetClientId != 0)
+                {
+                    ClientRpcParams clientRpcParams = new ClientRpcParams
+                    {
+                        Send = new ClientRpcSendParams
+                        {
+                            TargetClientIds = new ulong[] { targetClientId }
+                        }
+                    };
+
+                    RpcVibratePhoneClientRpc(clientRpcParams);
+                }
             }
         }
     }
-    
-    [Unity.Netcode.ClientRpc] // or [ServerRpc] depending on your setup
-    public void RpcVibratePhone(string targetPlayerId)
+
+// Example method to get Client ID (implement accordingly)
+private ulong GetClientIdByPlayerId(string playerId)
+{
+    // Logic to get the correct client ID based on playerId
+    return 0; // Replace with real client ID
+}
+
+
+    [Unity.Netcode.ClientRpc]
+    public void RpcVibratePhoneClientRpc(ClientRpcParams clientRpcParams)
     {
-        // Only vibrate if this is the correct player
-        if (GetLocalPlayerId() == targetPlayerId)
-        {
     #if UNITY_ANDROID || UNITY_IOS
-            Handheld.Vibrate(); // Vibrates on mobile devices
-            Debug.Log($"Vibrating phone for player {targetPlayerId}");
+        Handheld.Vibrate();
+        Debug.Log("Vibrating phone...");
     #endif
-        }
     }
 }
