@@ -152,7 +152,7 @@ public class OurNetwork : MonoBehaviour
         }
     }
 
-    private ulong GetClientIdByPlayerId(string playerId)
+    static private ulong GetClientIdByPlayerId(string playerId)
     {
         return playerIdToClientIdMap(playerId);
     }
