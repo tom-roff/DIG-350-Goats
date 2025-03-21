@@ -152,11 +152,9 @@ public class OurNetwork : MonoBehaviour
         }
     }
 
-    // Example method to get Client ID (implement accordingly)
     private ulong GetClientIdByPlayerId(string playerId)
     {
-        // Logic to get the correct client ID based on playerId
-        return 0; // Replace with real client ID
+        return playerIdToClientIdMap(playerId);
     }
 
 
