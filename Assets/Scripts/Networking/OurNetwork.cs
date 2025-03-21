@@ -12,7 +12,10 @@ public class OurNetwork : MonoBehaviour
     public bool isHost = false;
     private MenuManager menuManager;
 
+    // Mapping from authentication to player index
     private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+    // Mapping from authentication to netcode id
+    private Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
 
     public async void Initialize(MenuManager manager)
     {
@@ -149,12 +152,12 @@ public class OurNetwork : MonoBehaviour
         }
     }
 
-// Example method to get Client ID (implement accordingly)
-private ulong GetClientIdByPlayerId(string playerId)
-{
-    // Logic to get the correct client ID based on playerId
-    return 0; // Replace with real client ID
-}
+    // Example method to get Client ID (implement accordingly)
+    private ulong GetClientIdByPlayerId(string playerId)
+    {
+        // Logic to get the correct client ID based on playerId
+        return 0; // Replace with real client ID
+    }
 
 
     [Unity.Netcode.ClientRpc]
