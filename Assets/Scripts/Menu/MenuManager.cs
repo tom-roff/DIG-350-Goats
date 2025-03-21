@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour
     public Button startGameButton;
 
     [SerializeField] private OurNetwork ourNetwork;
+    [SerializeField] private LobbyManager lobbyManager;
 
     private void Start()
     {
@@ -26,10 +27,11 @@ public class MenuManager : MonoBehaviour
         }
 
         ourNetwork.Initialize(this);
+        // lobbyManager.Initialize(this);
 
-        hostButton.onClick.AddListener(ourNetwork.HostGame);
-        joinButton.onClick.AddListener(() => ourNetwork.JoinGame(joinCodeInput.text));
-        startGameButton.onClick.AddListener(ourNetwork.StartGame);
+        hostButton.onClick.AddListener(lobbyManager.HostGame);
+        joinButton.onClick.AddListener(() => lobbyManager.JoinGame(joinCodeInput.text));
+        startGameButton.onClick.AddListener(lobbyManager.StartGame);
         startGameButton.gameObject.SetActive(false);
         playerCountText.gameObject.SetActive(false);
     }

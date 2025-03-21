@@ -15,8 +15,6 @@ public class LobbyManager : MonoBehaviour
     
     // Mapping from authentication to player index
     private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
-    // Mapping from authentication to netcode id
-    private Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
 
     public async void Initialize(MenuManager manager, OurNetwork network)
     {
