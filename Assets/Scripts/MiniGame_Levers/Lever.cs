@@ -5,9 +5,23 @@ public class LeverController : MonoBehaviour
     private Animator animator;
     private bool isPulled = false;
 
+    public int leverIndex;
+    public int PlayerID;
+    private CameraController cameraController;
+
     void Start()
     {
         animator = GetComponent<Animator>();
+        if (animator == null)
+        {
+            Debug.LogError("Animator component missing from lever!");
+        }
+
+        cameraController = FindFirstObjectByType<CameraController>();
+        if (cameraController == null)
+        {
+            Debug.LogError("CameraController not found in the scene!");
+        }
     }
 
     void Update()
@@ -25,7 +39,13 @@ public class LeverController : MonoBehaviour
 
     void PullLever()
     {
-        isPulled = true;
-        animator.SetTrigger("isPulled");
+        if (!isPulled)
+        {
+            isPulled = true;
+            animator.SetTrigger("IsPulled");
+            GetComponent<Collider>().enabled = false; // Disable collider so it can't be touched again
+            Debug.Log($"Lever {leverIndex} pulled!");
+            cameraController.OnLeverPulled(leverIndex);
+        }
     }
 }

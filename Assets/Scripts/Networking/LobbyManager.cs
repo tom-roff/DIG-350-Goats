@@ -6,15 +6,20 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class NetworkManager : MonoBehaviour
+public class LobbyManager : MonoBehaviour
 {
     private Lobby currentLobby;
-    private bool isHost = false;
+    public bool isHost = false;
     private MenuManager menuManager;
+    private OurNetwork ourNetwork;
+    
+    // Mapping from authentication to player index
+    private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
 
-    public async void Initialize(MenuManager manager)
+    public async void Initialize(MenuManager manager, OurNetwork network)
     {
         menuManager = manager;
+        ourNetwork = network;
 
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -60,6 +65,7 @@ public class NetworkManager : MonoBehaviour
         foreach (var player in newPlayers)
         {
             Debug.Log($"Player joined: {player.Player.Id} at index {player.PlayerIndex}");
+            playerIndexMap[player.Player.Id] = player.PlayerIndex;
         }
         UpdatePlayerCount();
     }
@@ -105,5 +111,17 @@ public class NetworkManager : MonoBehaviour
         {
             UpdatePlayerCount();
         }
+    }
+
+    // Public method to get PlayerIndex
+    public int GetPlayerIndex(string playerId)
+    {
+        return playerIndexMap.ContainsKey(playerId) ? playerIndexMap[playerId] : -1;
+    }
+
+    // Public method to get local player's ID
+    public string GetLocalPlayerId()
+    {
+        return AuthenticationService.Instance.PlayerId;
     }
 }

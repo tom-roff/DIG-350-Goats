@@ -11,25 +11,27 @@ public class MenuManager : MonoBehaviour
     public TMP_Text playerCountText;
     public Button startGameButton;
 
-    [SerializeField] private NetworkManager networkManager;
+    [SerializeField] private OurNetwork ourNetwork;
+    [SerializeField] private LobbyManager lobbyManager;
 
     private void Start()
     {
-        if (networkManager == null)
+        if (ourNetwork == null)
         {
-            networkManager = FindObjectOfType<NetworkManager>();
-            if (networkManager == null)
+            ourNetwork = FindObjectOfType<OurNetwork>();
+            if (ourNetwork == null)
             {
-                Debug.LogError("NetworkManager not found in the scene!");
+                Debug.LogError("ourNetwork not found in the scene!");
                 return;
             }
         }
 
-        networkManager.Initialize(this);
+        ourNetwork.Initialize(this);
+        // lobbyManager.Initialize(this);
 
-        hostButton.onClick.AddListener(networkManager.HostGame);
-        joinButton.onClick.AddListener(() => networkManager.JoinGame(joinCodeInput.text));
-        startGameButton.onClick.AddListener(networkManager.StartGame);
+        hostButton.onClick.AddListener(lobbyManager.HostGame);
+        joinButton.onClick.AddListener(() => lobbyManager.JoinGame(joinCodeInput.text));
+        startGameButton.onClick.AddListener(lobbyManager.StartGame);
         startGameButton.gameObject.SetActive(false);
         playerCountText.gameObject.SetActive(false);
     }
