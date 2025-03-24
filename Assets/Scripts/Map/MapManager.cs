@@ -32,6 +32,12 @@ public class MapManager : MonoBehaviour
     public int mapHeight;
 
 
+    private Queue<MapPlayer> players;
+    private MapPlayer currentPlayer;
+    private int moves;
+    public bool playing;
+
+
     /*
         Old Map Syntax:
         -1 = wall
@@ -86,6 +92,17 @@ public class MapManager : MonoBehaviour
     {
         mapWidth = map.GetLength(1);
         mapHeight = map.GetLength(0);
+        // create player queue
+    }
+
+    public void Play()
+    {
+        playing = true;
+    }
+
+    public void Pause()
+    {
+        playing = false;
     }
 
     public void ChangeColor(Vector2 pos)
@@ -132,7 +149,7 @@ public class MapManager : MonoBehaviour
         {
             for (int j = 0; j < mapWidth; j++)
             {
-                if (tiles[i,j] != null)
+                if (tiles[i, j] != null)
                 {
                     total += 1;
                 }
@@ -142,10 +159,10 @@ public class MapManager : MonoBehaviour
                 }
             }
         }
-        total-=2; // end and start tiles
+        total -= 2; // end and start tiles
         map_discovered = explored / total;
         if (map_discovered == 1) Debug.Log("You discovered the whole map !!");
-        
+
     }
 
     void CheckVisited(Vector2 pos)
@@ -215,5 +232,21 @@ public class MapManager : MonoBehaviour
         playerPosition.x = x;
         playerPosition.y = y;
     }
+
+    void Update()
+    {
+        if (playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+        {
+            // if playerID == currentPlayer
+            // try move, successful moves-- && set MapPlayer position etc...
+            // else do nothing 
+
+            // if moves == 0
+            // requeue currentPlayer, dequeue next player into currentPlayer
+            // roll dice mechanism? 
+        }
+    }
+
+
 
 }
