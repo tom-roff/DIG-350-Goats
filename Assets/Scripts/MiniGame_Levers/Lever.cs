@@ -5,8 +5,7 @@ public class LeverController : MonoBehaviour
     private Animator animator;
     private bool isPulled = false;
 
-    public int leverIndex;
-    public int PlayerID;
+    private int leverIndex;
     private CameraController cameraController;
 
     void Start()

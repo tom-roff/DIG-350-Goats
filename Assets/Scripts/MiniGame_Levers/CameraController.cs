@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
     private string playerId;
     private OurNetwork network;
     private LobbyManager lobbyManager;
+    private VibrationManager vibration;
 
 
     public GameObject[] playerCameras; // Array of cameras for each player index
@@ -43,6 +44,8 @@ public class CameraController : MonoBehaviour
         
             AssignCamera();
         }
+
+        StartLeverSequence();
     }
     void AssignCamera()
     {
@@ -77,7 +80,7 @@ public class CameraController : MonoBehaviour
     // Sends vibration to the correct player
     void SendVibrationToPlayer(int playerToVibrate)
     {
-        network.SendVibrationSignal(playerToVibrate); // Send signal to vibrate
+        vibration.SendVibrationSignal(playerToVibrate); // Send signal to vibrate
     }
 
     // Called by the lever when it is pulled correctly

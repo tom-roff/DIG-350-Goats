@@ -263,7 +263,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &24570734
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,7 +681,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &310506515
 GameObject:
   m_ObjectHideFlags: 0
@@ -964,7 +962,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &527890501
 GameObject:
   m_ObjectHideFlags: 0
@@ -1531,7 +1528,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &927678452
 GameObject:
   m_ObjectHideFlags: 0
@@ -2175,7 +2171,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &1279702268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2406,6 +2401,77 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1384118500}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1407276528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1407276531}
+  - component: {fileID: 1407276529}
+  - component: {fileID: 1407276530}
+  m_Layer: 0
+  m_Name: VibrationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1407276529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407276528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3239776934
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1407276530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407276528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 877091bc6ca25bc4f9b3e9ef6fd43a2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!4 &1407276531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407276528}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.2710915, y: -0.64004207, z: -6.9747415}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1501466565
 GameObject:
   m_ObjectHideFlags: 0
@@ -2870,6 +2936,51 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &1674251965
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1674251967}
+  - component: {fileID: 1674251966}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1674251966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674251965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91c5bb0e4dc562f4381a56d73d9876d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isHost: 0
+--- !u!4 &1674251967
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674251965}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.2710915, y: -0.64004207, z: -6.9747415}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1722318935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3264,6 +3375,7 @@ MonoBehaviour:
   - {fileID: 24570734}
   - {fileID: 1722318935}
   TVCamera: {fileID: 237132158}
+  leverOrder: 0100000002000000030000000400000005000000060000000700000008000000
 --- !u!4 &1898348470
 Transform:
   m_ObjectHideFlags: 0
@@ -3423,7 +3535,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &2003242566
 GameObject:
   m_ObjectHideFlags: 0
@@ -3568,7 +3679,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1 &2117012505
 GameObject:
   m_ObjectHideFlags: 0
@@ -3713,7 +3823,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerID: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3723,3 +3832,5 @@ SceneRoots:
   - {fileID: 1078582125}
   - {fileID: 237132162}
   - {fileID: 1898348470}
+  - {fileID: 1674251967}
+  - {fileID: 1407276531}

@@ -13,9 +13,9 @@ public class OurNetwork : MonoBehaviour
     private MenuManager menuManager;
 
     // Mapping from authentication to player index
-    private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+    public Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
     // Mapping from authentication to netcode id
-    private Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
+    public Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
 
     public async void Initialize(MenuManager manager)
     {
@@ -25,36 +25,19 @@ public class OurNetwork : MonoBehaviour
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
-    public void SendVibrationSignal(int playerToVibrate)
-    {
-        // foreach (var player in playerIndexMap)
-        // {
-        //     string playerID = player.Key;
-        //     int playerIndex = player.Value;
-
-        //     if (playerIndex == playerToVibrate)
-        //     {
-        //         // Find the targeted client's network ID
-        //         ulong targetClientId = GetClientIdByPlayerId(playerID);
-        //         if (targetClientId != 0)
-        //         {
-        //             ClientRpcParams clientRpcParams = new ClientRpcParams
-        //             {
-        //                 Send = new ClientRpcSendParams
-        //                 {
-        //                     TargetClientIds = new ulong[] { targetClientId }
-        //                 }
-        //             };
-
-        //             RpcVibratePhoneClientRpc(clientRpcParams);
-        //         }
-        //     }
-        // }
-    }
+    
 
     private ulong GetClientIdByPlayerId(string playerId)
     {
-        return playerIdToClientIdMap[playerId];
+        if (playerIdToClientIdMap.TryGetValue(playerId, out ulong clientId))
+        {
+            return clientId;
+        }
+        else
+        {
+            Debug.LogError($"Client ID not found for playerId: {playerId}");
+            return 0;
+        }
     }
 
 
