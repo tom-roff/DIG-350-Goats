@@ -1704,6 +1704,7 @@ GameObject:
   - component: {fileID: 1493936762}
   - component: {fileID: 1493936761}
   - component: {fileID: 1493936760}
+  - component: {fileID: 1493936764}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -1755,9 +1756,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
-        m_MethodName: HostGame
+      - m_Target: {fileID: 1493936764}
+        m_TargetAssemblyTypeName: MenuStartButton, Assembly-CSharp
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1825,6 +1826,18 @@ RectTransform:
   m_AnchoredPosition: {x: 222, y: 135}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1493936764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493936759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6050084a57b34644cba7a10864bdefda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1727106391
 GameObject:
   m_ObjectHideFlags: 0
