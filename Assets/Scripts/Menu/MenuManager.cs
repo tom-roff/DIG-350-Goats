@@ -27,7 +27,7 @@ public class MenuManager : MonoBehaviour
         }
 
         ourNetwork.Initialize(this);
-        // lobbyManager.Initialize(this);
+        lobbyManager.Initialize(this, ourNetwork);
 
         hostButton.onClick.AddListener(lobbyManager.HostGame);
         joinButton.onClick.AddListener(() => lobbyManager.JoinGame(joinCodeInput.text));

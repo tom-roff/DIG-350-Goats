@@ -5,6 +5,8 @@ public class CameraController : MonoBehaviour
     private int playerIndex;
     private string playerId;
     private OurNetwork network;
+    private LobbyManager lobbyManager;
+    private VibrationManager vibration;
 
 
     public GameObject[] playerCameras; // Array of cameras for each player index
@@ -23,6 +25,7 @@ public class CameraController : MonoBehaviour
         TVCamera.SetActive(false);
 
         network = FindFirstObjectByType<OurNetwork>(); // Find the network script
+        lobbyManager = FindFirstObjectByType<LobbyManager>(); // Find lobby manager
         if (network == null)
         {
             Debug.LogError("OurNetwork instance not found!");
@@ -36,11 +39,13 @@ public class CameraController : MonoBehaviour
         }
 
         else{
-            playerId = network.GetLocalPlayerId();
-            playerIndex = network.GetPlayerIndex(playerId);
+            playerId = lobbyManager.GetLocalPlayerId();
+            playerIndex = lobbyManager.GetPlayerIndex(playerId);
         
             AssignCamera();
         }
+
+        StartLeverSequence();
     }
     void AssignCamera()
     {
@@ -75,7 +80,7 @@ public class CameraController : MonoBehaviour
     // Sends vibration to the correct player
     void SendVibrationToPlayer(int playerToVibrate)
     {
-        network.SendVibrationSignal(playerToVibrate); // Send signal to vibrate
+        vibration.SendVibrationSignal(playerToVibrate); // Send signal to vibrate
     }
 
     // Called by the lever when it is pulled correctly

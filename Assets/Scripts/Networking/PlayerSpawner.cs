@@ -9,28 +9,67 @@ public class PlayerSpawner : NetworkBehaviour
     
     // Dictionary to track which spawn points are occupied
     private Dictionary<int, bool> occupiedSpawnPoints = new Dictionary<int, bool>();
-    
-    public override void OnNetworkSpawn()
+
+    void Start()
     {
+        Debug.Log("Start Everyone");
         if (!IsServer) return;
-        
-        // Initialize all spawn points as unoccupied
+
+        Debug.Log("Start Server");
+
+        // Initialize spawn point tracking
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             occupiedSpawnPoints[i] = false;
         }
-        
-        // Spawn all connected players
+
+        // Spawn all currently connected players
         SpawnAllPlayers();
+        
+        // Subscribe to client connection event for future connections
+        NetworkManager.Singleton.OnClientConnectedCallback += SpawnPlayerOnJoin;
+    }
+    
+    public override void OnNetworkSpawn()
+    {
+        Debug.Log("On Network Spawn not is server");
+        if (!IsServer) return;
+
+        Debug.Log("On Network Spawn");
+
+        // Initialize spawn point tracking
+        for (int i = 0; i < spawnPoints.Length; i++)
+        {
+            occupiedSpawnPoints[i] = false;
+        }
+
+        // Spawn all currently connected players
+        SpawnAllPlayers();
+        
+        // Subscribe to client connection event for future connections
+        NetworkManager.Singleton.OnClientConnectedCallback += SpawnPlayerOnJoin;
+    }
+
+    private void SpawnPlayerOnJoin(ulong clientId)
+    {
+        if (IsServer)
+        {
+            SpawnPlayer(clientId);
+        }
     }
     
     public void SpawnAllPlayers()
     {
         if (!IsServer) return;
+
+        int count = 0;
+        Debug.Log(count);
         
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             SpawnPlayer(clientId);
+            count += 1;
+            Debug.Log(count);
         }
     }
     
