@@ -1,12 +1,13 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class LeverController : MonoBehaviour
+public class Lever : NetworkBehaviour
 {
     private Animator animator;
-    private bool isPulled = false;
-
-    private int leverIndex;
     private CameraController cameraController;
+    private OurNetwork network;
+
+    public int leverIndex;
 
     void Start()
     {
@@ -21,6 +22,12 @@ public class LeverController : MonoBehaviour
         {
             Debug.LogError("CameraController not found in the scene!");
         }
+
+        network = FindFirstObjectByType<OurNetwork>();
+        if (network == null)
+        {
+            Debug.LogError("OurNetwork instance not found!");
+        }
     }
 
     void Update()
@@ -29,21 +36,34 @@ public class LeverController : MonoBehaviour
         {
             Debug.Log("Touch Detected");
             Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-            if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform && !isPulled)
+            if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
             {
-                PullLever();
+                PullLeverServerRpc(leverIndex);
             }
         }
     }
 
-    void PullLever()
+    [ServerRpc(RequireOwnership = false)]
+    void PullLeverServerRpc(int leverIndex, ServerRpcParams rpcParams = default)
     {
-        if (!isPulled)
+        Debug.Log($"[ServerRpc] Lever {leverIndex} was pulled.");
+
+        // Broadcast to all clients that this lever has been pulled
+        PullLeverClientRpc(leverIndex);
+    }
+
+    [ClientRpc]
+    void PullLeverClientRpc(int leverIndex, ClientRpcParams clientRpcParams = default)
+    {
+        Debug.Log($"[ClientRpc] Lever {leverIndex} animation triggered.");
+        
+        // Play animation and disable collider
+        animator.SetTrigger("IsPulled");
+        GetComponent<Collider>().enabled = false;
+
+        // Only the owner should call OnLeverPulled to update game logic
+        if (IsOwner)
         {
-            isPulled = true;
-            animator.SetTrigger("IsPulled");
-            GetComponent<Collider>().enabled = false; // Disable collider so it can't be touched again
-            Debug.Log($"Lever {leverIndex} pulled!");
             cameraController.OnLeverPulled(leverIndex);
         }
     }

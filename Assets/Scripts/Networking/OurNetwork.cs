@@ -5,8 +5,9 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
-public class OurNetwork : MonoBehaviour
+public class OurNetwork : NetworkBehaviour
 {
     private Lobby currentLobby;
     public bool isHost = false;
