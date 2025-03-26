@@ -5,6 +5,7 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -103,6 +104,7 @@ public class LobbyManager : MonoBehaviour
             if (currentLobby.Data.ContainsKey("GameStarted") && 
                 currentLobby.Data["GameStarted"].Value == "true")
             {
+                // NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
                 SceneManager.LoadScene("LaserMinigame");
             }
         }
