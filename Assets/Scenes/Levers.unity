@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 7472653}
   - component: {fileID: 7472652}
   - component: {fileID: 7472651}
+  - component: {fileID: 7472656}
   - component: {fileID: 7472655}
   m_Layer: 0
   m_Name: Cube
@@ -263,6 +264,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 0
+--- !u!114 &7472656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7472649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 473002241
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &24570734
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,6 +709,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 3
 --- !u!1 &310506515
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,6 +992,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 5
 --- !u!1 &527890501
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,7 +1007,7 @@ GameObject:
   - component: {fileID: 527890504}
   - component: {fileID: 527890503}
   m_Layer: 0
-  m_Name: Lever (1)
+  m_Name: Lever3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1528,6 +1560,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 4
 --- !u!1 &927678452
 GameObject:
   m_ObjectHideFlags: 0
@@ -1678,7 +1712,7 @@ GameObject:
   - component: {fileID: 930944200}
   - component: {fileID: 930944199}
   m_Layer: 0
-  m_Name: Lever (5)
+  m_Name: Lever6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1880,10 +1914,10 @@ Transform:
   m_LocalScale: {x: 60, y: 40, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1600820145}
-  - {fileID: 527890502}
-  - {fileID: 1739919096}
   - {fileID: 1610015231}
+  - {fileID: 1739919096}
+  - {fileID: 527890502}
+  - {fileID: 1600820145}
   - {fileID: 1501466566}
   - {fileID: 930944198}
   - {fileID: 1882391079}
@@ -2171,6 +2205,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 1
 --- !u!1 &1279702268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2305,7 +2341,7 @@ GameObject:
   - component: {fileID: 1384118503}
   - component: {fileID: 1384118502}
   m_Layer: 0
-  m_Name: Lever (7)
+  m_Name: Lever8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2472,6 +2508,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1438165494
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1438165496}
+  - component: {fileID: 1438165495}
+  m_Layer: 0
+  m_Name: LobbyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1438165495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438165494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58d16ad86aa524b479a25f5834caca52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isHost: 0
+--- !u!4 &1438165496
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438165494}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.2710915, y: -0.64004207, z: -6.9747415}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1501466565
 GameObject:
   m_ObjectHideFlags: 0
@@ -2485,7 +2566,7 @@ GameObject:
   - component: {fileID: 1501466568}
   - component: {fileID: 1501466567}
   m_Layer: 0
-  m_Name: Lever (4)
+  m_Name: Lever5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2581,6 +2662,79 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501466565}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1595694041
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1595694044}
+  - component: {fileID: 1595694042}
+  - component: {fileID: 1595694043}
+  m_Layer: 0
+  m_Name: PlayerSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1595694042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595694041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2437130263
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1595694043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595694041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 513e4360c93ebb54e92073539b6733ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerPrefab: {fileID: 0}
+  spawnPoints: []
+--- !u!4 &1595694044
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595694041}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.2710915, y: -0.64004207, z: -6.9747415}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1600820144
 GameObject:
   m_ObjectHideFlags: 0
@@ -2594,7 +2748,7 @@ GameObject:
   - component: {fileID: 1600820147}
   - component: {fileID: 1600820146}
   m_Layer: 0
-  m_Name: Lever
+  m_Name: Lever4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2703,7 +2857,7 @@ GameObject:
   - component: {fileID: 1610015233}
   - component: {fileID: 1610015232}
   m_Layer: 0
-  m_Name: Lever (3)
+  m_Name: Lever1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2945,6 +3099,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1674251967}
+  - component: {fileID: 1674251968}
   - component: {fileID: 1674251966}
   m_Layer: 0
   m_Name: NetworkManager
@@ -2952,7 +3107,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1674251966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2965,6 +3120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91c5bb0e4dc562f4381a56d73d9876d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   isHost: 0
 --- !u!4 &1674251967
 Transform:
@@ -2981,6 +3137,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1674251968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674251965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1842952787
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &1722318935
 GameObject:
   m_ObjectHideFlags: 0
@@ -3131,7 +3312,7 @@ GameObject:
   - component: {fileID: 1739919098}
   - component: {fileID: 1739919097}
   m_Layer: 0
-  m_Name: Lever (2)
+  m_Name: Lever2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3240,7 +3421,7 @@ GameObject:
   - component: {fileID: 1882391081}
   - component: {fileID: 1882391080}
   m_Layer: 0
-  m_Name: Lever (6)
+  m_Name: Lever7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3345,6 +3526,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1898348470}
+  - component: {fileID: 1898348471}
   - component: {fileID: 1898348469}
   m_Layer: 0
   m_Name: CameraController
@@ -3365,6 +3547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96cfd657953744ac2985857e43fcc94c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   playerCameras:
   - {fileID: 1661004962}
   - {fileID: 1245740894}
@@ -3391,6 +3574,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1898348471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898348468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1195198153
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &2003024462
 GameObject:
   m_ObjectHideFlags: 0
@@ -3535,6 +3743,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 7
 --- !u!1 &2003242566
 GameObject:
   m_ObjectHideFlags: 0
@@ -3679,6 +3889,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 2
 --- !u!1 &2117012505
 GameObject:
   m_ObjectHideFlags: 0
@@ -3823,6 +4035,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a7e4018b4554c9baec8ee265b0f3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  leverIndex: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3834,3 +4048,5 @@ SceneRoots:
   - {fileID: 1898348470}
   - {fileID: 1674251967}
   - {fileID: 1407276531}
+  - {fileID: 1438165496}
+  - {fileID: 1595694044}

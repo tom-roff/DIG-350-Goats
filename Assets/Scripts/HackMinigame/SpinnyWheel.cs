@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SpinnyWheel : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public int rotationSpeed = 100;
     void Start()
     {
         
@@ -11,6 +11,6 @@ public class SpinnyWheel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        transform.Rotate (0, rotationSpeed*Time.deltaTime, 0);
     }
 }
