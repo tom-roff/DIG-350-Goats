@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     private int playerIndex;
     private string playerId;
@@ -30,6 +31,11 @@ public class CameraController : MonoBehaviour
         {
             Debug.LogError("OurNetwork instance not found!");
             return;
+        }
+        if (lobbyManager == null)
+        {
+            Debug.LogError("LobbyManager not found in the scene! Make sure it's added and active.");
+            return; // Exit early to prevent further errors
         }
 
 
