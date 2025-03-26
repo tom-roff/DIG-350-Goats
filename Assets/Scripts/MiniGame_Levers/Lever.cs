@@ -1,13 +1,13 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class LeverController : NetworkBehaviour
+public class Lever : NetworkBehaviour
 {
     private Animator animator;
     private CameraController cameraController;
     private OurNetwork network;
 
-    private int leverIndex;
+    public int leverIndex;
 
     void Start()
     {
