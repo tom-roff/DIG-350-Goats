@@ -43,7 +43,7 @@ public class PlayerBehavior_Map : MonoBehaviour
             this.transform.SetParent(MapManager.Instance.tiles[i, j].transform);
             MapManager.Instance.SetPlayerPosition(i, j);
             this.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-            MapManager.Instance.CheckPosition((int)MapManager.Instance.playerPosition.x, (int)MapManager.Instance.playerPosition.y);
+            MapHelpers.CheckPosition(MapManager.Instance.map, MapManager.Instance.tiles, (int)MapManager.Instance.playerPosition.x, (int)MapManager.Instance.playerPosition.y);
         }
     }
 

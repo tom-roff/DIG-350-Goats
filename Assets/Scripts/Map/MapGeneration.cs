@@ -49,7 +49,7 @@ public class MapGeneration : MonoBehaviour
                     tileInstance.name = i + ", " + j;
                     MapManager.Instance.tiles[i, j] = tileInstance;
 
-                    MapManager.Instance.ChangeColor(new Vector2(i, j));
+                    MapHelpers.ChangeColor(MapManager.Instance.map, MapManager.Instance.tiles, new Vector2(i, j));
                 }
             }
         }
