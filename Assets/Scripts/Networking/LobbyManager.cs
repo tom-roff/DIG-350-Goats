@@ -104,7 +104,7 @@ public class LobbyManager : MonoBehaviour
             if (currentLobby.Data.ContainsKey("GameStarted") &&
                 currentLobby.Data["GameStarted"].Value == "true")
             {
-                // SceneManager.LoadScene("LaserMinigame");
+                // SceneManager.LoadScene("Levers");
                 if (isHost)
                 {
                     SceneManager.LoadScene("Map");

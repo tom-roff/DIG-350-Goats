@@ -9,6 +9,7 @@ using Unity.Netcode;
 
 public class OurNetwork : NetworkBehaviour
 {
+   
     private Lobby currentLobby;
     public bool isHost = false;
     private MenuManager menuManager;

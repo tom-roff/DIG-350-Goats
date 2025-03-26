@@ -47,17 +47,37 @@ public class PlayerBehavior_Map : MonoBehaviour
         }
     }
 
-    void Update()
+    public void TryMove(string direction)
     {
-        if(playing)
+        switch (direction)
         {
-            if(Input.GetKeyDown(KeyCode.RightArrow)) MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y+1);
-            if(Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y-1);
-            if(Input.GetKeyDown(KeyCode.UpArrow)) MovePlayer(MapManager.Instance.playerPosition.x+1, MapManager.Instance.playerPosition.y);
-            if(Input.GetKeyDown(KeyCode.DownArrow)) MovePlayer(MapManager.Instance.playerPosition.x-1, MapManager.Instance.playerPosition.y);
-        }
+            case "up":
+                MovePlayer(MapManager.Instance.playerPosition.x + 1, MapManager.Instance.playerPosition.y);
+                break;
+            case "down":
+                MovePlayer(MapManager.Instance.playerPosition.x - 1, MapManager.Instance.playerPosition.y);
+                break;
+            case "left":
+                MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y - 1);
+                break;
+            case "right":
+                MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y + 1);
+                break;
         
+        }
     }
+
+    // void Update()
+    // {
+    //     if(playing)
+    //     {
+    //         if(Input.GetKeyDown(KeyCode.RightArrow)) MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y+1);
+    //         if(Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayer(MapManager.Instance.playerPosition.x, MapManager.Instance.playerPosition.y-1);
+    //         if(Input.GetKeyDown(KeyCode.UpArrow)) MovePlayer(MapManager.Instance.playerPosition.x+1, MapManager.Instance.playerPosition.y);
+    //         if(Input.GetKeyDown(KeyCode.DownArrow)) MovePlayer(MapManager.Instance.playerPosition.x-1, MapManager.Instance.playerPosition.y);
+    //     }
+        
+    // }
 
     bool InBounds(int i, int j)
     {
