@@ -44,6 +44,7 @@ public class PlayerBehavior_Map : MonoBehaviour
             MapManager.Instance.SetPlayerPosition(i, j);
             this.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             MapHelpers.CheckPosition(MapManager.Instance.map, MapManager.Instance.tiles, (int)MapManager.Instance.playerPosition.x, (int)MapManager.Instance.playerPosition.y);
+            MapAudioManager.playerMovementAudio.Play();
         }
     }
 
