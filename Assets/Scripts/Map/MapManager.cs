@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -27,15 +28,13 @@ public class MapManager : MonoBehaviour
 
 
     public GameObject[,] tiles;
-    public Vector2 playerPosition = Vector2.positiveInfinity;
-    // list of players
     public int mapWidth;
     public int mapHeight;
 
 
-    private Queue<MapPlayer> players;
-    private MapPlayer currentPlayer;
-    private int moves;
+    public MapPlayer[] players = null;
+    public int currentPlayer = -1;
+    public int moves;
     public bool playing;
 
 
@@ -48,8 +47,6 @@ public class MapManager : MonoBehaviour
         3 = item
         4 = start
         5 = end
-        
-        This may be changed later
    */
     public enum Tiles
     {
@@ -93,7 +90,6 @@ public class MapManager : MonoBehaviour
     {
         mapWidth = map.GetLength(1);
         mapHeight = map.GetLength(0);
-        // create player queue
     }
 
     public void Play()
@@ -106,27 +102,18 @@ public class MapManager : MonoBehaviour
         playing = false;
     }
 
-    
-    public void SetPlayerPosition(int x, int y)
+    public void NextPlayer()
     {
-        playerPosition.x = x;
-        playerPosition.y = y;
-    }
-
-    void Update()
-    {
-        if (playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+        if (moves < 1) // necessary when called from StartMap()
         {
-            // if playerID == currentPlayer
-            // try move, successful moves-- && set MapPlayer position etc...
-            // else do nothing 
+            if (currentPlayer + 1 == players.GetLength(0)) currentPlayer = 0;
+            else currentPlayer++;
+            
 
-            // if moves == 0
-            // requeue currentPlayer, dequeue next player into currentPlayer
-            // roll dice mechanism? 
+            // roll moves
+            System.Random rnd = new System.Random();
+            moves = rnd.Next(1, 7);
+            Debug.Log("Player " + players[currentPlayer].playerID + " rolled a " + moves);
         }
     }
-
-
-
 }

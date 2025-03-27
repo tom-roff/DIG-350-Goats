@@ -12,7 +12,7 @@ public class MapGeneration : MonoBehaviour
     [Header("References")]
     [SerializeField] public GameObject tileParent;
     [SerializeField] public GameObject tilePrefab;
-    [SerializeField] public GameObject player;
+    [SerializeField] public MapPlayerBehavior mapPlayerBehavior;
 
     [Header("Margins")]
     [SerializeField] public float xMargin = .1f;
@@ -53,7 +53,7 @@ public class MapGeneration : MonoBehaviour
                 }
             }
         }
-        player.GetComponent<PlayerBehavior_Map>().StartMap();
+        mapPlayerBehavior.StartMap();
     }
 
     
