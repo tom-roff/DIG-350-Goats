@@ -21,21 +21,21 @@ public class MapGeneration : MonoBehaviour
 
     void OnEnable()
     {
-        tileWidth = (1-(xMargin*2)) / MapManager.Instance.mapWidth;
-        tileHeight = (1-(yMargin*2)) / MapManager.Instance.mapHeight;
+        tileWidth = (1-(xMargin*2)) / GameManager.Instance.MapManager.mapWidth;
+        tileHeight = (1-(yMargin*2)) / GameManager.Instance.MapManager.mapHeight;
 
-        MapManager.Instance.tiles = new GameObject[MapManager.Instance.mapHeight, MapManager.Instance.mapWidth];
+        GameManager.Instance.MapManager.tiles = new GameObject[GameManager.Instance.MapManager.mapHeight, GameManager.Instance.MapManager.mapWidth];
 
         GenerateMap();
     }
 
     void GenerateMap()
     {
-        for (int i = 0; i < MapManager.Instance.mapHeight; i++)
+        for (int i = 0; i < GameManager.Instance.MapManager.mapHeight; i++)
         {
-            for (int j = 0; j < MapManager.Instance.mapWidth; j++)
+            for (int j = 0; j < GameManager.Instance.MapManager.mapWidth; j++)
             {
-                if (MapManager.Instance.map[i, j] != MapManager.Tiles.Wall)
+                if (GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
                 {
                     float xStart = xMargin + (j * tileWidth);
                     float yStart = yMargin + (i * tileHeight);
@@ -47,9 +47,9 @@ public class MapGeneration : MonoBehaviour
                     tileInstance.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
                     tileInstance.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
                     tileInstance.name = i + ", " + j;
-                    MapManager.Instance.tiles[i, j] = tileInstance;
+                    GameManager.Instance.MapManager.tiles[i, j] = tileInstance;
 
-                    MapHelpers.ChangeColor(MapManager.Instance.map, MapManager.Instance.tiles, new Vector2(i, j));
+                    MapHelpers.ChangeColor(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, new Vector2(i, j));
                 }
             }
         }

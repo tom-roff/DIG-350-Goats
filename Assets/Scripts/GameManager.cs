@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 	public bool singletonCreated = false;
 
 	public OurNetwork OurNetwork { get; set; }
+	public MapManager MapManager { get; set; }
 
 	[Tooltip("Turn on debugging")]
 	public bool DEBUG = true;
@@ -52,6 +53,7 @@ public class GameManager : MonoBehaviour
 
 		// @@@ SERVICE LOCATOR => Store references for global access
 		OurNetwork = GetComponentInChildren<OurNetwork>();
+		MapManager = GetComponentInChildren<MapManager>();
 
 		if (DEBUG)
 			Debug.Log($"*** GameManager (Singleton) created ***");

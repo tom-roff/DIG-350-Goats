@@ -11,13 +11,13 @@ public class MapPlayerBehavior : MonoBehaviour
 
     void OnEnable()
     {
-        // if (MapManager.Instance.players == null)
+        // if (GameManager.Instance.MapManager.players == null)
         // {
         //     CreatePlayerQueue();
         // }
         // else
         // {
-        //     foreach (var player in MapManager.Instance.players)
+        //     foreach (var player in GameManager.Instance.MapManager.players)
         //     {
         //         InstantiatePlayer(player.position, player);
         //     }
@@ -26,42 +26,42 @@ public class MapPlayerBehavior : MonoBehaviour
 
     void CreatePlayerQueue()
     {
-        MapManager.Instance.players = new MapPlayer[2]; // replace with # of players in lobby
+        GameManager.Instance.MapManager.players = new MapPlayer[2]; // replace with # of players in lobby
         for (int i = 0; i < 2; i++)
         {
-            MapManager.Instance.players[i] = new MapPlayer(i.ToString());
+            GameManager.Instance.MapManager.players[i] = new MapPlayer(i.ToString());
         }
     }
 
 
     public void StartMap()
     {
-        if (MapManager.Instance.players == null)
+        if (GameManager.Instance.MapManager.players == null)
         {
             CreatePlayerQueue();
         }
         else
         {
-            foreach (var player in MapManager.Instance.players)
+            foreach (var player in GameManager.Instance.MapManager.players)
             {
                 InstantiatePlayer(player.position, player);
             }
         }
-        if (MapManager.Instance.currentPlayer == -1)
+        if (GameManager.Instance.MapManager.currentPlayer == -1)
         {
             SpawnPlayers(FindStartPosition());
         }
-        MapManager.Instance.Play();
-        MapManager.Instance.NextPlayer();
+        GameManager.Instance.MapManager.Play();
+        GameManager.Instance.MapManager.NextPlayer();
     }
 
     private Vector2 FindStartPosition()
     {
-        for (int i = 0; i < MapManager.Instance.mapHeight; i++)
+        for (int i = 0; i < GameManager.Instance.MapManager.mapHeight; i++)
         {
-            for (int j = 0; j < MapManager.Instance.mapWidth; j++)
+            for (int j = 0; j < GameManager.Instance.MapManager.mapWidth; j++)
             {
-                if (MapManager.Instance.map[i, j] == MapManager.Tiles.Start)
+                if (GameManager.Instance.MapManager.map[i, j] == MapManager.Tiles.Start)
                 {
                     return new Vector2(i, j);
                 }
@@ -72,7 +72,7 @@ public class MapPlayerBehavior : MonoBehaviour
 
     void SpawnPlayers(Vector2 startPosition)
     {
-        foreach (var player in MapManager.Instance.players)
+        foreach (var player in GameManager.Instance.MapManager.players)
         {
             InstantiatePlayer(startPosition, player);
         }
@@ -84,41 +84,41 @@ public class MapPlayerBehavior : MonoBehaviour
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         playerInstance.name = "player " + player.playerID;
-        playerInstance.transform.SetParent(MapManager.Instance.tiles[(int)startPosition.x, (int)startPosition.y].transform);
+        playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         player.SetBody(playerInstance);
         player.SetPosition(startPosition);
-        MapHelpers.CheckPosition(MapManager.Instance.map, MapManager.Instance.tiles, (int)startPosition.x, (int)startPosition.y);
+        MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
     }
 
     void MovePlayer(float x, float y)
     {
         int i = (int)x;
         int j = (int)y;
-        if (InBounds(i, j) && MapManager.Instance.map[i, j] != MapManager.Tiles.Wall)
+        if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
         {
-            int currentPlayer = MapManager.Instance.currentPlayer;
-            MapManager.Instance.players[currentPlayer].body.transform.SetParent(MapManager.Instance.tiles[i, j].transform);
-            MapManager.Instance.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-            MapManager.Instance.players[currentPlayer].SetPosition(new Vector2(i, j));
+            int currentPlayer = GameManager.Instance.MapManager.currentPlayer;
+            GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
+            GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+            GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
 
-            MapHelpers.CheckPosition(MapManager.Instance.map, MapManager.Instance.tiles, i, j);
+            MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
-            MapManager.Instance.moves--;
+            GameManager.Instance.MapManager.moves--;
         }
     }
 
     
     void Update()
     {
-        if (MapManager.Instance.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+        if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
         {
             // if playerID == currentPlayer
             // try move, successful moves-- && set MapPlayer position etc...
             // else do nothing 
 
-            MapPlayer currentPlayer = MapManager.Instance.players[MapManager.Instance.currentPlayer];
+            MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
 
             if (currentPlayer.playerID == "0")
             {
@@ -139,16 +139,16 @@ public class MapPlayerBehavior : MonoBehaviour
             // requeue currentPlayer, dequeue next player into currentPlayer
             // roll dice mechanism? 
 
-            if (MapManager.Instance.moves < 1)
+            if (GameManager.Instance.MapManager.moves < 1)
             {
-                MapManager.Instance.NextPlayer();
+                GameManager.Instance.MapManager.NextPlayer();
             }
         }
     }
 
     bool InBounds(int i, int j)
     {
-        if(i > -1 && i < MapManager.Instance.mapHeight && j > -1 && j < MapManager.Instance.mapWidth) return true;
+        if(i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
         return false;
     }
 
