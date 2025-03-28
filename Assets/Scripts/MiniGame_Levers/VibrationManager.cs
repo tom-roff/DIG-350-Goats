@@ -41,34 +41,34 @@ public class VibrationManager : NetworkBehaviour
 
     public void SendVibrationSignal(int playerToVibrate)
     {
-        foreach (var player in network.playerIndexMap)
-        {
-            string playerID = player.Key;
-            int playerIndex = player.Value;
+        // foreach (var player in network.playerIndexMap)
+        // {
+        //     string playerID = player.Key;
+        //     int playerIndex = player.Value;
 
-            if (playerIndex == playerToVibrate)
-            {
-                // Find the targeted client's network ID
-                ulong targetClientId = GetClientIdByPlayerId(playerID);
-                if (targetClientId == 0)
-                {
-                    Debug.LogError($"Invalid client ID for player {playerID}. Vibration not sent.");
-                    return;
-                }
-                else if (targetClientId != 0)
-                {
-                    ClientRpcParams clientRpcParams = new ClientRpcParams
-                    {
-                        Send = new ClientRpcSendParams
-                        {
-                            TargetClientIds = new ulong[] { targetClientId }
-                        }
-                    };
+        //     if (playerIndex == playerToVibrate)
+        //     {
+        //         // Find the targeted client's network ID
+        //         ulong targetClientId = GetClientIdByPlayerId(playerID);
+        //         if (targetClientId == 0)
+        //         {
+        //             Debug.LogError($"Invalid client ID for player {playerID}. Vibration not sent.");
+        //             return;
+        //         }
+        //         else if (targetClientId != 0)
+        //         {
+        //             ClientRpcParams clientRpcParams = new ClientRpcParams
+        //             {
+        //                 Send = new ClientRpcSendParams
+        //                 {
+        //                     TargetClientIds = new ulong[] { targetClientId }
+        //                 }
+        //             };
 
-                    VibratePhoneClientRpc(clientRpcParams);
-                }
-            }
-        }
+        //             VibratePhoneClientRpc(clientRpcParams);
+        //         }
+        //     }
+        // }
     }
 
     private ulong GetClientIdByPlayerId(string pID)

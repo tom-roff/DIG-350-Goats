@@ -1,9 +1,13 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class DestroyLaser : MonoBehaviour
+public class DestroyLaser : NetworkBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(other.gameObject);
+        if (other.TryGetComponent<NetworkObject>(out var laser))
+        {
+            laser.Despawn(true);
+        }
     }
 }

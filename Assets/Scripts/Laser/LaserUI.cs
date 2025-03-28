@@ -6,6 +6,7 @@ public class LaserUI : NetworkBehaviour
 {
     [SerializeField] private LaserManager laserManager;
     [SerializeField] private GameObject scoresParent;
+    private ulong hostId;
 
     public override void OnNetworkSpawn()
     {
@@ -13,20 +14,37 @@ public class LaserUI : NetworkBehaviour
         {
             this.gameObject.SetActive(false);
         }
+
+        hostId = NetworkManager.Singleton.LocalClientId;
     }
 
     void Update()
     {
         if (!gameObject.activeSelf) return;
         
-        UpdateScores();
+        UpdateScoreUI();
     }
 
-    private void UpdateScores()
+    private void UpdateScoreUI()
     {
-        foreach (TMP_Text scoreText in scoresParent.GetComponentsInChildren<TMP_Text>())
+        TMP_Text[] scoreTexts = scoresParent.GetComponentsInChildren<TMP_Text>();
+        int playerIndex = 0;
+        
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            scoreText.text = $"Score: {laserManager.GetScore()}";
+            if (clientId == NetworkManager.Singleton.LocalClientId)
+                continue;
+                
+            if (playerIndex < scoreTexts.Length)
+            {
+                scoreTexts[playerIndex].text = $"Player {clientId}: {laserManager.GetScore(clientId)}";
+                playerIndex++;
+            }
+        }
+        
+        for (int i = playerIndex; i < scoreTexts.Length; i++)
+        {
+            scoreTexts[i].gameObject.SetActive(false);
         }
     }
 }
