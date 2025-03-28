@@ -11,17 +11,17 @@ public class MapPlayerBehavior : MonoBehaviour
 
     void OnEnable()
     {
-        if (MapManager.Instance.players == null)
-        {
-            CreatePlayerQueue();
-        }
-        else
-        {
-            foreach (var player in MapManager.Instance.players)
-            {
-                InstantiatePlayer(player.position, player);
-            }
-        }
+        // if (MapManager.Instance.players == null)
+        // {
+        //     CreatePlayerQueue();
+        // }
+        // else
+        // {
+        //     foreach (var player in MapManager.Instance.players)
+        //     {
+        //         InstantiatePlayer(player.position, player);
+        //     }
+        // }
     }
 
     void CreatePlayerQueue()
@@ -36,6 +36,17 @@ public class MapPlayerBehavior : MonoBehaviour
 
     public void StartMap()
     {
+        if (MapManager.Instance.players == null)
+        {
+            CreatePlayerQueue();
+        }
+        else
+        {
+            foreach (var player in MapManager.Instance.players)
+            {
+                InstantiatePlayer(player.position, player);
+            }
+        }
         if (MapManager.Instance.currentPlayer == -1)
         {
             SpawnPlayers(FindStartPosition());
@@ -93,7 +104,7 @@ public class MapPlayerBehavior : MonoBehaviour
             MapManager.Instance.players[currentPlayer].SetPosition(new Vector2(i, j));
 
             MapHelpers.CheckPosition(MapManager.Instance.map, MapManager.Instance.tiles, i, j);
-            //MapAudioManager.playerMovementAudio.Play();
+            // MapAudioManager.playerMovementAudio.Play();
             MapManager.Instance.moves--;
         }
     }

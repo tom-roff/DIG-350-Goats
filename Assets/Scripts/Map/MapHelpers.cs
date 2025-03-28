@@ -27,7 +27,7 @@ public static class MapHelpers
                 break;
             case MapManager.Tiles.ExploredItem:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(168, 107, 0);
-                //MapAudioManager.collectItemAudio.Play();
+                // MapAudioManager.collectItemAudio.Play();
                 break;
             case MapManager.Tiles.Start:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.green;
