@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class LaserManager : MonoBehaviour
+public class LaserManager : NetworkBehaviour
 {
     public int score;
     public GameObject laserPrefab;
@@ -14,11 +15,17 @@ public class LaserManager : MonoBehaviour
 
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnLaser();
             SetNextSpawnTime();
         }
+        Debug.Log(score);
     }
 
     private void SpawnLaser()
@@ -27,6 +34,8 @@ public class LaserManager : MonoBehaviour
         Vector3 spawnPosition = new Vector3(randomX, yPosition, zPosition);
         
         GameObject laser = Instantiate(laserPrefab, spawnPosition, Quaternion.identity);
+        NetworkObject networkObject = laser.GetComponent<NetworkObject>();
+        networkObject.Spawn();
     }
 
     private void SetNextSpawnTime()
@@ -37,5 +46,10 @@ public class LaserManager : MonoBehaviour
     public void AddScore()
     {
         score++;
+    }
+
+    public int GetScore()
+    {
+        return score;
     }
 }

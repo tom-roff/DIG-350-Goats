@@ -1,9 +1,11 @@
 using Unity.Netcode;
 using UnityEngine;
+using TMPro;
 
 public class LaserUI : NetworkBehaviour
 {
     [SerializeField] private LaserManager laserManager;
+    [SerializeField] private GameObject scoresParent;
 
     public override void OnNetworkSpawn()
     {
@@ -22,12 +24,9 @@ public class LaserUI : NetworkBehaviour
 
     private void UpdateScores()
     {
-        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        foreach (TMP_Text scoreText in scoresParent.GetComponentsInChildren<TMP_Text>())
         {
-            if (clientId != hostId)
-            {
-                scoreText.text = laserManager.GetScore(playerId);
-            }
+            scoreText.text = $"Score: {laserManager.GetScore()}";
         }
     }
 }
