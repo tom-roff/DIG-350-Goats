@@ -1669,6 +1669,10 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 1981688707
       objectReference: {fileID: 0}
+    - target: {fileID: 5157450115741152067, guid: 354cbc3f9833de24ab81975e018cdea2, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6333582370754192052, guid: 354cbc3f9833de24ab81975e018cdea2, type: 3}
       propertyPath: m_Name
       value: Laser

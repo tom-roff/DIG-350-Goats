@@ -36,6 +36,6 @@ public class LaserManager : MonoBehaviour
 
     public void AddScore()
     {
-        score += 1;
+        score++;
     }
 }

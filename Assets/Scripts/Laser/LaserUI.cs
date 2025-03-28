@@ -3,15 +3,31 @@ using UnityEngine;
 
 public class LaserUI : NetworkBehaviour
 {
-    void Awake()
+    [SerializeField] private LaserManager laserManager;
+
+    public override void OnNetworkSpawn()
     {
-        if (GameManager.Instance.OurNetwork.isHost)
-        {
-            this.gameObject.SetActive(true);
-        }
-        else
+        if (!IsServer)
         {
             this.gameObject.SetActive(false);
+        }
+    }
+
+    void Update()
+    {
+        if (!gameObject.activeSelf) return;
+        
+        UpdateScores();
+    }
+
+    private void UpdateScores()
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (clientId != hostId)
+            {
+                scoreText.text = laserManager.GetScore(playerId);
+            }
         }
     }
 }
