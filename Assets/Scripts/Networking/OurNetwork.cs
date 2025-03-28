@@ -16,7 +16,7 @@ public class OurNetwork : NetworkBehaviour
     
 
     // Mapping from authentication to player index
-    public Dictionary<string, PlayerInfo> playerIndexMap = new Dictionary<string, PlayerInfo>();
+    public Dictionary<ulong, PlayerInfo> playerIndexMap = new Dictionary<ulong, PlayerInfo>();
     // Mapping from authentication to netcode id
     public Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
 
