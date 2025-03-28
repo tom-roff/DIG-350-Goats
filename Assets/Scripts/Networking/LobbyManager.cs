@@ -1,21 +1,28 @@
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using Unity.Services.Lobbies;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Lobbies.Models;
+
 
 public class LobbyManager : MonoBehaviour
 {
-    private Lobby currentLobby;
     public bool isHost = false;
     private MenuManager menuManager;
     private OurNetwork ourNetwork;
+    private string joinCode;
+    private int maxPlayers = 8;
+    private int currentPlayerCount = 0;
     
-    // Mapping from authentication to player index
-    private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+    public PlayerColor[] colorsArray = new PlayerColor[] {PlayerColor.DarkBlue, PlayerColor.DarkGreen, PlayerColor.Fuchsia, PlayerColor.Gold, PlayerColor.LightBlue, PlayerColor.LightPink, PlayerColor.Lime, PlayerColor.Red};
+
+    public List<PlayerInfo> playerInfos = new List<PlayerInfo>();
 
     public async void Initialize(MenuManager manager, OurNetwork network)
     {
@@ -28,106 +35,97 @@ public class LobbyManager : MonoBehaviour
 
     public async void HostGame()
     {
-        var lobbyOptions = new CreateLobbyOptions
-        {
-            IsPrivate = true
-        };
-
-        currentLobby = await LobbyService.Instance.CreateLobbyAsync("My Game", 8, lobbyOptions);
-        menuManager.UpdateJoinCodeDisplay(currentLobby.LobbyCode);
-        Debug.Log($"Lobby created with code: {currentLobby.LobbyCode}");
-        SubscribeToLobbyEvents();
-        isHost = true;
-        UpdatePlayerCount();
-        menuManager.ShowStartButton(true);
-    }
-
-    public async void JoinGame(string joinCode)
-    {
-        currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode);
-        Debug.Log($"Joined lobby: {currentLobby.Name}");
-        SubscribeToLobbyEvents();
-        isHost = false;
-        UpdatePlayerCount();
-    }
-
-    private async void SubscribeToLobbyEvents()
-    {
-        var callbacks = new LobbyEventCallbacks();
-        callbacks.LobbyChanged += OnLobbyChanged;
-        callbacks.PlayerJoined += OnPlayerJoined;
-        callbacks.PlayerLeft += OnPlayerLeft;
-
-        await LobbyService.Instance.SubscribeToLobbyEventsAsync(currentLobby.Id, callbacks);
-    }
-
-    private void OnPlayerJoined(List<LobbyPlayerJoined> newPlayers)
-    {
-        foreach (var player in newPlayers)
-        {
-            Debug.Log($"Player joined: {player.Player.Id} at index {player.PlayerIndex}");
-            playerIndexMap[player.Player.Id] = player.PlayerIndex;
+        try {
+            // Create a Relay allocation
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
+            
+            // Get the join code
+            joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            
+            // Set up the Relay connection data on the NetworkManager
+            var relayServerData = AllocationUtils.ToRelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            
+            // Start the host
+            NetworkManager.Singleton.StartHost();
+            
+            // Update UI
+            menuManager.UpdateJoinCodeDisplay(joinCode);
+            Debug.Log($"Relay allocation created with join code: {joinCode}");
+            
+            isHost = true;
+            UpdatePlayerCount();
+            menuManager.ShowStartButton(true);
+            
+            // Set up connection event handlers
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         }
-        UpdatePlayerCount();
+        catch (System.Exception e) {
+            Debug.LogError($"Failed to start host: {e.Message}");
+        }
     }
 
-    private void OnPlayerLeft(List<int> leftPlayerIndices)
+    public async void JoinGame(string code)
     {
-        foreach (var playerIndex in leftPlayerIndices)
-        {
-            Debug.Log($"Player left at index: {playerIndex}");
+        try {
+            // Join the Relay allocation using the provided join code
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(code);
+            
+            // Set up the Relay connection data on the NetworkManager
+            var relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            
+            // Start the client
+            NetworkManager.Singleton.StartClient();
+            
+            Debug.Log($"Joined game with code: {code}");
+            joinCode = code;
+            isHost = false;
+            
+            // Set up connection event handlers
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         }
+        catch (System.Exception e) {
+            Debug.LogError($"Failed to join game: {e.Message}");
+        }
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        // A new client connected
+        currentPlayerCount++;
+        UpdatePlayerCount();
+
+        // Add the connected player to our playerIndexMap in the ourNetwork script
+        ourNetwork.playerIndexMap.Add(clientId.ToString(), new PlayerInfo(ourNetwork.playerIndexMap.Count, "Name Placeholder", colorsArray[currentPlayerCount - 1], 0));
+        
+        // You'll need to implement a way to share player IDs and assign indices
+        // This could be done with RPCs after connection
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        // A client disconnected
+        currentPlayerCount--;
         UpdatePlayerCount();
     }
 
     private void UpdatePlayerCount()
     {
-        int playerCount = currentLobby.Players.Count - 1;
-        int maxPlayers = currentLobby.MaxPlayers;
-        menuManager.UpdatePlayerCountDisplay(playerCount, maxPlayers);
+        menuManager.UpdatePlayerCountDisplay(currentPlayerCount, maxPlayers);
     }
 
-    public async void StartGame()
+    public void StartGame()
     {
-        var updateOptions = new UpdateLobbyOptions();
-        updateOptions.Data = new Dictionary<string, DataObject>()
+        if (isHost)
         {
-            {"GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "true")}
-        };
-        await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, updateOptions);
-    }
-
-    private void OnLobbyChanged(ILobbyChanges changes)
-    {
-        if (changes.Data.Changed)
-        {
-            if (currentLobby.Data.ContainsKey("GameStarted") &&
-                currentLobby.Data["GameStarted"].Value == "true")
-            {
-                // SceneManager.LoadScene("Levers");
-                if (isHost)
-                {
-                    SceneManager.LoadScene("Map");
-                }
-                else
-                {
-                    SceneManager.LoadScene("MapControls");
-
-                }
-            }
-        }
-
-        if (changes.PlayerJoined.Changed || changes.PlayerLeft.Changed)
-        {
-            UpdatePlayerCount();
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
         }
     }
 
-    // Public method to get PlayerIndex
-    public int GetPlayerIndex(string playerId)
-    {
-        return playerIndexMap.ContainsKey(playerId) ? playerIndexMap[playerId] : -1;
-    }
 
     // Public method to get local player's ID
     public string GetLocalPlayerId()

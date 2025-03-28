@@ -12,6 +12,8 @@ public class GyroRotation : NetworkBehaviour
 
     private Quaternion avg;
 
+    public GameObject ballDownCollision;
+
     void Start()
     {
         if (SystemInfo.supportsGyroscope)
@@ -34,7 +36,6 @@ public class GyroRotation : NetworkBehaviour
     {
         // if(IsServer == true)
             // Apply the offset so the object starts with zeroed rotation
-            Debug.Log(gyro.attitude);
             // avg = gyro_inputs.Average<Quaternion>();
             transform.rotation = initialRotation * ConvertGyroRotation(gyro.attitude);
     }
