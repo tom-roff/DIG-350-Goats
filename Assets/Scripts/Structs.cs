@@ -1,3 +1,5 @@
+using System;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 
@@ -7,7 +9,19 @@ public enum PlayerColor
 };
 
 public struct PlayerInfo{
-    // enum PlayerColor playerColor;
+    public int playerIndex;
+    public String playerName;
+    public PlayerColor playerColor;
+    public int treasuresCollected;
+
+
+    public PlayerInfo(int index, String name, PlayerColor color, int treasures){
+        playerIndex = index;
+        playerName = name;
+        playerColor = color;
+        treasuresCollected = treasures;
+    }
+
 }
 
 public class Structs

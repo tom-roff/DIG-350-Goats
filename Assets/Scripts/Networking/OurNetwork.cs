@@ -13,10 +13,14 @@ public class OurNetwork : NetworkBehaviour
     public bool isHost = false;
     private MenuManager menuManager;
 
+    
+
     // Mapping from authentication to player index
-    public Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+    public Dictionary<string, PlayerInfo> playerIndexMap = new Dictionary<string, PlayerInfo>();
     // Mapping from authentication to netcode id
     public Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
+
+
 
     public async void Initialize(MenuManager manager)
     {
@@ -40,8 +44,6 @@ public class OurNetwork : NetworkBehaviour
             return 0;
         }
     }
-
-
     // [Unity.Netcode.ClientRpc]
     // public void RpcVibratePhoneClientRpc(ClientRpcParams clientRpcParams)
     // {

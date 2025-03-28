@@ -46,7 +46,8 @@ public class CameraController : NetworkBehaviour
 
         else{
             playerId = lobbyManager.GetLocalPlayerId();
-            playerIndex = lobbyManager.GetPlayerIndex(playerId);
+            // Hi Paul I commented this out since the LobbyManager doesn't use this function anymore. Sorry to do this to you king. We can talk in class about the new, more versatile approach.
+            // playerIndex = lobbyManager.GetPlayerIndex(playerId);
         
             AssignCamera();
         }

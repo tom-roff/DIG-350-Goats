@@ -8,6 +8,7 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Lobbies.Models;
 
 
 public class LobbyManager : MonoBehaviour
@@ -19,8 +20,9 @@ public class LobbyManager : MonoBehaviour
     private int maxPlayers = 8;
     private int currentPlayerCount = 0;
     
-    // Dictionary to track connected players
-    private Dictionary<string, int> playerIndexMap = new Dictionary<string, int>();
+    public PlayerColor[] colorsArray = new PlayerColor[] {PlayerColor.DarkBlue, PlayerColor.DarkGreen, PlayerColor.Fuchsia, PlayerColor.Gold, PlayerColor.LightBlue, PlayerColor.LightPink, PlayerColor.Lime, PlayerColor.Red};
+
+    public List<PlayerInfo> playerInfos = new List<PlayerInfo>();
 
     public async void Initialize(MenuManager manager, OurNetwork network)
     {
@@ -95,6 +97,9 @@ public class LobbyManager : MonoBehaviour
         // A new client connected
         currentPlayerCount++;
         UpdatePlayerCount();
+
+        // Add the connected player to our playerIndexMap in the ourNetwork script
+        ourNetwork.playerIndexMap.Add(clientId.ToString(), new PlayerInfo(ourNetwork.playerIndexMap.Count, "Name Placeholder", colorsArray[currentPlayerCount - 1], 0));
         
         // You'll need to implement a way to share player IDs and assign indices
         // This could be done with RPCs after connection
@@ -121,11 +126,6 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    // Public method to get PlayerIndex - you'll need to implement a system to track this
-    public int GetPlayerIndex(string playerId)
-    {
-        return playerIndexMap.ContainsKey(playerId) ? playerIndexMap[playerId] : -1;
-    }
 
     // Public method to get local player's ID
     public string GetLocalPlayerId()
