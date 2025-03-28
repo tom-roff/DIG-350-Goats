@@ -11,6 +11,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Lobbies.Models;
 
 
+// No longer using Unity Lobbies, just Unity Relay
 public class LobbyManager : MonoBehaviour
 {
     public bool isHost = false;
