@@ -11,6 +11,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Lobbies.Models;
 
 
+// No longer using Unity Lobbies, just Unity Relay
 public class LobbyManager : MonoBehaviour
 {
     public bool isHost = false;
@@ -99,7 +100,7 @@ public class LobbyManager : MonoBehaviour
         UpdatePlayerCount();
 
         // Add the connected player to our playerIndexMap in the ourNetwork script
-        ourNetwork.playerIndexMap.Add(clientId.ToString(), new PlayerInfo(ourNetwork.playerIndexMap.Count, "Name Placeholder", colorsArray[currentPlayerCount - 1], 0));
+        ourNetwork.playerIndexMap.Add(clientId, new PlayerInfo(ourNetwork.playerIndexMap.Count, "Name Placeholder", colorsArray[currentPlayerCount - 1], 0));
         
         // You'll need to implement a way to share player IDs and assign indices
         // This could be done with RPCs after connection

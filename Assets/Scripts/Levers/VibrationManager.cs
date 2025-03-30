@@ -70,19 +70,4 @@ public class VibrationManager : NetworkBehaviour
         //     }
         // }
     }
-
-    private ulong GetClientIdByPlayerId(string pID)
-    {
-        Dictionary<string, ulong> IdMap = network.playerIdToClientIdMap;
-
-        if(!IdMap.ContainsKey(pID))
-        {
-            Debug.Log($"Player ID {pID} not found in IdMap.");
-            return 0;
-        }
-        else
-        {
-            return IdMap[pID];
-        }
-    }
 }
