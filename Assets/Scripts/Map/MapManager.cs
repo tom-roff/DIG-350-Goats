@@ -10,7 +10,7 @@ public class MapManager : MonoBehaviour
 {
 
 
-
+    public ulong hostId;
     public GameObject[,] tiles;
     public int mapWidth;
     public int mapHeight;

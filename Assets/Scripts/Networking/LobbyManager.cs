@@ -55,6 +55,7 @@ public class LobbyManager : MonoBehaviour
             Debug.Log($"Relay allocation created with join code: {joinCode}");
             
             isHost = true;
+            GameManager.Instance.MapManager.hostId = NetworkManager.Singleton.LocalClientId;
             UpdatePlayerCount();
             menuManager.ShowStartButton(true);
             

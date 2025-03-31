@@ -9,25 +9,50 @@ using Unity.Netcode;
 public class MapPlayerBehavior : NetworkBehaviour
 {
     [SerializeField] public GameObject playerPrefab;
+    private ulong hostId;
+    [SerializeField] public GameObject hostUI;
+    [SerializeField] public GameObject playerUI;
 
 
+    void Start()
+    {
+        hostId = NetworkManager.Singleton.LocalClientId;
+        if (hostId == GameManager.Instance.MapManager.hostId) // main screen
+        {
+            playerUI.SetActive(false);
+        }
+        else
+        {
+            hostUI.SetActive(false);
+        }
+    }
 
     void CreatePlayerQueue()
     {
-        GameManager.Instance.MapManager.players = new MapPlayer[NetworkManager.Singleton.ConnectedClientsIds.Count]; // replace with # of players in lobby
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
+        int playerCount = GameManager.Instance.OurNetwork.playerIndexMap.Count;
+        GameManager.Instance.MapManager.players = new MapPlayer[playerCount]; // replace with # of players in lobby
+
+        int i = 0;
+        foreach (KeyValuePair<ulong, PlayerInfo> entry in GameManager.Instance.OurNetwork.playerIndexMap)
         {
-            if (NetworkManager.Singleton.ConnectedClientsIds[i] != NetworkManager.Singleton.LocalClientId)
+            // do something with entry.Value or entry.Key
+            if (entry.Key != GameManager.Instance.MapManager.hostId)
             {
-                GameManager.Instance.MapManager.players[i] = new MapPlayer(NetworkManager.Singleton.ConnectedClientsIds[i]);
-                Debug.Log(NetworkManager.Singleton.ConnectedClientsIds[i]);
+                GameManager.Instance.MapManager.players[i] = new MapPlayer(entry.Key);
             }
+            else
+            {
+                Debug.Log("host found?");
+            }
+            i++;
         }
+        
         Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
     }
 
     public void StartMap()
     {
+        if (hostId != GameManager.Instance.MapManager.hostId) return;
         CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
@@ -53,7 +78,6 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         if (GameManager.Instance.MapManager.currentPlayer == -1)
         {
-            Debug.Log("currentPlayer == -1");
             Vector2 startPosition = FindStartPosition();
             foreach (var player in GameManager.Instance.MapManager.players)
             {
@@ -83,7 +107,8 @@ public class MapPlayerBehavior : NetworkBehaviour
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
     }
 
-    public static void MovePlayer(float x, float y)
+    [Rpc(SendTo.Server)]
+    public void MovePlayerRpc(float x, float y)
     {
         int i = (int)x;
         int j = (int)y;
@@ -101,43 +126,36 @@ public class MapPlayerBehavior : NetworkBehaviour
     }
 
     
-    // void Update()
-    // {
-    //     if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
-    //     {
-    //         // if playerID == currentPlayer
-    //         // try move, successful moves-- && set MapPlayer position etc...
-    //         // else do nothing 
+    void Update()
+    {
+        if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+        {
+            // if playerID == currentPlayer
+            // try move, successful moves-- && set MapPlayer position etc...
+            // else do nothing 
 
-    //         MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+            MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
 
-    //         if (currentPlayer.playerID == "0")
-    //         {
-    //             if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayer(currentPlayer.position.x, currentPlayer.position.y + 1);
-    //             if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayer(currentPlayer.position.x, currentPlayer.position.y - 1);
-    //             if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayer(currentPlayer.position.x + 1, currentPlayer.position.y);
-    //             if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayer(currentPlayer.position.x - 1, currentPlayer.position.y);
-    //         }
-    //         else if (currentPlayer.playerID == "1")
-    //         {
-    //             if (Input.GetKeyDown("d")) MovePlayer(currentPlayer.position.x, currentPlayer.position.y + 1);
-    //             if (Input.GetKeyDown("a")) MovePlayer(currentPlayer.position.x, currentPlayer.position.y - 1);
-    //             if (Input.GetKeyDown("w")) MovePlayer(currentPlayer.position.x + 1, currentPlayer.position.y);
-    //             if (Input.GetKeyDown("s")) MovePlayer(currentPlayer.position.x - 1, currentPlayer.position.y);
-    //         }
+            if (currentPlayer.playerID == hostId)
+            {
+                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(currentPlayer.position.x, currentPlayer.position.y + 1);
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(currentPlayer.position.x, currentPlayer.position.y - 1);
+                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(currentPlayer.position.x + 1, currentPlayer.position.y);
+                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(currentPlayer.position.x - 1, currentPlayer.position.y);
+            }
 
-    //         // if moves == 0
-    //         // requeue currentPlayer, dequeue next player into currentPlayer
-    //         // roll dice mechanism? 
+            // if moves == 0
+            // requeue currentPlayer, dequeue next player into currentPlayer
+            // roll dice mechanism? 
 
-    //         if (GameManager.Instance.MapManager.moves < 1)
-    //         {
-    //             GameManager.Instance.MapManager.NextPlayer();
-    //         }
-    //     }
-    // }
+            if (GameManager.Instance.MapManager.moves < 1)
+            {
+                GameManager.Instance.MapManager.NextPlayer();
+            }
+        }
+    }
 
-    static bool InBounds(int i, int j)
+    bool InBounds(int i, int j)
     {
         if(i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
         return false;
