@@ -4,11 +4,9 @@ using Unity.Netcode;
 public class PlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
-    public float gravity = 9.8f;
-    public float jumpForce = 5f;
+    public float gravity = 4f;
+    public float jumpForce = 20f;
     public float groundCheckDistance = 0.1f;
-    // Removed groundLayer since we're checking against all objects
-    
     private float horizontalInput;
     private float verticalVelocity = 0f;
     private bool isGrounded;
@@ -26,30 +24,31 @@ public class PlayerMovement : NetworkBehaviour
         // Handle jumping
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            verticalVelocity = jumpForce;
-            JumpRpc();
+            Debug.Log("Jump");
+            verticalVelocity += jumpForce;
+            Move(horizontalInput, verticalVelocity);
+        
+            // Send movement to server
+            MoveRpc(horizontalInput, verticalVelocity);
+        }
+        else
+        {
+            // Move horizontally
+            Move(horizontalInput, verticalVelocity);
+            
+            // Send movement to server
+            MoveRpc(horizontalInput, verticalVelocity);
         }
         
         // Apply gravity
         ApplyGravity();
-        
-        // Move horizontally
-        Move(horizontalInput);
-        
-        // Send movement to server
-        MoveRpc(horizontalInput, verticalVelocity);
     }
     
     private void CheckGrounded()
     {
         // Cast a ray downward from slightly above the player's feet
-        // No layer mask means it will check against ANY collider
-        Vector3 rayStart = transform.position + Vector3.up * 0.1f;
-        isGrounded = Physics.Raycast(rayStart, Vector3.down, groundCheckDistance + 0.1f);
-        
-        // Visual debugging to see the ray (visible in Scene view when game is running)
-        Debug.DrawRay(rayStart, Vector3.down * (groundCheckDistance + 0.1f), 
-            isGrounded ? Color.green : Color.red, 0.1f);
+        Vector3 rayStart = transform.position - Vector3.up * 0.51f;
+        isGrounded = Physics.Raycast(rayStart, Vector3.down, groundCheckDistance - 0.51f);
     }
     
     private void ApplyGravity()
@@ -59,20 +58,22 @@ public class PlayerMovement : NetworkBehaviour
             // Apply gravity to vertical velocity
             verticalVelocity -= gravity * Time.deltaTime;
         }
-        else if (verticalVelocity < 0)
+        else
         {
             // Reset vertical velocity when grounded
-            verticalVelocity = -0.1f; // Small negative value to keep player grounded
+            verticalVelocity = -0.001f; // Small negative value to keep player grounded
         }
         
         // Apply vertical movement
         transform.Translate(new Vector3(0, verticalVelocity * Time.deltaTime, 0));
     }
     
-    private void Move(float horizontalInput)
+    private void Move(float horizontalInput, float verticalVel)
     {
+        verticalVelocity = verticalVel;
         Vector3 movement = new Vector3(horizontalInput, 0f, 0f);
         transform.Translate(movement * moveSpeed * Time.deltaTime);
+        ApplyGravity();
     }
     
     [Rpc(SendTo.Server)]
@@ -80,13 +81,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         // On server, set the vertical velocity and apply movement
         verticalVelocity = verticalVel;
-        Move(horizontalInput);
+        Move(horizontalInput, verticalVel);
         ApplyGravity();
-    }
-    
-    [Rpc(SendTo.Server)]
-    private void JumpRpc()
-    {
-        verticalVelocity = jumpForce;
     }
 }
