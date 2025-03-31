@@ -30,8 +30,6 @@ public class CameraController : NetworkBehaviour
         AssignCamera();
 
         StartVibrationSequence();
-
-        StartLeverSequence();
     }
 
     void AssignCamera()
@@ -74,18 +72,10 @@ public class CameraController : NetworkBehaviour
             Debug.Log($"Lever {pulledLeverIndex} pulled correctly!");
             currentLeverIndex++;
 
-            if (currentLeverIndex < leverOrder.Length)
-            {
-                SendVibrationToPlayer(leverOrder[currentLeverIndex]);
-            }
-            else
-            {
-                Debug.Log("All levers have been pulled in order!");
-            }
         }
         else
         {
-            Debug.LogWarning("Incorrect lever pulled! Try again.");
+            Debug.Log($"Wrong Lever, {pulledLeverIndex} should have been pulled!");
         }
     }
 }
