@@ -9,22 +9,6 @@ using UnityEngine.SceneManagement;
 public class MapManager : MonoBehaviour
 {
 
-    // private static MapManager _Instance;
-    // public static MapManager Instance
-    // {
-    //     get
-    //     {
-    //         if (!_Instance)
-    //         {
-    //             _Instance = new GameObject().AddComponent<MapManager>();
-    //             // name it for easy recognition
-    //             _Instance.name = _Instance.GetType().ToString();
-    //             // mark root as DontDestroyOnLoad();
-    //             DontDestroyOnLoad(_Instance.gameObject);
-    //         }
-    //         return _Instance;
-    //     }
-    // }
 
 
     public GameObject[,] tiles;

@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class MapPlayer
 {
-    public string playerID { get; set; }
+    public ulong playerID { get; set; }
     public Vector2 position { get; set; }
     public GameObject body { get; set; }
 
 
-    public MapPlayer(string playerID)
+    public MapPlayer(ulong playerID)
     {
         this.playerID = playerID;
         this.position = Vector2.positiveInfinity;
     }
 
-    public MapPlayer(string playerID, Vector2 position)
+    public MapPlayer(ulong playerID, Vector2 position)
     {
         this.playerID = playerID;
         this.position = position;

@@ -122,8 +122,12 @@ public class LobbyManager : MonoBehaviour
     {
         if (isHost)
         {
-            // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
+            SceneManager.LoadScene("Map");
+        }
+        else
+        {
+            Debug.Log("MapControls");
+            SceneManager.LoadScene("MapControls");
         }
     }
 

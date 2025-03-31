@@ -31,7 +31,7 @@ public class CameraController : NetworkBehaviour
 
         StartVibrationSequence();
 
-        StartLeverSequence();
+        // StartLeverSequence();
     }
 
     void AssignCamera()
@@ -76,7 +76,7 @@ public class CameraController : NetworkBehaviour
 
             if (currentLeverIndex < leverOrder.Length)
             {
-                SendVibrationToPlayer(leverOrder[currentLeverIndex]);
+                // SendVibrationToPlayer(leverOrder[currentLeverIndex]);
             }
             else
             {

@@ -21,8 +21,8 @@ public class MapGeneration : MonoBehaviour
 
     void OnEnable()
     {
-        tileWidth = (1-(xMargin*2)) / GameManager.Instance.MapManager.mapWidth;
-        tileHeight = (1-(yMargin*2)) / GameManager.Instance.MapManager.mapHeight;
+        tileWidth = (1-(xMargin*2)) / GameManager.Instance.MapManager.map.GetLength(1);
+        tileHeight = (1-(yMargin*2)) / GameManager.Instance.MapManager.map.GetLength(0);
 
         GameManager.Instance.MapManager.tiles = new GameObject[GameManager.Instance.MapManager.mapHeight, GameManager.Instance.MapManager.mapWidth];
 
