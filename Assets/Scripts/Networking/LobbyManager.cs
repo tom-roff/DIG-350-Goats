@@ -17,7 +17,7 @@ public class LobbyManager : MonoBehaviour
     private MenuManager menuManager;
     private OurNetwork ourNetwork;
     private string joinCode;
-    private int maxPlayers = 8;
+    private int maxPlayers = 6;
     private int currentPlayerCount = 0;
     
     public PlayerColor[] colorsArray = new PlayerColor[] {PlayerColor.DarkBlue, PlayerColor.DarkGreen, PlayerColor.Fuchsia, PlayerColor.Gold, PlayerColor.LightBlue, PlayerColor.LightPink, PlayerColor.Lime, PlayerColor.Red};

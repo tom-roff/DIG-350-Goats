@@ -24,7 +24,7 @@ public struct PlayerInfo{
 
 }
 
-public class Structs
+public static class Structs
 {
     
 }
