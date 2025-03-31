@@ -11,8 +11,8 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public GameObject playerPrefab;
 
 
-   
-void CreatePlayerQueue()
+
+    void CreatePlayerQueue()
     {
         GameManager.Instance.MapManager.players = new MapPlayer[NetworkManager.Singleton.ConnectedClientsIds.Count]; // replace with # of players in lobby
         for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsIds.Count; i++)
@@ -23,22 +23,13 @@ void CreatePlayerQueue()
                 Debug.Log(NetworkManager.Singleton.ConnectedClientsIds[i]);
             }
         }
+        Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
     }
 
     public void StartMap()
     {
         CreatePlayerQueue();
-        if (GameManager.Instance.MapManager.currentPlayer == -1)
-        {
-            SpawnPlayers(FindStartPosition());
-        }
-        else
-        {
-            foreach (var player in GameManager.Instance.MapManager.players)
-            {
-                InstantiatePlayer(player.position, player);
-            }
-        }
+        SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
     }
@@ -58,11 +49,23 @@ void CreatePlayerQueue()
         return Vector2.positiveInfinity;
     }
 
-    void SpawnPlayers(Vector2 startPosition)
+    void SpawnPlayers()
     {
-        foreach (var player in GameManager.Instance.MapManager.players)
+        if (GameManager.Instance.MapManager.currentPlayer == -1)
         {
-            InstantiatePlayer(startPosition, player);
+            Debug.Log("currentPlayer == -1");
+            Vector2 startPosition = FindStartPosition();
+            foreach (var player in GameManager.Instance.MapManager.players)
+            {
+                InstantiatePlayer(startPosition, player);
+            }
+        }
+        else
+        {
+            foreach (var player in GameManager.Instance.MapManager.players)
+            {
+                InstantiatePlayer(player.position, player);
+            }
         }
     }
 
@@ -71,11 +74,11 @@ void CreatePlayerQueue()
     void InstantiatePlayer(Vector2 startPosition, MapPlayer player)
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        // playerInstance.name = "player " + player.playerID;
+        playerInstance.name = "player";
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        player.SetBody(playerInstance);
+        player.body = playerInstance;
         player.SetPosition(startPosition);
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
     }

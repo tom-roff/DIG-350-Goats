@@ -120,15 +120,8 @@ public class LobbyManager : MonoBehaviour
 
     public void StartGame()
     {
-        if (isHost)
-        {
-            SceneManager.LoadScene("Map");
-        }
-        else
-        {
-            Debug.Log("MapControls");
-            SceneManager.LoadScene("MapControls");
-        }
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        
     }
 
 
