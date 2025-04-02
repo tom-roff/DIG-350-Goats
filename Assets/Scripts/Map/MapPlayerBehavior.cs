@@ -16,8 +16,12 @@ public class MapPlayerBehavior : NetworkBehaviour
     public ulong currentPlayerId;
     public Vector2 currentPlayerPosition;
 
+    void OnEnable()
+    {
+        CheckHost();
+    }
 
-    void Start()
+    void CheckHost()
     {
         clientId = NetworkManager.Singleton.LocalClientId;
         if (clientId == GameManager.Instance.MapManager.hostId) // main screen
@@ -57,14 +61,17 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     public void StartMap()
     {
+        CheckHost();
+        Debug.Log("startmap");
         if (!host) return;
         Debug.Log("doing host stuff");
         CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
-        MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
-        SendCurrentPlayerRpc(tempPlayer.playerID, tempPlayer.position);
+        // MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID,
+                            GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position);
     }
 
     private Vector2 FindStartPosition()

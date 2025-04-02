@@ -53,6 +53,7 @@ public class MapGeneration : MonoBehaviour
                 }
             }
         }
+        Debug.Log("about to call start map");
         mapPlayerBehavior.StartMap();
     }
 
