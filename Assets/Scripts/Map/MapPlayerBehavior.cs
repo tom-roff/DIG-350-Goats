@@ -120,7 +120,6 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
 
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
-            // MapAudioManager.playerMovementAudio.Play();
             GameManager.Instance.MapManager.moves--;
         }
     }

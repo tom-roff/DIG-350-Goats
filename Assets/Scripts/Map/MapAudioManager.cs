@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MapAudioManager : MonoBehaviour
 {
-    public static AudioSource playerMovementAudio;
+    public static AudioSource stepAudio;
     public static AudioSource collectItemAudio;
 
     void Awake(){
@@ -11,7 +11,7 @@ public class MapAudioManager : MonoBehaviour
         {
             if (source.clip != null && source.clip.name == "Player_Movement")
             {
-                playerMovementAudio = source;
+                stepAudio = source;
             }
             if (source.clip != null && source.clip.name == "Collect_Item")
             {
