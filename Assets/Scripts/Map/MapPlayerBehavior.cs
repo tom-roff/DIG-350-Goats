@@ -9,21 +9,26 @@ using Unity.Netcode;
 public class MapPlayerBehavior : NetworkBehaviour
 {
     [SerializeField] public GameObject playerPrefab;
-    private ulong hostId;
+    private ulong clientId;
+    public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
+    public ulong currentPlayerId;
+    public Vector2 currentPlayerPosition;
 
 
     void Start()
     {
-        hostId = NetworkManager.Singleton.LocalClientId;
-        if (hostId == GameManager.Instance.MapManager.hostId) // main screen
+        clientId = NetworkManager.Singleton.LocalClientId;
+        if (clientId == GameManager.Instance.MapManager.hostId) // main screen
         {
             playerUI.SetActive(false);
+            host = true;
         }
         else
         {
             hostUI.SetActive(false);
+            host = false;
         }
     }
 
@@ -36,7 +41,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         foreach (KeyValuePair<ulong, PlayerInfo> entry in GameManager.Instance.OurNetwork.playerIndexMap)
         {
             // do something with entry.Value or entry.Key
-            if (entry.Key != GameManager.Instance.MapManager.hostId)
+            if (entry.Key != clientId)
             {
                 GameManager.Instance.MapManager.players[i] = new MapPlayer(entry.Key);
             }
@@ -52,11 +57,14 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     public void StartMap()
     {
-        if (hostId != GameManager.Instance.MapManager.hostId) return;
+        if (!host) return;
+        Debug.Log("doing host stuff");
         CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
+        MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+        SendCurrentPlayerRpc(tempPlayer.playerID, tempPlayer.position);
     }
 
     private Vector2 FindStartPosition()
@@ -121,8 +129,22 @@ public class MapPlayerBehavior : NetworkBehaviour
 
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
+            Debug.Log("moved");
             GameManager.Instance.MapManager.moves--;
+            if (GameManager.Instance.MapManager.moves < 1)
+            {
+                GameManager.Instance.MapManager.NextPlayer();
+                MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+                SendCurrentPlayerRpc(tempPlayer.playerID, tempPlayer.position);
+            }
         }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SendCurrentPlayerRpc(ulong currentPlayerId, Vector2 currentPlayerPosition)
+    {
+        this.currentPlayerId = currentPlayerId;
+        this.currentPlayerPosition = currentPlayerPosition;
     }
 
     
@@ -130,28 +152,19 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
         {
-            // if playerID == currentPlayer
-            // try move, successful moves-- && set MapPlayer position etc...
-            // else do nothing 
+            
 
-            MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
-
-            if (currentPlayer.playerID == hostId)
+            // client does this? 
+            if (currentPlayerId == clientId)
             {
-                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(currentPlayer.position.x, currentPlayer.position.y + 1);
-                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(currentPlayer.position.x, currentPlayer.position.y - 1);
-                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(currentPlayer.position.x + 1, currentPlayer.position.y);
-                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(currentPlayer.position.x - 1, currentPlayer.position.y);
+                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(currentPlayerPosition.x, currentPlayerPosition.y + 1);
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(currentPlayerPosition.x, currentPlayerPosition.y - 1);
+                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(currentPlayerPosition.x + 1, currentPlayerPosition.y);
+                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(currentPlayerPosition.x - 1, currentPlayerPosition.y);
             }
 
-            // if moves == 0
-            // requeue currentPlayer, dequeue next player into currentPlayer
-            // roll dice mechanism? 
 
-            if (GameManager.Instance.MapManager.moves < 1)
-            {
-                GameManager.Instance.MapManager.NextPlayer();
-            }
+            
         }
     }
 
