@@ -247,7 +247,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 2ba835f0eccfb30429fcd0c9eee58b01, type: 2}
-    TickRate: 30
+    TickRate: 64
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
@@ -1101,6 +1101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isHost: 0
+  colorsArray: 0000000001000000020000000300000004000000050000000600000007000000
 --- !u!4 &1163449857
 Transform:
   m_ObjectHideFlags: 0
