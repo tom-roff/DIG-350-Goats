@@ -304,12 +304,12 @@ GameObject:
   - component: {fileID: 237132160}
   - component: {fileID: 237132159}
   m_Layer: 0
-  m_Name: TV Camera
+  m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &237132159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1113,7 +1113,7 @@ GameObject:
   m_Component:
   - component: {fileID: 807857277}
   m_Layer: 0
-  m_Name: PhoneCameras
+  m_Name: PhoneCamerasFolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3053,7 +3053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  gameCamera: {fileID: 0}
+  gameCamera: {fileID: 237132158}
   playerCameraPositions:
   - {fileID: 1661004965}
   - {fileID: 1245740895}
