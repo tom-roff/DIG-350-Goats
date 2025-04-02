@@ -19,10 +19,23 @@ public class LobbyManager : MonoBehaviour
     private string joinCode;
     private int maxPlayers = 6;
     private int currentPlayerCount = 0;
+
+    public List<PlayerColor> possibleColors = new List<PlayerColor>();
     
-    public PlayerColor[] colorsArray = new PlayerColor[] {PlayerColor.DarkBlue, PlayerColor.DarkGreen, PlayerColor.Fuchsia, PlayerColor.Gold, PlayerColor.LightBlue, PlayerColor.LightPink, PlayerColor.Lime, PlayerColor.Red};
 
     public List<PlayerInfo> playerInfos = new List<PlayerInfo>();
+
+    public Material[] colorMats = new Material[8];
+
+    private void Start()
+    {
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkBlue, new Color (25, 25, 112), colorMats[0]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkGreen, new Color (0, 100, 0), colorMats[1]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Fuchsia, new Color (190, 0, 255), colorMats[2]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color (255, 215, 0), colorMats[3]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color (30, 156, 255), colorMats[4]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color (0, 225, 0), colorMats[5]));
+    }
 
     public async void Initialize(MenuManager manager, OurNetwork network)
     {
@@ -66,6 +79,15 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    public void OnNameInput(string name){
+        if(name.Length != 0){
+            menuManager.nameText.text = name;
+        }
+        else{
+            menuManager.nameText.text = "Please type in a name.";
+        }
+    }
+
     public async void JoinGame(string code)
     {
         try {
@@ -86,9 +108,13 @@ public class LobbyManager : MonoBehaviour
             // Set up connection event handlers
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+            menuManager.clientStartUI.SetActive(false);
+            menuManager.clientJoinedUI.SetActive(true);
         }
         catch (System.Exception e) {
             Debug.LogError($"Failed to join game: {e.Message}");
+            menuManager.joinText.text = "Connection failed, try again.";
         }
     }
 
@@ -99,7 +125,7 @@ public class LobbyManager : MonoBehaviour
         UpdatePlayerCount();
 
         // Add the connected player to our playerIndexMap in the ourNetwork script
-        ourNetwork.playerIndexMap.Add(clientId, new PlayerInfo(ourNetwork.playerIndexMap.Count, "Name Placeholder", colorsArray[currentPlayerCount - 1], 0));
+        ourNetwork.playerInfoList.Add(new PlayerInfo("Name Placeholder", possibleColors[currentPlayerCount - 1], 0));
         
         // You'll need to implement a way to share player IDs and assign indices
         // This could be done with RPCs after connection
