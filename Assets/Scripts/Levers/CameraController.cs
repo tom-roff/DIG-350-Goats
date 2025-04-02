@@ -7,7 +7,7 @@ public class CameraController : NetworkBehaviour
 {
     private OurNetwork network;
     private VibrationManager vibration;
-    private int playerIndex;
+    private ulong playerId;
 
     public GameObject gameCamera;
     public Transform[] playerCameraPositions;
@@ -31,9 +31,7 @@ public class CameraController : NetworkBehaviour
             return;
         }
 
-        ulong playerId = NetworkManager.Singleton.LocalClientId;
-        playerIndex = network.playerIndexMap[playerId].playerIndex;
-    
+        playerId = NetworkManager.Singleton.LocalClientId;
 
         AssignCamera();
 
@@ -42,22 +40,22 @@ public class CameraController : NetworkBehaviour
 
     void AssignCamera()
     {
-        if (playerIndex < 0 || playerIndex >= playerCameraPositions.Length)
+        if (playerId < 0 || (int)playerId >= playerCameraPositions.Length)
         {
-            Debug.LogError($"Invalid player index {playerIndex}");
+            Debug.LogError($"Invalid player index {playerId}");
             return;
         }
 
-        Transform desiredPos = playerCameraPositions[playerIndex];
+        Transform desiredPos = playerCameraPositions[playerId - 1]; // needs to be -1 because the host is Id 0
         if (desiredPos != null)
         {
             gameCamera.transform.position = desiredPos.position;
             gameCamera.transform.rotation = desiredPos.rotation;
-            Debug.Log($"Camera set to position {playerIndex}");
+            Debug.Log($"Camera set to position {playerId}");
         }
         else
         {
-            Debug.LogError($"Camera position for player {playerIndex} not found.");
+            Debug.LogError($"Camera position for player {playerId} not found.");
         }
     }
 
@@ -101,6 +99,7 @@ public class CameraController : NetworkBehaviour
     void OnWrongLeverPulled()
     {
         Debug.Log("Incorrect lever pulled! Resetting sequence or allow retries.");
+        currentLeverIndex = 0;
         // logic to reset or provide retries
     }
 }

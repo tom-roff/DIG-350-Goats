@@ -5,7 +5,6 @@ public class Lever : NetworkBehaviour
 {
     private Animator animator;
     private CameraController cameraController;
-    private OurNetwork network;
 
     public int leverIndex;
 
@@ -21,12 +20,6 @@ public class Lever : NetworkBehaviour
         if (cameraController == null)
         {
             Debug.LogError("CameraController not found in the scene!");
-        }
-
-        network = FindFirstObjectByType<OurNetwork>();
-        if (network == null)
-        {
-            Debug.LogError("OurNetwork instance not found!");
         }
     }
 

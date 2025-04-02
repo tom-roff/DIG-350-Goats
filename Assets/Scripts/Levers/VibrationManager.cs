@@ -17,7 +17,7 @@ public class VibrationManager : NetworkBehaviour
             return;
         }
 
-        int numPlayers = network.playerIndexMap.Count - 1;
+        int numPlayers = network.playerIndexMap.Count;
         indexToIdArray = new ulong[numPlayers];
 
         int i = 0;
