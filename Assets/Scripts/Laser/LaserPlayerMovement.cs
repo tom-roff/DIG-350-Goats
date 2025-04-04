@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerMovement : NetworkBehaviour
+public class LaserPlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
     public float gravity = 10f;
@@ -106,7 +106,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!IsServer) return;
         
-        PlayerMovement otherPlayer = collision.gameObject.GetComponent<PlayerMovement>();
+        LaserPlayerMovement otherPlayer = collision.gameObject.GetComponent<LaserPlayerMovement>();
         
         if (collision.gameObject.CompareTag("Player"))
         {
