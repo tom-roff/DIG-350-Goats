@@ -11,8 +11,9 @@ public class CameraController : NetworkBehaviour
 
     public GameObject gameCamera;
     public Transform[] playerCameraPositions;
+    public Transform hostCameraPosition;
 
-    private int[] leverOrder = {0, 1, 2, 3, 4, 5}; // Array that holds the lever order (0, 1, 2, 3, ...)
+    private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
 
     void Start()
@@ -23,6 +24,8 @@ public class CameraController : NetworkBehaviour
             Debug.LogError("OurNetwork instance not found!");
             return;
         }
+
+        AssignLeverOrder();
 
         vibration = FindFirstObjectByType<VibrationManager>();
         if (vibration == null)
@@ -38,8 +41,24 @@ public class CameraController : NetworkBehaviour
         StartVibrationSequence();
     }
 
+    void AssignLeverOrder() 
+    {
+        // Just as an example – this assumes Start() runs after Awake()
+        int numPlayers = network.playerIndexMap.Count;
+        leverOrder = new int[numPlayers];
+        for (int i = 0; i < numPlayers; i++)
+        {
+            leverOrder[i] = i;
+        }
+    }
+
     void AssignCamera()
     {
+        if(playerId == 0) // host camera position
+        {
+            gameCamera.transform.position = hostCameraPosition.position;
+            return;
+        }
         if (playerId < 0 || (int)playerId >= playerCameraPositions.Length)
         {
             Debug.LogError($"Invalid player index {playerId}");

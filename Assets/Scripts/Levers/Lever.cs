@@ -23,7 +23,7 @@ public class Lever : NetworkBehaviour
         }
     }
 
-    void Update()
+    /*void Update() REAL TRACK TOUCH FUNCTION FOR PHONE
     {
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
@@ -34,7 +34,34 @@ public class Lever : NetworkBehaviour
                 PullLeverServerRpc(leverIndex);
             }
         }
+    }*/
+
+    void Update()
+    {
+        // Touch input (mobile)
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            CheckLeverHit(ray);
+        }
+
+        // Mouse input (desktop testing)
+        if (Input.GetMouseButtonDown(0)) // Left click
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            CheckLeverHit(ray);
+        }
     }
+
+    void CheckLeverHit(Ray ray)
+    {
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
+        {
+            Debug.Log($"Lever {leverIndex} clicked or tapped!");
+            PullLeverServerRpc(leverIndex);
+        }
+    }
+
 
     [ServerRpc(RequireOwnership = false)]
     void PullLeverServerRpc(int leverIndex, ServerRpcParams rpcParams = default)

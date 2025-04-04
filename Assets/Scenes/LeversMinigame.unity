@@ -291,6 +291,37 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!1 &86986654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 86986655}
+  m_Layer: 0
+  m_Name: HostCameraPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &86986655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86986654}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.26, y: 2.24, z: -7.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &237132158
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,7 +453,7 @@ Transform:
   m_GameObject: {fileID: 237132158}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.5, y: 0.8, z: -9.6}
+  m_LocalPosition: {x: -5.26, y: 2.24, z: -7.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3061,6 +3092,7 @@ MonoBehaviour:
   - {fileID: 310506516}
   - {fileID: 814309486}
   - {fileID: 927678453}
+  hostCameraPosition: {fileID: 86986655}
 --- !u!4 &1898348470
 Transform:
   m_ObjectHideFlags: 0
@@ -3260,3 +3292,4 @@ SceneRoots:
   - {fileID: 1407276531}
   - {fileID: 1438165496}
   - {fileID: 1595694044}
+  - {fileID: 86986655}
