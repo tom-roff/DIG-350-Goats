@@ -5,6 +5,8 @@ public class ClimingPlayerMovement : MonoBehaviour
     private bool right = true;
     private int climbAmount = 2;
 
+    private float reachLength;
+
     private void Update()
     {
         if (right)
