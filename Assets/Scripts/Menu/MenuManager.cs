@@ -10,6 +10,7 @@ public class MenuManager : MonoBehaviour
     public Button joinButton;
     public TMP_Text playerCountText;
     public Button startGameButton;
+    public Button startLeverGameButton;
 
     [SerializeField] private OurNetwork ourNetwork;
     [SerializeField] private LobbyManager lobbyManager;
@@ -33,6 +34,7 @@ public class MenuManager : MonoBehaviour
         joinButton.onClick.AddListener(() => lobbyManager.JoinGame(joinCodeInput.text));
         startGameButton.onClick.AddListener(lobbyManager.StartGame);
         startGameButton.gameObject.SetActive(false);
+        startLeverGameButton.onClick.AddListener(lobbyManager.StartLeverGame);
         playerCountText.gameObject.SetActive(false);
     }
 

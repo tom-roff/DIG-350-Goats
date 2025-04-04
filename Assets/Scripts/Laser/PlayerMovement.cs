@@ -4,89 +4,125 @@ using Unity.Netcode;
 public class PlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
-    public float gravity = 9.8f;
-    public float jumpForce = 5f;
-    public float groundCheckDistance = 0.1f;
-    // Removed groundLayer since we're checking against all objects
-    
+    public float gravity = 10f;
+    public float jumpForce = 15f;
+    public float bounceForce = 2f;
     private float horizontalInput;
     private float verticalVelocity = 0f;
     private bool isGrounded;
     
+
     void Update()
     {
-        if (!IsOwner) return;
-        
-        // Check ground state
-        CheckGrounded();
-        
         // Get input
         horizontalInput = Input.GetAxis("Horizontal");
-        
+
         // Handle jumping
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             verticalVelocity = jumpForce;
-            JumpRpc();
         }
+    }
+
+    void FixedUpdate()
+    {
+        if (!IsOwner) return;
+
+        CheckInBounds();
+        
+        // Check ground state
+        CheckGrounded();
         
         // Apply gravity
         ApplyGravity();
         
-        // Move horizontally
-        Move(horizontalInput);
-        
-        // Send movement to server
         MoveRpc(horizontalInput, verticalVelocity);
     }
     
+    private void CheckInBounds()
+    {
+        if (transform.position.y < 0.5)
+        {
+            transform.position = new Vector3 (transform.position.x, 0.5f, transform.position.z);
+        }
+        if (transform.position.x < -4.75)
+        {
+            transform.position = new Vector3 (-4.75f, transform.position.y, transform.position.z);
+        }
+        else if (transform.position.x > 4.75)
+        {
+            transform.position = new Vector3 (4.75f, transform.position.y, transform.position.z);
+        }
+    }
+
     private void CheckGrounded()
     {
-        // Cast a ray downward from slightly above the player's feet
-        // No layer mask means it will check against ANY collider
-        Vector3 rayStart = transform.position + Vector3.up * 0.1f;
-        isGrounded = Physics.Raycast(rayStart, Vector3.down, groundCheckDistance + 0.1f);
-        
-        // Visual debugging to see the ray (visible in Scene view when game is running)
-        Debug.DrawRay(rayStart, Vector3.down * (groundCheckDistance + 0.1f), 
-            isGrounded ? Color.green : Color.red, 0.1f);
+        // Check if player is on the ground
+        isGrounded = transform.position.y <= 0.51;
     }
     
     private void ApplyGravity()
     {
-        if (!isGrounded)
+        if ((isGrounded) && (verticalVelocity < 0))
         {
-            // Apply gravity to vertical velocity
+            // When grounded, reset vertical velocity
+            verticalVelocity = 0f;
+        }
+        else
+        {
+            // Apply gravity
             verticalVelocity -= gravity * Time.deltaTime;
         }
-        else if (verticalVelocity < 0)
-        {
-            // Reset vertical velocity when grounded
-            verticalVelocity = -0.1f; // Small negative value to keep player grounded
-        }
-        
-        // Apply vertical movement
-        transform.Translate(new Vector3(0, verticalVelocity * Time.deltaTime, 0));
     }
     
-    private void Move(float horizontalInput)
+    private void Move(float horizontalInput, float verticalVel)
     {
-        Vector3 movement = new Vector3(horizontalInput, 0f, 0f);
-        transform.Translate(movement * moveSpeed * Time.deltaTime);
+        if (verticalVel != 0)
+        {
+            Debug.Log(verticalVel);
+        }
+
+        // Horizontal movement
+        float horizontalMovement = horizontalInput * moveSpeed * Time.deltaTime;
+        
+        // Vertical movement
+        float verticalMovement = verticalVel * Time.deltaTime;
+        
+        // Apply both movements
+        transform.Translate(horizontalMovement, verticalMovement, 0f);
     }
     
     [Rpc(SendTo.Server)]
     private void MoveRpc(float horizontalInput, float verticalVel)
     {
-        // On server, set the vertical velocity and apply movement
+        // Update values on server
         verticalVelocity = verticalVel;
-        Move(horizontalInput);
-        ApplyGravity();
+        
+        // Move on server
+        Move(horizontalInput, verticalVel);
     }
-    
-    [Rpc(SendTo.Server)]
-    private void JumpRpc()
+
+    private void OnCollisionEnter(Collision collision)
     {
-        verticalVelocity = jumpForce;
+        if (!IsServer) return;
+        
+        PlayerMovement otherPlayer = collision.gameObject.GetComponent<PlayerMovement>();
+        
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // Calculate bounce direction based on positions
+            Vector3 bounceDir = (transform.position - otherPlayer.transform.position).normalized;
+            
+            // Apply immediate bounce to both players
+            // This player bounces in the direction away from the other player
+            transform.position += bounceDir * bounceForce * 0.1f;
+            // Add a small upward bounce
+            verticalVelocity = Mathf.Max(verticalVelocity, jumpForce * 0.5f);
+            
+            // Other player bounces in the opposite direction
+            otherPlayer.transform.position -= bounceDir * bounceForce * 0.1f;
+            // Add a small upward bounce to other player
+            otherPlayer.verticalVelocity = Mathf.Max(otherPlayer.verticalVelocity, jumpForce * 0.5f);
+        }
     }
 }
