@@ -13,8 +13,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
-    public ulong currentPlayerId;
-    public Vector2 currentPlayerPosition;
+    public ulong currentPlayerId = ulong.MinValue;
 
     void OnEnable()
     {
@@ -55,23 +54,34 @@ public class MapPlayerBehavior : NetworkBehaviour
             }
             i++;
         }
-        
+
         Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
     }
 
     public void StartMap()
     {
         CheckHost();
-        Debug.Log("startmap");
-        if (!host) return;
+        if (!host)
+        {
+            GameManager.Instance.MapManager.Play();
+            return;
+        }
         Debug.Log("doing host stuff");
         CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
-        // MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
-        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID,
-                            GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position);
+
+
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (!host) return;
+        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
+        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
+        SendCurrentPlayerRpc(currentPlayerId);
+        base.OnNetworkSpawn();
     }
 
     private Vector2 FindStartPosition()
@@ -108,7 +118,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
     }
 
-    
+
 
     void InstantiatePlayer(Vector2 startPosition, MapPlayer player)
     {
@@ -123,10 +133,11 @@ public class MapPlayerBehavior : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void MovePlayerRpc(float x, float y)
+    public void MovePlayerRpc(int x, int y)
     {
-        int i = (int)x;
-        int j = (int)y;
+        Vector2 currentPlayerPosition = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position;
+        int i = (int)currentPlayerPosition.x + x;
+        int j = (int)currentPlayerPosition.y + y;
         if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
         {
             int currentPlayer = GameManager.Instance.MapManager.currentPlayer;
@@ -136,50 +147,66 @@ public class MapPlayerBehavior : NetworkBehaviour
 
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
-            Debug.Log("moved");
+
             GameManager.Instance.MapManager.moves--;
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
-                MapPlayer tempPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
-                SendCurrentPlayerRpc(tempPlayer.playerID, tempPlayer.position);
+                // SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
             }
         }
     }
 
     [Rpc(SendTo.NotServer)]
-    public void SendCurrentPlayerRpc(ulong currentPlayerId, Vector2 currentPlayerPosition)
+    // public void SendCurrentPlayerRpc(string message)
+    public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
+        // Debug.Log(message);
         this.currentPlayerId = currentPlayerId;
-        this.currentPlayerPosition = currentPlayerPosition;
     }
 
-    
+    [Rpc(SendTo.Server)]
+    public void AskForCurrentPlayerRpc()
+    {
+        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
+        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
+        SendCurrentPlayerRpc(currentPlayerId);
+    }
+
+
     void Update()
     {
         if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
         {
-            
+
 
             // client does this? 
-            if (currentPlayerId == clientId)
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
             {
-                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(currentPlayerPosition.x, currentPlayerPosition.y + 1);
-                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(currentPlayerPosition.x, currentPlayerPosition.y - 1);
-                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(currentPlayerPosition.x + 1, currentPlayerPosition.y);
-                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(currentPlayerPosition.x - 1, currentPlayerPosition.y);
+                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
+                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
+                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
+            }
+            else if (currentPlayerId == ulong.MinValue)
+            {
+                AskForCurrentPlayerRpc();
             }
 
 
-            
+
         }
     }
 
     bool InBounds(int i, int j)
     {
-        if(i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
+        if (i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
         return false;
     }
+    
+
+
+    // BUTTON ARROW KEY AREA
 
 
 }
