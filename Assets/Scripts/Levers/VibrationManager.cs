@@ -1,12 +1,34 @@
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class VibrationManager : NetworkBehaviour
 {
-    // Method called by OurNetwork to trigger vibration for a specific client
+    private ulong[] indexToIdArray;
     private OurNetwork network;
+
+    void Start()
+    {
+        network = FindFirstObjectByType<OurNetwork>();
+        if (network == null)
+        {
+            Debug.LogError("OurNetwork instance not found!");
+            return;
+        }
+
+        int numPlayers = network.playerIndexMap.Count;
+        indexToIdArray = new ulong[numPlayers];
+
+        int i = 0;
+        foreach(var player in network.playerIndexMap)
+        {
+            ulong pId = player.Key;
+            indexToIdArray[i] = pId;
+            i++;
+        }
+    }
+
     public void TriggerVibration(ulong clientId)
     {
         if (!IsServer)
@@ -14,18 +36,16 @@ public class VibrationManager : NetworkBehaviour
             Debug.LogWarning("TriggerVibration called on a client, but should only be run on the server.");
             return;
         }
-        else if (IsServer)
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
         {
-            ClientRpcParams clientRpcParams = new ClientRpcParams
+            Send = new ClientRpcSendParams
             {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new ulong[] { clientId }
-                }
-            };
-            
-            VibratePhoneClientRpc(clientRpcParams);
-        }
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
+        
+        VibratePhoneClientRpc(clientRpcParams);  
     }
     
     [ClientRpc]
@@ -39,35 +59,26 @@ public class VibrationManager : NetworkBehaviour
         #endif
     }
 
-    public void SendVibrationSignal(int playerToVibrate)
+    public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
-        // foreach (var player in network.playerIndexMap)
-        // {
-        //     string playerID = player.Key;
-        //     int playerIndex = player.Value;
+        foreach (int playerIndex in leverOrder)
+        {
+            ulong targetClientId = indexToIdArray[playerIndex];
+            
+            if (targetClientId == 0)
+            {
+                Debug.LogError($"No valid client ID for player index {playerIndex}");
+                continue;
+            }
 
-        //     if (playerIndex == playerToVibrate)
-        //     {
-        //         // Find the targeted client's network ID
-        //         ulong targetClientId = GetClientIdByPlayerId(playerID);
-        //         if (targetClientId == 0)
-        //         {
-        //             Debug.LogError($"Invalid client ID for player {playerID}. Vibration not sent.");
-        //             return;
-        //         }
-        //         else if (targetClientId != 0)
-        //         {
-        //             ClientRpcParams clientRpcParams = new ClientRpcParams
-        //             {
-        //                 Send = new ClientRpcSendParams
-        //                 {
-        //                     TargetClientIds = new ulong[] { targetClientId }
-        //                 }
-        //             };
+            // Vibrate the correct player's phone
+            TriggerVibration(targetClientId);
 
-        //             VibratePhoneClientRpc(clientRpcParams);
-        //         }
-        //     }
-        // }
+            // Delay between vibrations
+            yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty
+        }
+
+        Debug.Log("Vibration sequence complete. Players should now pull levers.");
     }
+
 }

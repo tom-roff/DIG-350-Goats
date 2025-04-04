@@ -124,6 +124,14 @@ public class LobbyManager : MonoBehaviour
         NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
         
     }
+    public void StartLeverGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("LeversMinigame", LoadSceneMode.Single);
+        }
+    }
 
 
     // Public method to get local player's ID
