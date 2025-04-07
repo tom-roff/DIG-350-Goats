@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class ClimbingManager : NetworkBehaviour
 {
-    [SerializeField] private int finishLine = 100;
+    private int finishLine = 30;
+
+    [SerializeField] private GameObject playerUI;
     
     // Dictionary to track each player's height
     private Dictionary<ulong, float> playerHeights = new Dictionary<ulong, float>();
@@ -51,10 +53,11 @@ public class ClimbingManager : NetworkBehaviour
         return finishLine;
     }
     
-    private void PlayerFinished(ulong clientId)
+    public void PlayerFinished(ulong clientId)
     {
-        Debug.Log($"Player {clientId} has finished the climb!");
-        // Implement any game-specific logic for when a player finishes
-        // For example: announce winner, give rewards, etc.
+        if (NetworkManager.Singleton.LocalClientId != 0)
+        {
+            playerUI.gameObject.SetActive(true);
+        }
     }
 }

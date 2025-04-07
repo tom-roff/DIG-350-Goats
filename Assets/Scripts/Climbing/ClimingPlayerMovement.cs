@@ -10,6 +10,8 @@ public class ClimingPlayerMovement : NetworkBehaviour
 
     [SerializeField] private ClimbingManager climbingManager;
 
+    [SerializeField] private GameObject playerUI;
+
     private void Update()
     {
         if (right)
@@ -68,6 +70,11 @@ public class ClimingPlayerMovement : NetworkBehaviour
         ToggleArm();
 
         climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
+
+        if (transform.position.y >= climbingManager.GetFinishHeight())
+        {
+            climbingManager.PlayerFinished(NetworkManager.Singleton.LocalClientId);
+        }
         
         // Room for animation code to be added later
         // Example:

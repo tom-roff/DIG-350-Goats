@@ -38,7 +38,15 @@ public class ClimbingUI : NetworkBehaviour
                 
             if (playerIndex < scoreTexts.Length)
             {
-                scoreTexts[playerIndex].text = $"Player {clientId}: {climbingManager.GetPlayerHeight(clientId) * 4}%";
+                float percentage = 100 * climbingManager.GetPlayerHeight(clientId) / climbingManager.GetFinishHeight();
+                if (percentage < 100)
+                {
+                    scoreTexts[playerIndex].text = $"Player {clientId}: {percentage.ToString("F2")}%";
+                }
+                else {
+                    scoreTexts[playerIndex].text = $"Player {clientId}: Finished!";
+                }
+                
                 playerIndex++;
             }
         }
