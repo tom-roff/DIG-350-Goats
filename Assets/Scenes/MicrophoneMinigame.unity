@@ -864,7 +864,7 @@ MonoBehaviour:
   listening: 0
   startButton: {fileID: 813526803}
   timeText: {fileID: 1984658966}
-  loudnessThreshold: 1
+  loudnessThreshold: 0.75
   host: 0
   readyCount: 0
   playerCount: 0

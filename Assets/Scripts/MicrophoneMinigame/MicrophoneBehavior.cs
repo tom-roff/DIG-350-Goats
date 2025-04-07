@@ -10,27 +10,30 @@ using System.Linq;
 
 public class MicrophoneBehavior : NetworkBehaviour
 {
+    [Header("Audio Detector")]
     [SerializeField] public AudioLoudnessDetection detector;
 
     public float loudnessSensitivity = 100;
-    public float threshold = 0.1f;
+    public float quietThreshold = .75f;
+    public float loudThreshold = 2f;
 
     public float listeningTime = 30f;
-    public float timeTooLoud = 0f;
+    public float timeIncorrect = 0f;
     public bool listening = false;
+    public bool beLoud = false;
+
+    [Header("Canvas Objects")]
     [SerializeField] public GameObject startButton;
     [SerializeField] public TMP_Text timeText;
-    public float loudnessThreshold = 1f;
+    [SerializeField] public GameObject background;
+
+    [Header("Host")]
     public bool host = false;
     public int readyCount = 0;
     public int playerCount = 0;
 
 
-    void Start()
-    {
-        startButton.GetComponent<Image>().color = Color.green;
-        
-    }
+    
 
     public override void OnNetworkSpawn()
     {
@@ -48,12 +51,9 @@ public class MicrophoneBehavior : NetworkBehaviour
             host = true;
         }
         else
-        {
             host = false;
-        }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         if (listening)
@@ -61,43 +61,48 @@ public class MicrophoneBehavior : NetworkBehaviour
             if (!host)
             {
                 ComputeLoudness(Time.deltaTime);
-
             }
-            
-            
+        }
+    }
+
+    public void ComputeLoudness(float deltaTime)
+    {
+        float loudness = detector.GetLoudnessFromMicrophone() * loudnessSensitivity;
+
+        if (!beLoud)
+        {
+            if (loudness > quietThreshold)
+            {
+                Debug.Log("Too loud!: " + loudness);
+                timeIncorrect += deltaTime;
+                SendTimeRpc(deltaTime);
+            }
+        }
+        else
+        {
+            if (loudness < loudThreshold)
+            {
+                Debug.Log("Too quiet!: " + loudness);
+                timeIncorrect += deltaTime;
+                SendTimeRpc(deltaTime);
+            }
         }
         
-
+        
     }
 
     [Rpc(SendTo.Server)]
     public void SendTimeRpc(float deltaTime)
     {
-        timeTooLoud += deltaTime;
-        timeText.text = "Total: " + timeTooLoud;
-        SendTimeNotServerRpc(timeTooLoud);
+        timeIncorrect += deltaTime;
+        timeText.text = "Total: " + timeIncorrect;
+        SendTimeNotServerRpc(timeIncorrect);
     }
 
     [Rpc(SendTo.NotServer)]
     public void SendTimeNotServerRpc(float totalTime)
     {
         timeText.text = "Total: " + totalTime;
-    }
-
-
-    public void ComputeLoudness(float deltaTime)
-    {
-        float loudness = detector.GetLoudnessFromMicrophone() * loudnessSensitivity;
-        if (loudness < threshold)
-            loudness = 0;
-
-        if (loudness > loudnessThreshold)
-        {
-            Debug.Log("Too loud!: " + loudness);
-            timeTooLoud += deltaTime;
-            SendTimeRpc(deltaTime);
-        }
-        
     }
 
     [Rpc(SendTo.Server)]
@@ -107,6 +112,46 @@ public class MicrophoneBehavior : NetworkBehaviour
         if (playerCount != 0 && readyCount == playerCount)
         {
             StartGameRpc();
+            RandomizeLoudness();
+        }
+    }
+
+    private void RandomizeLoudness()
+    {
+        if (listening)
+        {
+            
+            if (beLoud) // quiet
+            {
+                beLoud = false;
+                background.GetComponent<Image>().color = Color.red;
+            }
+            else
+            {
+                beLoud = true;
+                background.GetComponent<Image>().color = Color.green;
+            }
+
+            SendRandomizedLoudnessRpc(beLoud);
+
+            float timeUntilSwitch = UnityEngine.Random.Range(0f, 3f);
+            Invoke("RandomizeLoudness", timeUntilSwitch);
+        }
+        
+
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SendRandomizedLoudnessRpc(bool beLoud)
+    {
+        this.beLoud = beLoud;
+        if (beLoud)
+        {
+            background.GetComponent<Image>().color = Color.green;
+        }
+        else
+        {
+            background.GetComponent<Image>().color = Color.red;
         }
     }
 
@@ -114,9 +159,10 @@ public class MicrophoneBehavior : NetworkBehaviour
     public void StartGameRpc()
     {
         listening = true;
-        timeTooLoud = 0f;
+        timeIncorrect = 0f;
         Invoke("StopListening", listeningTime);
     }
+
 
     public void StartListening()
     {
@@ -124,14 +170,13 @@ public class MicrophoneBehavior : NetworkBehaviour
         {
             SendReadyRpc();
             startButton.SetActive(false);
-            
+
         }
     }
 
     void StopListening()
     {
         listening = false;
-        Debug.Log("Too loud for: " + timeTooLoud + " seconds");
-        // startButton.GetComponent<Image>().color = Color.green;
+        Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
     }
 }
