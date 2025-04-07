@@ -1,11 +1,14 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class ClimingPlayerMovement : MonoBehaviour
+public class ClimingPlayerMovement : NetworkBehaviour
 {
     private bool right = true;
     private int climbAmount = 2;
 
     private float reachLength;
+
+    [SerializeField] private ClimbingManager climbingManager;
 
     private void Update()
     {
@@ -63,6 +66,8 @@ public class ClimingPlayerMovement : MonoBehaviour
         transform.position += Vector3.up * climbAmount;
 
         ToggleArm();
+
+        climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
         
         // Room for animation code to be added later
         // Example:

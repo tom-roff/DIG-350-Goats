@@ -123,7 +123,7 @@ public class LobbyManager : MonoBehaviour
         if (isHost)
         {
             // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("ClimbingMinigame", LoadSceneMode.Single);
         }
     }
     public void StartLeverGame()
