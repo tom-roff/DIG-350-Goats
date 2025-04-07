@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
+
 
 public static class MapHelpers
 {
@@ -77,7 +79,8 @@ public static class MapHelpers
             case MapManager.Tiles.PeakedMinigame:
                 map[(int)pos.x, (int)pos.y] = MapManager.Tiles.ExploredMinigame;
                 ChangeColor(map, tiles, pos);
-                SceneManager.LoadScene("TEST_MapMinigame");
+                // SceneManager.LoadScene("MicrophoneMinigame");
+                NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
                 break;
             case MapManager.Tiles.PeakedItem:
                 map[(int)pos.x, (int)pos.y] = MapManager.Tiles.ExploredItem;
