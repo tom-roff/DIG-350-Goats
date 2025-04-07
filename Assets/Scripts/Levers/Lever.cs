@@ -64,27 +64,27 @@ public class Lever : NetworkBehaviour
 
 
     [ServerRpc(RequireOwnership = false)]
-    void PullLeverServerRpc(int leverIndex, ServerRpcParams rpcParams = default)
+    void PullLeverServerRpc(int _leverIndex, ServerRpcParams rpcParams = default)
     {
-        Debug.Log($"[ServerRpc] Lever {leverIndex} was pulled.");
+        Debug.Log($"[ServerRpc] Lever {_leverIndex} was pulled.");
 
         // Broadcast to all clients that this lever has been pulled
-        PullLeverClientRpc(leverIndex);
+        PullLeverClientRpc(_leverIndex);
     }
 
     [ClientRpc]
-    void PullLeverClientRpc(int leverIndex, ClientRpcParams clientRpcParams = default)
+    void PullLeverClientRpc(int _leverIndex, ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log($"[ClientRpc] Lever {leverIndex} animation triggered.");
+        Debug.Log($"[ClientRpc] Lever {_leverIndex} animation triggered.");
         
         // Play animation and disable collider
         animator.SetTrigger("IsPulled");
-        GetComponent<Collider>().enabled = false;
+        //GetComponent<Collider>().enabled = false;
 
         // Only the owner should call OnLeverPulled to update game logic
         if (IsOwner)
         {
-            cameraController.OnLeverPulled(leverIndex);
+            cameraController.OnLeverPulled(_leverIndex);
         }
     }
 

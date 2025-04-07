@@ -104,7 +104,7 @@ public class CameraController : NetworkBehaviour
 
         else
         {
-            Debug.Log($"Wrong Lever, {pulledLeverIndex} should have been pulled!");
+            Debug.Log($"Wrong Lever, {currentLeverIndex} should have been pulled!");
             OnWrongLeverPulled();
         }
     }
