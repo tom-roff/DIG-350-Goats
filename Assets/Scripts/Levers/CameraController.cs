@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
 
 public class CameraController : NetworkBehaviour
