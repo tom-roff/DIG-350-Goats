@@ -23,7 +23,7 @@ public class Lever : NetworkBehaviour
         }
     }
 
-    void Update()
+    /*void Update() REAL TRACK TOUCH FUNCTION FOR PHONE
     {
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
@@ -34,30 +34,57 @@ public class Lever : NetworkBehaviour
                 PullLeverServerRpc(leverIndex);
             }
         }
+    }*/
+
+    void Update()
+    {
+        // Touch input (mobile)
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            CheckLeverHit(ray);
+        }
+
+        // Mouse input (desktop testing)
+        if (Input.GetMouseButtonDown(0)) // Left click
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            CheckLeverHit(ray);
+        }
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    void PullLeverServerRpc(int leverIndex, ServerRpcParams rpcParams = default)
+    void CheckLeverHit(Ray ray)
     {
-        Debug.Log($"[ServerRpc] Lever {leverIndex} was pulled.");
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
+        {
+            Debug.Log($"Lever {leverIndex} clicked or tapped!");
+            PullLeverServerRpc(leverIndex);
+        }
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    void PullLeverServerRpc(int _leverIndex, ServerRpcParams rpcParams = default)
+    {
+        Debug.Log($"[ServerRpc] Lever {_leverIndex} was pulled.");
 
         // Broadcast to all clients that this lever has been pulled
-        PullLeverClientRpc(leverIndex);
+        PullLeverClientRpc(_leverIndex);
     }
 
     [ClientRpc]
-    void PullLeverClientRpc(int leverIndex, ClientRpcParams clientRpcParams = default)
+    void PullLeverClientRpc(int _leverIndex, ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log($"[ClientRpc] Lever {leverIndex} animation triggered.");
+        Debug.Log($"[ClientRpc] Lever {_leverIndex} animation triggered.");
         
         // Play animation and disable collider
         animator.SetTrigger("IsPulled");
-        GetComponent<Collider>().enabled = false;
+        //GetComponent<Collider>().enabled = false;
 
         // Only the owner should call OnLeverPulled to update game logic
         if (IsOwner)
         {
-            cameraController.OnLeverPulled(leverIndex);
+            cameraController.OnLeverPulled(_leverIndex);
         }
     }
 
