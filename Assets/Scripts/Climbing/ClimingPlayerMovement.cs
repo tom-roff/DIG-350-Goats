@@ -10,7 +10,6 @@ public class ClimingPlayerMovement : NetworkBehaviour
 
     [SerializeField] private ClimbingManager climbingManager;
 
-    [SerializeField] private GameObject playerUI;
 
     private void Update()
     {
