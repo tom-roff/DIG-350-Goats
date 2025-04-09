@@ -37,7 +37,12 @@ public class LaserUI : NetworkBehaviour
                 
             if (playerIndex < scoreTexts.Length)
             {
-                scoreTexts[playerIndex].text = $"Player {clientId}: {laserManager.GetScore(clientId)}";
+                if (laserManager.IsAlive(clientId))
+                {
+                    scoreTexts[playerIndex].text = $"Player {clientId}: Alive :)";
+                } else {
+                    scoreTexts[playerIndex].text = $"Player {clientId}: Dead :(";
+                }
                 playerIndex++;
             }
         }

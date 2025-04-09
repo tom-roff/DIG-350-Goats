@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class ClimbingManager : NetworkBehaviour
 {
     private int finishLine = 30;
+    public ulong[] scoring = new ulong[8];
 
     [SerializeField] private GameObject playerUI;
     
@@ -57,7 +58,19 @@ public class ClimbingManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton.LocalClientId != 0)
         {
+            UpdateScoringRpc(clientId);
             playerUI.gameObject.SetActive(true);
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void UpdateScoringRpc(ulong clientId)
+    {
+        int index = 0;
+        while (scoring[index] != 0)
+        {
+            index++;
+        }
+        scoring[index] = clientId;
     }
 }

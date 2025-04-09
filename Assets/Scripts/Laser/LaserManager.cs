@@ -86,6 +86,11 @@ public class LaserManager : NetworkBehaviour
         return scores[clientId];
     }
 
+    public bool IsAlive(ulong clientId)
+    {
+        return alive[clientId];
+    }
+
     public void KillPlayer(ulong ClientId)
     {
         alive[ClientId] = false;
