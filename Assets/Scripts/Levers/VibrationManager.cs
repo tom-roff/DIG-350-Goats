@@ -61,18 +61,16 @@ public class VibrationManager : NetworkBehaviour
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
-        foreach (int playerIndex in leverOrder)
+        foreach (int playerNum in leverOrder)
         {
-            ulong targetClientId = indexToIdArray[playerIndex];
-            
-            if (targetClientId == 0)
+            if (playerNum == 0)
             {
-                Debug.LogError($"No valid client ID for player index {playerIndex}");
+                Debug.Log("Skipped the host for vibration");
                 continue;
             }
 
             // Vibrate the correct player's phone
-            TriggerVibration(targetClientId);
+            TriggerVibration((ulong)playerNum);
 
             // Delay between vibrations
             yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty

@@ -1,10 +1,11 @@
 using Unity.Netcode;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
-public class LaserUI : NetworkBehaviour
+public class ClimbingUI : NetworkBehaviour
 {
-    [SerializeField] private LaserManager laserManager;
+    [SerializeField] private ClimbingManager climbingManager;
     [SerializeField] private GameObject scoresParent;
     private ulong hostId;
 
@@ -37,12 +38,15 @@ public class LaserUI : NetworkBehaviour
                 
             if (playerIndex < scoreTexts.Length)
             {
-                if (laserManager.IsAlive(clientId))
+                float percentage = 100 * climbingManager.GetPlayerHeight(clientId) / climbingManager.GetFinishHeight();
+                if (percentage < 100)
                 {
-                    scoreTexts[playerIndex].text = $"Player {clientId}: Alive :)";
-                } else {
-                    scoreTexts[playerIndex].text = $"Player {clientId}: Dead :(";
+                    scoreTexts[playerIndex].text = $"Player {clientId}: {percentage.ToString("F2")}%";
                 }
+                else {
+                    scoreTexts[playerIndex].text = $"Player {clientId}: Finished!";
+                }
+                
                 playerIndex++;
             }
         }
