@@ -54,6 +54,7 @@ public class OurNetwork : NetworkBehaviour
         PlayerInfo updatedInfo = playerInfoList[clientId - 1];
         updatedInfo.playerName = name;
         playerInfoList[clientId - 1] = updatedInfo;
+        menuManager.playerEntries[playerInfoList.Count - 1].SetNameAndColor(name, playerInfoList[playerInfoList.Count - 1].playerColor);
     }
 
     [Rpc(SendTo.Server)]

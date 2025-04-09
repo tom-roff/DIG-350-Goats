@@ -10,6 +10,8 @@ public class PlayerUIEntry : NetworkBehaviour
     public TMP_Text nameTextObj;
 
     public void SetNameAndColor(string nameToSet, PlayerColor colorToSet){
+        Debug.Log("Setting player name to:" + nameToSet);
+        Debug.Log("Setting color:" + colorToSet.colorRGB);
         name = nameToSet;
         nameTextObj.text = name;
         entryColor = colorToSet;

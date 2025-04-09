@@ -8,7 +8,7 @@ using UnityEngine;
 
 public struct PlayerColor : INetworkSerializable{
     public colorEnumerator colorEnum;
-    public Color colorRGB;
+    public Color32 colorRGB;
 
     public PlayerColor(colorEnumerator enumer, Color rgb, Material colorMat){
         colorEnum = enumer;

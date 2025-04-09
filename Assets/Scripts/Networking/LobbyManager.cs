@@ -23,16 +23,16 @@ public class LobbyManager : MonoBehaviour
     public List<PlayerColor> possibleColors = new List<PlayerColor>();
 
 
-    public Material[] colorMats = new Material[8];
+    public Material[] colorMats = new Material[6];
 
     private void Start()
     {
-        possibleColors.Add(new PlayerColor(colorEnumerator.DarkBlue, new Color (25, 25, 112), colorMats[0]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.DarkGreen, new Color (0, 100, 0), colorMats[1]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Fuchsia, new Color (190, 0, 255), colorMats[2]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color (255, 215, 0), colorMats[3]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color (30, 156, 255), colorMats[4]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color (0, 225, 0), colorMats[5]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkBlue, new Color32 (25, 25, 112, 255), colorMats[0]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkGreen, new Color32 (0, 100, 0, 255), colorMats[1]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Fuchsia, new Color32 (190, 0, 255, 255), colorMats[2]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color32 (255, 215, 0, 255), colorMats[3]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color32 (30, 156, 255, 255), colorMats[4]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color32 (0, 225, 0, 255), colorMats[5]));
     }
 
     public async void Initialize(MenuManager manager, OurNetwork network)
@@ -132,8 +132,9 @@ public class LobbyManager : MonoBehaviour
 
         // This function updates the UI when a player joins
         if(isHost){
-            ourNetwork.playerInfoList.Add(new PlayerInfo("Name Placeholder", possibleColors[currentPlayerCount - 1], 0));
+            ourNetwork.playerInfoList.Add(new PlayerInfo("Player Joining", possibleColors[currentPlayerCount - 1], 0));
             menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].gameObject.SetActive(true);
+            Debug.Log(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor.colorRGB);
             menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].SetNameAndColor(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerName.ToString(), ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor);
         }
         
