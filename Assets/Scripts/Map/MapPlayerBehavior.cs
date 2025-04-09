@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
+using Unity.Netcode.Transports.UTP;
 
 public class MapPlayerBehavior : NetworkBehaviour
 {
     [SerializeField] public GameObject playerPrefab;
-    private ulong clientId;
+    public ulong clientId;
     public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
@@ -66,11 +68,12 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.Play();
             return;
         }
-        if(GameManager.Instance.MapManager.players == null)
+        if (GameManager.Instance.MapManager.players == null)
             CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
+        // SendCurrentPlayerRpc(currentPlayerId);
 
 
     }
@@ -125,7 +128,6 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         playerInstance.name = "player";
-        Debug.Log("Spawn player at: " + startPosition.x + ", " + startPosition.y);
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
@@ -146,8 +148,8 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
             GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
-            Debug.Log(GameManager.Instance.MapManager.players[currentPlayer].position);
 
+            CheckSceneChange(i,j);
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
 
@@ -155,16 +157,24 @@ public class MapPlayerBehavior : NetworkBehaviour
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
+                SendCurrentPlayerRpc(currentPlayerId);
                 // SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
             }
         }
     }
 
+    void CheckSceneChange(int x, int y)
+    {
+        if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
+        {
+            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame; // I think this is needed? 
+            NetworkManager.Singleton.SceneManager.LoadScene("TEST_MapMinigame", LoadSceneMode.Single);
+        }
+    }
+
     [Rpc(SendTo.NotServer)]
-    // public void SendCurrentPlayerRpc(string message)
     public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
-        // Debug.Log(message);
         this.currentPlayerId = currentPlayerId;
     }
 

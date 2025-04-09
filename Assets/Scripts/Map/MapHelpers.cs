@@ -76,12 +76,10 @@ public static class MapHelpers
                 break;
             case MapManager.Tiles.PeakedMinigame:
                 map[(int)pos.x, (int)pos.y] = MapManager.Tiles.ExploredMinigame;
-                ChangeColor(map, tiles, pos);
-                SceneManager.LoadScene("TEST_MapMinigame");
+                // NetworkManager.Singleton.SceneManager.LoadScene("TEST_MapMinigame", LoadSceneMode.Single);
                 break;
             case MapManager.Tiles.PeakedItem:
                 map[(int)pos.x, (int)pos.y] = MapManager.Tiles.ExploredItem;
-                ChangeColor(map, tiles, pos);
                 Debug.Log("Item");
                 break;
             default:

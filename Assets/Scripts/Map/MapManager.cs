@@ -92,7 +92,7 @@ public class MapManager : MonoBehaviour
         {
             if (currentPlayer + 1 == players.GetLength(0)) currentPlayer = 0;
             else currentPlayer++;
-            
+
 
             // roll moves
             System.Random rnd = new System.Random();
@@ -100,4 +100,6 @@ public class MapManager : MonoBehaviour
             Debug.Log("Player " + players[currentPlayer].playerID + " rolled a " + moves);
         }
     }
+    
+    
 }
