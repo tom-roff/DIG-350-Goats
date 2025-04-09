@@ -77,7 +77,8 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!host) return;
+        if (!host)
+            AskForCurrentPlayerRpc();
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
