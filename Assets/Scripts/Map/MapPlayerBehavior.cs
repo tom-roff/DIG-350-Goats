@@ -66,8 +66,8 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.Play();
             return;
         }
-        Debug.Log("doing host stuff");
-        CreatePlayerQueue();
+        if(GameManager.Instance.MapManager.players == null)
+            CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
@@ -124,6 +124,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         playerInstance.name = "player";
+        Debug.Log("Spawn player at: " + startPosition.x + ", " + startPosition.y);
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
@@ -144,6 +145,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
             GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
+            Debug.Log(GameManager.Instance.MapManager.players[currentPlayer].position);
 
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
@@ -174,39 +176,74 @@ public class MapPlayerBehavior : NetworkBehaviour
     }
 
 
-    void Update()
-    {
-        if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
-        {
+    // void Update()
+    // {
+    //     if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+    //     {
 
 
-            // client does this? 
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
-            {
-                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
-                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
-                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
-                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
-            }
-            else if (currentPlayerId == ulong.MinValue)
-            {
-                AskForCurrentPlayerRpc();
-            }
+    //         // client does this? 
+    //         if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
+    //         {
+    //             if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
+    //             if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
+    //             if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
+    //             if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
+    //         }
+    //         else if (currentPlayerId == ulong.MinValue)
+    //         {
+    //             AskForCurrentPlayerRpc();
+    //         }
 
 
 
-        }
-    }
+    //     }
+    // }
 
     bool InBounds(int i, int j)
     {
         if (i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
         return false;
     }
-    
+
 
 
     // BUTTON ARROW KEY AREA
+    public void MoveRight()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, 1);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveLeft()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, -1);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveUp()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(1, 0);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveDown()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(-1, 0);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
 
 
 }
