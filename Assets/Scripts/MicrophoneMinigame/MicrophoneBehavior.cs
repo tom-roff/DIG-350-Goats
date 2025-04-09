@@ -33,12 +33,13 @@ public class MicrophoneBehavior : NetworkBehaviour
     public int playerCount = 0;
 
 
-    
+
 
     public override void OnNetworkSpawn()
     {
         playerCount = GameManager.Instance.OurNetwork.playerIndexMap.Count;
         CheckHost();
+        ChangeColor();
         base.OnNetworkSpawn();
     }
 
@@ -87,8 +88,8 @@ public class MicrophoneBehavior : NetworkBehaviour
                 SendTimeRpc(deltaTime);
             }
         }
-        
-        
+
+
     }
 
     [Rpc(SendTo.Server)]
@@ -112,47 +113,44 @@ public class MicrophoneBehavior : NetworkBehaviour
         if (playerCount != 0 && readyCount == playerCount)
         {
             StartGameRpc();
-            RandomizeLoudness();
+            listening = true;
+            float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
+            Invoke("SwitchLoudness", timeUntilSwitch);
         }
     }
 
-    private void RandomizeLoudness()
+
+    public void SwitchLoudness()
     {
+        Debug.Log("Attempt to switch");
         if (listening)
         {
-            
-            if (beLoud) // quiet
-            {
+
+            if (beLoud)
                 beLoud = false;
-                background.GetComponent<Image>().color = Color.red;
-            }
             else
-            {
                 beLoud = true;
-                background.GetComponent<Image>().color = Color.green;
-            }
 
-            SendRandomizedLoudnessRpc(beLoud);
+            ChangeColor();
+            SwitchRpc();
 
-            float timeUntilSwitch = UnityEngine.Random.Range(0f, 3f);
-            Invoke("RandomizeLoudness", timeUntilSwitch);
+            float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
+            Debug.Log("Time until next switch: " + timeUntilSwitch);
+            Invoke("SwitchLoudness", timeUntilSwitch);
         }
-        
+
 
     }
 
     [Rpc(SendTo.NotServer)]
-    public void SendRandomizedLoudnessRpc(bool beLoud)
+    public void SwitchRpc()
     {
-        this.beLoud = beLoud;
         if (beLoud)
-        {
-            background.GetComponent<Image>().color = Color.green;
-        }
+            beLoud = false;
         else
-        {
-            background.GetComponent<Image>().color = Color.red;
-        }
+            beLoud = true;
+
+        ChangeColor();
     }
 
     [Rpc(SendTo.NotServer)]
@@ -174,9 +172,25 @@ public class MicrophoneBehavior : NetworkBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    public void StopListeningRpc()
+    {
+        listening = false;
+    }
+
     void StopListening()
     {
         listening = false;
+        StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
+    }
+
+    void ChangeColor()
+    {
+        if (!beLoud)
+            background.GetComponent<Image>().color = Color.red;
+        else
+            background.GetComponent<Image>().color = Color.green;
+
     }
 }

@@ -858,13 +858,15 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   detector: {fileID: 371415208}
   loudnessSensitivity: 100
-  threshold: 0.1
+  quietThreshold: 0.75
+  loudThreshold: 2
   listeningTime: 30
-  timeTooLoud: 0
+  timeIncorrect: 0
   listening: 0
+  beLoud: 0
   startButton: {fileID: 813526803}
   timeText: {fileID: 1984658966}
-  loudnessThreshold: 0.75
+  background: {fileID: 2021934819}
   host: 0
   readyCount: 0
   playerCount: 0
