@@ -44,6 +44,32 @@ public class OurNetwork : NetworkBehaviour
             return 0;
         }
     }
+
+    /**
+    Server RPCs live in this section. If you call these from the server nothing will happen, so call them from the clients!
+    **/
+
+    [Rpc(SendTo.Server)]
+    public void UpdatePlayerNameRpc(int clientId, string name){
+        PlayerInfo updatedInfo = playerInfoList[clientId - 1];
+        updatedInfo.playerName = name;
+        playerInfoList[clientId - 1] = updatedInfo;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void IncrementPlayerScoreRpc(int clientId){
+        PlayerInfo updatedInfo = playerInfoList[clientId];
+        updatedInfo.treasuresCollected++;
+        playerInfoList[clientId] = updatedInfo;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SetPlayerScoreRpc(int clientId, int scoreToSet){
+        PlayerInfo updatedInfo = playerInfoList[clientId];
+        updatedInfo.treasuresCollected = scoreToSet;
+        playerInfoList[clientId] = updatedInfo;
+    }
+
     // [Unity.Netcode.ClientRpc]
     // public void RpcVibratePhoneClientRpc(ClientRpcParams clientRpcParams)
     // {

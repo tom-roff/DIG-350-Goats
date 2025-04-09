@@ -21,9 +21,7 @@ public class LobbyManager : MonoBehaviour
     private int currentPlayerCount = 0;
 
     public List<PlayerColor> possibleColors = new List<PlayerColor>();
-    
 
-    public List<PlayerInfo> playerInfos = new List<PlayerInfo>();
 
     public Material[] colorMats = new Material[8];
 
@@ -69,6 +67,7 @@ public class LobbyManager : MonoBehaviour
             isHost = true;
             UpdatePlayerCount();
             menuManager.ShowStartButton(true);
+            menuManager.hostButton.gameObject.SetActive(false);
             
             // Set up connection event handlers
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -82,6 +81,10 @@ public class LobbyManager : MonoBehaviour
     public void OnNameInput(string name){
         if(name.Length != 0){
             menuManager.nameText.text = name;
+            ourNetwork.UpdatePlayerNameRpc((int)NetworkManager.Singleton.LocalClientId, name);
+            menuManager.waitingForHostToStartText.text = "Waiting for host to start game...";
+            menuManager.confirmNameButton.gameObject.SetActive(false);
+            menuManager.nameInput.gameObject.SetActive(false);
         }
         else{
             menuManager.nameText.text = "Please type in a name.";
@@ -125,11 +128,19 @@ public class LobbyManager : MonoBehaviour
         UpdatePlayerCount();
 
         // Add the connected player to our playerIndexMap in the ourNetwork script
-        ourNetwork.playerInfoList.Add(new PlayerInfo("Name Placeholder", possibleColors[currentPlayerCount - 1], 0));
+        
+
+        // This function updates the UI when a player joins
+        if(isHost){
+            ourNetwork.playerInfoList.Add(new PlayerInfo("Name Placeholder", possibleColors[currentPlayerCount - 1], 0));
+            menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].gameObject.SetActive(true);
+            menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].SetNameAndColor(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerName.ToString(), ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor);
+        }
         
         // You'll need to implement a way to share player IDs and assign indices
         // This could be done with RPCs after connection
     }
+
 
     private void OnClientDisconnected(ulong clientId)
     {

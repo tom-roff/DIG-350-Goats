@@ -17,8 +17,7 @@ public class MenuManager : MonoBehaviour
     public TMP_Text nameText;
     public TMP_Text waitingForHostToStartText;
     public TMP_Text joinText;
-
-
+    public PlayerUIEntry[] playerEntries = new PlayerUIEntry[6];
     [SerializeField] private OurNetwork ourNetwork;
     [SerializeField] private LobbyManager lobbyManager;
 
