@@ -11,6 +11,9 @@ public class MenuManager : MonoBehaviour
     public TMP_Text playerCountText;
     public Button startGameButton;
     public Button startLeverGameButton;
+    public Button startLaserButton;
+    public Button startClimbButton;
+    public Button startHackButton;
 
     public GameObject clientJoinedUI;
     public GameObject clientStartUI;
@@ -44,6 +47,9 @@ public class MenuManager : MonoBehaviour
         confirmNameButton.onClick.AddListener(() => lobbyManager.OnNameInput(nameInput.text));
         startGameButton.gameObject.SetActive(false);
         startLeverGameButton.onClick.AddListener(lobbyManager.StartLeverGame);
+        startLaserButton.onClick.AddListener(lobbyManager.StartLaserGame);
+        startClimbButton.onClick.AddListener(lobbyManager.StartClimbGame);
+        startHackButton.onClick.AddListener(lobbyManager.StartHackGame);
         playerCountText.gameObject.SetActive(false);
     }
 
@@ -54,7 +60,8 @@ public class MenuManager : MonoBehaviour
 
     public void UpdatePlayerCountDisplay(int currentPlayers, int maxPlayers)
     {
-        playerCountText.text = $"Players: {currentPlayers}/{maxPlayers}";
+        int playersCountRightNow = ourNetwork.playerInfoList.Count;
+        playerCountText.text = $"Players: {playersCountRightNow}/{maxPlayers}";
         playerCountText.gameObject.SetActive(true);
     }
 

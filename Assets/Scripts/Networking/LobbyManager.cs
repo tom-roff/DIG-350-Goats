@@ -86,6 +86,7 @@ public class LobbyManager : MonoBehaviour
             menuManager.waitingForHostToStartText.text = "Waiting for host to start game...";
             menuManager.confirmNameButton.gameObject.SetActive(false);
             menuManager.nameInput.gameObject.SetActive(false);
+            Debug.Log(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1]);
         }
         else{
             menuManager.nameText.text = "Please type in a name.";
@@ -170,6 +171,30 @@ public class LobbyManager : MonoBehaviour
         {
             // Use NetworkManager to load the scene on all clients
             NetworkManager.Singleton.SceneManager.LoadScene("LeversMinigame", LoadSceneMode.Single);
+        }
+    }
+    public void StartLaserGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
+        }
+    }
+    public void StartClimbGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("ClimbingMinigame", LoadSceneMode.Single);
+        }
+    }
+    public void StartHackGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("HackingMinigame", LoadSceneMode.Single);
         }
     }
 
