@@ -43,7 +43,7 @@ public class CameraController : NetworkBehaviour
     void AssignLeverOrder() 
     {
         // Just as an example – this assumes Start() runs after Awake()
-        int numPlayers = network.playerIndexMap.Count;
+        int numPlayers = network.playerInfoList.Count;
         leverOrder = new int[numPlayers];
         for (int i = 0; i < numPlayers; i++)
         {

@@ -17,16 +17,7 @@ public class VibrationManager : NetworkBehaviour
             return;
         }
 
-        int numPlayers = network.playerIndexMap.Count;
-        indexToIdArray = new ulong[numPlayers];
-
-        int i = 0;
-        foreach(var player in network.playerIndexMap)
-        {
-            ulong pId = player.Key;
-            indexToIdArray[i] = pId;
-            i++;
-        }
+        int numPlayers = network.playerInfoList.Count;
     }
 
     public void TriggerVibration(ulong clientId)
