@@ -68,6 +68,13 @@ public class Lever : NetworkBehaviour
     {
         Debug.Log($"[ServerRpc] Lever {_leverIndex} was pulled.");
 
+        // Let server check lever logic
+        CameraController serverCameraController = FindFirstObjectByType<CameraController>();
+        if (serverCameraController != null)
+        {
+            serverCameraController.OnLeverPulled(_leverIndex);
+        }
+
         // Broadcast to all clients that this lever has been pulled
         PullLeverClientRpc(_leverIndex);
     }
@@ -79,13 +86,6 @@ public class Lever : NetworkBehaviour
         
         // Play animation and disable collider
         animator.SetTrigger("IsPulled");
-        //GetComponent<Collider>().enabled = false;
-
-        // Only the owner should call OnLeverPulled to update game logic
-        if (IsOwner)
-        {
-            cameraController.OnLeverPulled(_leverIndex);
-        }
     }
 
 
