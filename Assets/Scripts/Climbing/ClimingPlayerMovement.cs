@@ -1,92 +1,157 @@
 using UnityEngine;
+using System.Collections;
 using Unity.Netcode;
 
-public class ClimingPlayerMovement : NetworkBehaviour
+public class ClimbingPlayerMovement : NetworkBehaviour
 {
-    private bool right = true;
-    private int climbAmount = 2;
+    private enum ClimbState
+    {
+        Ready,
+        Reaching,
+        Grabbing
+    }
+        [Header("Acceleration Thresholds")]
+    [SerializeField] private float reachThreshold = 0.8f; // Upward acceleration threshold (0-1 scale)
+    [SerializeField] private float grabThreshold = -0.4f; // Forward tilt acceleration threshold (negative value)
 
-    private float reachLength;
-
+    
+    [Header("Climbing Settings")]
+    [SerializeField] private float climbAmount = 0.5f;
+    [SerializeField] private float rotationThreshold = 30.0f;
+    // [SerializeField] private float grabThreshold = -30.0f;
+    [SerializeField] private float cooldownTime = 0.5f;
+    
+    [Header("References")]
     [SerializeField] private ClimbingManager climbingManager;
-
-
+    
+    private ClimbState currentState = ClimbState.Ready;
+    private bool isRightArm = true;
+    private bool canStateChange = true;
+    private Vector3 baseRotation;
+    
+    private void Start()
+    {
+        // Enable gyroscope and accelerometer
+        Input.gyro.enabled = true;
+        
+        // Store initial rotation as a reference point
+        baseRotation = Input.gyro.gravity;
+        
+        Debug.Log("Climbing system initialized. Base rotation: " + baseRotation);
+    }
+    
     private void Update()
     {
-        if (right)
+        // Fallback for testing in editor
+        // if (!Application.isMobilePlatform && Application.isEditor)
+        // {
+        //     HandleKeyboardInput();
+        //     return;
+        // }
+        
+        // Get device acceleration
+        Vector3 acceleration = Input.acceleration;
+        
+        // Debug output
+        Debug.Log($"State: {currentState}, Accel X: {acceleration.x:F2}, Y: {acceleration.y:F2}, Z: {acceleration.z:F2}");
+        
+        // State machine for climbing
+        switch (currentState)
         {
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                // Start checking for W key while D is held
-                StartCoroutine(CheckForWKeyWhileHoldingD());
-            }
-        } 
-        else 
-        {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                // Start checking for W key while A is held
-                StartCoroutine(CheckForWKeyWhileHoldingA());
-            }
+            case ClimbState.Ready:
+                // Detect reaching motion (upward acceleration)
+                // When device is held normally, Y is up/down
+                bool isReaching = acceleration.y > reachThreshold;
+                
+                if (isReaching && canStateChange)
+                {
+                    currentState = ClimbState.Reaching;
+                    Debug.Log($"{(isRightArm ? "Right" : "Left")} arm reaching up. Y-accel: {acceleration.y:F2}");
+                }
+                break;
+                
+            case ClimbState.Reaching:
+                // Detect grabbing motion (forward tilt - negative Z acceleration)
+                // When tilted forward, Z acceleration becomes more negative
+                bool isGrabbing = acceleration.z < grabThreshold;
+                
+                if (isGrabbing && canStateChange)
+                {
+                    GrabAndClimb();
+                    currentState = ClimbState.Grabbing;
+                    StartCoroutine(ResetStateAfterDelay(cooldownTime));
+                    Debug.Log($"Grabbed! Z-accel: {acceleration.z:F2}");
+                }
+                break;
+                
+            case ClimbState.Grabbing:
+                // Wait for cooldown in coroutine before returning to Ready
+                break;
         }
     }
 
-    private System.Collections.IEnumerator CheckForWKeyWhileHoldingD()
+    
+    private void GrabAndClimb()
     {
-        // Continue checking as long as D is held down
-        while (Input.GetKey(KeyCode.D))
-        {
-            // If W is pressed while D is still held down
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                Climb();
-                yield break; // Exit the coroutine after climbing
-            }
-            yield return null; // Wait for next frame
-        }
-    }
-
-    private System.Collections.IEnumerator CheckForWKeyWhileHoldingA()
-    {
-        // Continue checking as long as A is held down
-        while (Input.GetKey(KeyCode.A))
-        {
-            // If W is pressed while A is still held down
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                Climb();
-                yield break; // Exit the coroutine after climbing
-            }
-            yield return null; // Wait for next frame
-        }
-    }
-
-    private void Climb()
-    {
-        // Move the player up
+        // Move player up
         transform.position += Vector3.up * climbAmount;
-
+        
+        // Switch arms
         ToggleArm();
-
-        climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
-
-        if (transform.position.y >= climbingManager.GetFinishHeight())
+        
+        // Update network position
+        if (IsOwner && NetworkManager.Singleton != null)
         {
-            climbingManager.PlayerFinished(NetworkManager.Singleton.LocalClientId);
+            climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
+            
+            // Check for finish
+            if (transform.position.y >= climbingManager.GetFinishHeight())
+            {
+                climbingManager.PlayerFinished(NetworkManager.Singleton.LocalClientId);
+            }
         }
         
-        // Room for animation code to be added later
-        // Example:
-        // Animator animator = GetComponent<Animator>();
-        // if (right)
-        //     animator.SetTrigger("ClimbRightHand");
-        // else
-        //     animator.SetTrigger("ClimbLeftHand");
+        Debug.Log($"Climbed! New height: {transform.position.y:F2}");
     }
-
-    // Public method to toggle which arm is active
+    
+    private IEnumerator ResetStateAfterDelay(float delay)
+    {
+        canStateChange = false;
+        yield return new WaitForSeconds(delay);
+        currentState = ClimbState.Ready;
+        canStateChange = true;
+        Debug.Log("Reset to Ready state");
+    }
+    
+    // Convert gyroscope quaternion to Unity coordinate system
+    private Quaternion GyroToUnity(Quaternion q)
+    {
+        return new Quaternion(q.x, q.y, -q.z, -q.w);
+    }
+    
+    private void HandleKeyboardInput()
+    {
+        if (currentState != ClimbState.Ready) return;
+        
+        bool reachInput = isRightArm ? Input.GetKey(KeyCode.D) : Input.GetKey(KeyCode.A);
+        bool grabInput = Input.GetKeyDown(KeyCode.W);
+        
+        if (reachInput)
+        {
+            currentState = ClimbState.Reaching;
+            
+            if (grabInput)
+            {
+                GrabAndClimb();
+                currentState = ClimbState.Grabbing;
+                StartCoroutine(ResetStateAfterDelay(cooldownTime));
+            }
+        }
+    }
+    
     public void ToggleArm()
     {
-        right = !right;
+        isRightArm = !isRightArm;
+        Debug.Log($"Switched to {(isRightArm ? "right" : "left")} arm");
     }
 }
