@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
+using Unity.Netcode.Transports.UTP;
 
 public class MapPlayerBehavior : NetworkBehaviour
 {
     [SerializeField] public GameObject playerPrefab;
-    private ulong clientId;
+    public ulong clientId;
     public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
@@ -66,18 +68,20 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.Play();
             return;
         }
-        Debug.Log("doing host stuff");
-        CreatePlayerQueue();
+        if (GameManager.Instance.MapManager.players == null)
+            CreatePlayerQueue();
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
+        // SendCurrentPlayerRpc(currentPlayerId);
 
 
     }
 
     public override void OnNetworkSpawn()
     {
-        if (!host) return;
+        if (!host)
+            AskForCurrentPlayerRpc();
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
@@ -145,6 +149,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
 
+            CheckSceneChange(i,j);
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
             // MapAudioManager.playerMovementAudio.Play();
 
@@ -152,16 +157,24 @@ public class MapPlayerBehavior : NetworkBehaviour
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
+                SendCurrentPlayerRpc(currentPlayerId);
                 // SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
             }
         }
     }
 
+    void CheckSceneChange(int x, int y)
+    {
+        if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
+        {
+            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame; // I think this is needed? 
+            NetworkManager.Singleton.SceneManager.LoadScene("TEST_MapMinigame", LoadSceneMode.Single);
+        }
+    }
+
     [Rpc(SendTo.NotServer)]
-    // public void SendCurrentPlayerRpc(string message)
     public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
-        // Debug.Log(message);
         this.currentPlayerId = currentPlayerId;
     }
 
@@ -174,39 +187,74 @@ public class MapPlayerBehavior : NetworkBehaviour
     }
 
 
-    void Update()
-    {
-        if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
-        {
+    // void Update()
+    // {
+    //     if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
+    //     {
 
 
-            // client does this? 
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
-            {
-                if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
-                if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
-                if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
-                if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
-            }
-            else if (currentPlayerId == ulong.MinValue)
-            {
-                AskForCurrentPlayerRpc();
-            }
+    //         // client does this? 
+    //         if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
+    //         {
+    //             if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
+    //             if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
+    //             if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
+    //             if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
+    //         }
+    //         else if (currentPlayerId == ulong.MinValue)
+    //         {
+    //             AskForCurrentPlayerRpc();
+    //         }
 
 
 
-        }
-    }
+    //     }
+    // }
 
     bool InBounds(int i, int j)
     {
         if (i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
         return false;
     }
-    
+
 
 
     // BUTTON ARROW KEY AREA
+    public void MoveRight()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, 1);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveLeft()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, -1);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveUp()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(1, 0);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
+
+    public void MoveDown()
+    {
+        if (GameManager.Instance.MapManager.playing)
+        {
+            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(-1, 0);
+            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+        }
+    }
 
 
 }

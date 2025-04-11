@@ -121,11 +121,8 @@ public class LobbyManager : MonoBehaviour
 
     public void StartGame()
     {
-        if (isHost)
-        {
-            // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("ClimbingMinigame", LoadSceneMode.Single);
-        }
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        
     }
     public void StartLeverGame()
     {
