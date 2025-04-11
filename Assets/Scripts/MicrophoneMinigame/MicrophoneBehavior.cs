@@ -32,6 +32,9 @@ public class MicrophoneBehavior : NetworkBehaviour
     public int readyCount = 0;
     public int playerCount = 0;
 
+    public Dictionary<int, float> finalScores = new Dictionary<int, float>();
+    public int scoresReceived = 0;
+
 
 
 
@@ -178,11 +181,32 @@ public class MicrophoneBehavior : NetworkBehaviour
         listening = false;
     }
 
+    [Rpc(SendTo.Server)]
+    public void SendFinalScoreRpc(int player, float score)
+    {
+        finalScores.Add(player, score);
+        scoresReceived++;
+        if (scoresReceived == playerCount)
+        {
+            PrintScores();
+        } 
+    }
+
+    public void PrintScores()
+    {
+        Dictionary<int,float> sortedScores = finalScores.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        foreach(KeyValuePair<int, float> score in sortedScores)
+        {
+            Debug.Log("Player " + score.Key + " scored " + score.Value);
+        }
+    }
+
     void StopListening()
     {
         listening = false;
         StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
+        SendFinalScoreRpc((int)NetworkManager.Singleton.LocalClientId, timeIncorrect);
     }
 
     void ChangeColor()
