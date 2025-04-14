@@ -4,6 +4,7 @@ using Unity.Netcode;
 
 public class LaserManager : NetworkBehaviour
 {
+    public List<ulong> leaderboard = new List<ulong>();
     public Dictionary<ulong, int> scores = new Dictionary<ulong, int>();
     public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
 
@@ -86,8 +87,19 @@ public class LaserManager : NetworkBehaviour
         return scores[clientId];
     }
 
+    public bool IsAlive(ulong clientId)
+    {
+        return alive[clientId];
+    }
+
     public void KillPlayer(ulong ClientId)
     {
         alive[ClientId] = false;
+        leaderboard.Add(ClientId);
+    }
+
+    private void EndGame()
+    {
+        leaderboard.Reverse();
     }
 }

@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 580561266561384541}
   - component: {fileID: 7502525127869894905}
   - component: {fileID: -7458213847284164364}
-  - component: {fileID: 8167767764690986783}
   - component: {fileID: 5599438515319865902}
   - component: {fileID: 3776422997332829996}
+  - component: {fileID: 5183391297293351355}
   m_Layer: 0
   m_Name: LaserPlayer
   m_TagString: Player
@@ -167,23 +167,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &8167767764690986783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9030311445376778106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5a04558f78cb614c9ac3da89c89a0a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  moveSpeed: 20
-  gravity: 50
-  jumpForce: 35
-  bounceForce: 4
 --- !u!114 &5599438515319865902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,3 +220,21 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &5183391297293351355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9030311445376778106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13be2d024cfb12845b3a671bd7be7b03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  moveSpeed: 8
+  gravity: 25
+  jumpForce: 11
+  bounceForce: 2
+  bounceDuration: 0.4

@@ -17,16 +17,7 @@ public class VibrationManager : NetworkBehaviour
             return;
         }
 
-        int numPlayers = network.playerIndexMap.Count;
-        indexToIdArray = new ulong[numPlayers];
-
-        int i = 0;
-        foreach(var player in network.playerIndexMap)
-        {
-            ulong pId = player.Key;
-            indexToIdArray[i] = pId;
-            i++;
-        }
+        int numPlayers = network.playerInfoList.Count;
     }
 
     public void TriggerVibration(ulong clientId)
@@ -61,18 +52,16 @@ public class VibrationManager : NetworkBehaviour
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
-        foreach (int playerIndex in leverOrder)
+        foreach (int playerNum in leverOrder)
         {
-            ulong targetClientId = indexToIdArray[playerIndex];
-            
-            if (targetClientId == 0)
+            if (playerNum == 0)
             {
-                Debug.LogError($"No valid client ID for player index {playerIndex}");
+                Debug.Log("Skipped the host for vibration");
                 continue;
             }
 
             // Vibrate the correct player's phone
-            TriggerVibration(targetClientId);
+            TriggerVibration((ulong)playerNum);
 
             // Delay between vibrations
             yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty

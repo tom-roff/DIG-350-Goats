@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
 
 public class CameraController : NetworkBehaviour
@@ -11,8 +10,9 @@ public class CameraController : NetworkBehaviour
 
     public GameObject gameCamera;
     public Transform[] playerCameraPositions;
+    public Transform[] hostCameraPositions;
 
-    private int[] leverOrder = {0, 1, 2, 3, 4, 5}; // Array that holds the lever order (0, 1, 2, 3, ...)
+    private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
 
     void Start()
@@ -23,6 +23,8 @@ public class CameraController : NetworkBehaviour
             Debug.LogError("OurNetwork instance not found!");
             return;
         }
+
+        AssignLeverOrder();
 
         vibration = FindFirstObjectByType<VibrationManager>();
         if (vibration == null)
@@ -38,8 +40,27 @@ public class CameraController : NetworkBehaviour
         StartVibrationSequence();
     }
 
+    void AssignLeverOrder() 
+    {
+        // Just as an example – this assumes Start() runs after Awake()
+        int numPlayers = network.playerInfoList.Count;
+        leverOrder = new int[numPlayers];
+        for (int i = 0; i < numPlayers; i++)
+        {
+            leverOrder[i] = i;
+        }
+    }
+
     void AssignCamera()
     {
+        if(playerId == 0) // host camera position
+        {
+            int numPlayers = NetworkManager.Singleton.ConnectedClientsIds.Count - 1;
+            Debug.Log(numPlayers);
+            Transform desiredHostPos = hostCameraPositions[numPlayers - 2];
+            gameCamera.transform.position = desiredHostPos.position;
+            return;
+        }
         if (playerId < 0 || (int)playerId >= playerCameraPositions.Length)
         {
             Debug.LogError($"Invalid player index {playerId}");
@@ -50,7 +71,7 @@ public class CameraController : NetworkBehaviour
         if (desiredPos != null)
         {
             gameCamera.transform.position = desiredPos.position;
-            gameCamera.transform.rotation = desiredPos.rotation;
+            //gameCamera.transform.rotation = desiredPos.rotation;
             Debug.Log($"Camera set to position {playerId}");
         }
         else
@@ -85,7 +106,7 @@ public class CameraController : NetworkBehaviour
 
         else
         {
-            Debug.Log($"Wrong Lever, {pulledLeverIndex} should have been pulled!");
+            Debug.Log($"Wrong Lever, {currentLeverIndex} should have been pulled!");
             OnWrongLeverPulled();
         }
     }
