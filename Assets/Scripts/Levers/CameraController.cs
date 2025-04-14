@@ -10,7 +10,7 @@ public class CameraController : NetworkBehaviour
 
     public GameObject gameCamera;
     public Transform[] playerCameraPositions;
-    public Transform hostCameraPosition;
+    public Transform[] hostCameraPositions;
 
     private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
@@ -55,7 +55,10 @@ public class CameraController : NetworkBehaviour
     {
         if(playerId == 0) // host camera position
         {
-            gameCamera.transform.position = hostCameraPosition.position;
+            int numPlayers = NetworkManager.Singleton.ConnectedClientsIds.Count - 1;
+            Debug.Log(numPlayers);
+            Transform desiredHostPos = hostCameraPositions[numPlayers - 2];
+            gameCamera.transform.position = desiredHostPos.position;
             return;
         }
         if (playerId < 0 || (int)playerId >= playerCameraPositions.Length)
@@ -68,7 +71,7 @@ public class CameraController : NetworkBehaviour
         if (desiredPos != null)
         {
             gameCamera.transform.position = desiredPos.position;
-            gameCamera.transform.rotation = desiredPos.rotation;
+            //gameCamera.transform.rotation = desiredPos.rotation;
             Debug.Log($"Camera set to position {playerId}");
         }
         else
