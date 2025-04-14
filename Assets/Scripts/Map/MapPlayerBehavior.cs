@@ -16,11 +16,15 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
     public ulong currentPlayerId = ulong.MinValue;
+    int mapWidth;
+    int mapHeight;
+
 
     void OnEnable()
     {
-        CheckHost();
-    }
+        mapWidth = GameManager.Instance.MapManager.MapWidth();
+        mapHeight = GameManager.Instance.MapManager.MapHeight();
+    } 
 
     void CheckHost()
     {
@@ -39,16 +43,16 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     void CreatePlayerQueue()
     {
-        int playerCount = GameManager.Instance.OurNetwork.playerIndexMap.Count;
+        int playerCount = GameManager.Instance.OurNetwork.playerIdToClientIdMap.Count;
         GameManager.Instance.MapManager.players = new MapPlayer[playerCount]; // replace with # of players in lobby
 
         int i = 0;
-        foreach (KeyValuePair<ulong, PlayerInfo> entry in GameManager.Instance.OurNetwork.playerIndexMap)
+        foreach (KeyValuePair<string, ulong> entry in GameManager.Instance.OurNetwork.playerIdToClientIdMap)
         {
             // do something with entry.Value or entry.Key
-            if (entry.Key != clientId)
+            if (entry.Value != clientId)
             {
-                GameManager.Instance.MapManager.players[i] = new MapPlayer(entry.Key);
+                GameManager.Instance.MapManager.players[i] = new MapPlayer(entry.Value);
             }
             else
             {
@@ -85,14 +89,15 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
+        CheckHost();
         base.OnNetworkSpawn();
     }
 
     private Vector2 FindStartPosition()
     {
-        for (int i = 0; i < GameManager.Instance.MapManager.mapHeight; i++)
+        for (int i = 0; i < mapHeight; i++)
         {
-            for (int j = 0; j < GameManager.Instance.MapManager.mapWidth; j++)
+            for (int j = 0; j < mapWidth; j++)
             {
                 if (GameManager.Instance.MapManager.map[i, j] == MapManager.Tiles.Start)
                 {
@@ -213,7 +218,7 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     bool InBounds(int i, int j)
     {
-        if (i > -1 && i < GameManager.Instance.MapManager.mapHeight && j > -1 && j < GameManager.Instance.MapManager.mapWidth) return true;
+        if (i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
         return false;
     }
 

@@ -12,8 +12,6 @@ public class MapManager : MonoBehaviour
 
     public ulong hostId;
     public GameObject[,] tiles;
-    public int mapWidth;
-    public int mapHeight;
 
 
     public MapPlayer[] players = null;
@@ -70,10 +68,15 @@ public class MapManager : MonoBehaviour
 
 
 
-    void Awake()
+
+    public int MapWidth()
     {
-        mapWidth = map.GetLength(1);
-        mapHeight = map.GetLength(0);
+        return map.GetLength(1);
+    }
+
+    public int MapHeight()
+    {
+        return map.GetLength(0);
     }
 
     public void Play()

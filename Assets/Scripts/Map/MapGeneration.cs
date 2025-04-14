@@ -8,6 +8,8 @@ public class MapGeneration : MonoBehaviour
 {
     float tileWidth;
     float tileHeight;
+    int mapWidth;
+    int mapHeight;
 
     [Header("References")]
     [SerializeField] public GameObject tileParent;
@@ -21,19 +23,21 @@ public class MapGeneration : MonoBehaviour
 
     void OnEnable()
     {
-        tileWidth = (1-(xMargin*2)) / GameManager.Instance.MapManager.map.GetLength(1);
-        tileHeight = (1-(yMargin*2)) / GameManager.Instance.MapManager.map.GetLength(0);
+        mapWidth = GameManager.Instance.MapManager.MapWidth();
+        mapHeight = GameManager.Instance.MapManager.MapHeight();
+        tileWidth = (1-(xMargin*2)) / mapWidth;
+        tileHeight = (1-(yMargin*2)) / mapHeight;
 
-        GameManager.Instance.MapManager.tiles = new GameObject[GameManager.Instance.MapManager.mapHeight, GameManager.Instance.MapManager.mapWidth];
+        GameManager.Instance.MapManager.tiles = new GameObject[mapHeight, mapWidth];
 
         GenerateMap();
     }
 
     void GenerateMap()
     {
-        for (int i = 0; i < GameManager.Instance.MapManager.mapHeight; i++)
+        for (int i = 0; i < mapHeight; i++)
         {
-            for (int j = 0; j < GameManager.Instance.MapManager.mapWidth; j++)
+            for (int j = 0; j < mapWidth; j++)
             {
                 if (GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
                 {

@@ -196,6 +196,15 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    public void StartMapGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        }
+    }
+
 
     // Public method to get local player's ID
     public string GetLocalPlayerId()
