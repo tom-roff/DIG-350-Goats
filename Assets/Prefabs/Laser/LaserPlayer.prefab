@@ -233,7 +233,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  moveSpeed: 20
-  gravity: 30
-  jumpForce: 20
-  bounceForce: 5
+  moveSpeed: 8
+  gravity: 25
+  jumpForce: 11
+  bounceForce: 2
+  bounceDuration: 0.4

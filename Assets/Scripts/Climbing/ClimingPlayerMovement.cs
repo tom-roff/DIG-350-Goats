@@ -1,92 +1,51 @@
 using UnityEngine;
+using System.Collections;
 using Unity.Netcode;
 
-public class ClimingPlayerMovement : NetworkBehaviour
+public class ClimbingPlayerMovement : NetworkBehaviour
 {
-    private bool right = true;
     private int climbAmount = 2;
-
-    private float reachLength;
-
+    
+    [Header("References")]
     [SerializeField] private ClimbingManager climbingManager;
 
-
+    private bool isRightArm = true;
+    
+    private void Start()
+    {
+        // Enable gyroscope and accelerometer
+        Input.gyro.enabled = true;
+    }
+    
     private void Update()
     {
-        if (right)
-        {
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                // Start checking for W key while D is held
-                StartCoroutine(CheckForWKeyWhileHoldingD());
-            }
-        } 
-        else 
-        {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                // Start checking for W key while A is held
-                StartCoroutine(CheckForWKeyWhileHoldingA());
-            }
-        }
-    }
+        
+        // Get device acceleration
+        Vector3 acceleration = Input.acceleration;
+        
+        // Debug output
+        // Debug.Log($"Accel X: {acceleration.x:F2}, Y: {acceleration.y:F2}, Z: {acceleration.z:F2}");
+        
 
-    private System.Collections.IEnumerator CheckForWKeyWhileHoldingD()
-    {
-        // Continue checking as long as D is held down
-        while (Input.GetKey(KeyCode.D))
+        if (acceleration.x < -0.7 & acceleration.y > -0.8 & isRightArm)
         {
-            // If W is pressed while D is still held down
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                Climb();
-                yield break; // Exit the coroutine after climbing
-            }
-            yield return null; // Wait for next frame
+            Climb();
         }
-    }
-
-    private System.Collections.IEnumerator CheckForWKeyWhileHoldingA()
-    {
-        // Continue checking as long as A is held down
-        while (Input.GetKey(KeyCode.A))
+        else if (acceleration.x > 0.7 & acceleration.y > -0.8 & !isRightArm)
         {
-            // If W is pressed while A is still held down
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                Climb();
-                yield break; // Exit the coroutine after climbing
-            }
-            yield return null; // Wait for next frame
+            Climb();
         }
     }
 
     private void Climb()
     {
-        // Move the player up
-        transform.position += Vector3.up * climbAmount;
-
+        // Debug.Log($"Climbed!! Right Arm: {isRightArm}, X: {Input.acceleration.x}, Y: {Input.acceleration.y}");
+        transform.position = new Vector3(transform.position.x, transform.position.y + climbAmount, transform.position.z);
         ToggleArm();
-
-        climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
-
-        if (transform.position.y >= climbingManager.GetFinishHeight())
-        {
-            climbingManager.PlayerFinished(NetworkManager.Singleton.LocalClientId);
-        }
-        
-        // Room for animation code to be added later
-        // Example:
-        // Animator animator = GetComponent<Animator>();
-        // if (right)
-        //     animator.SetTrigger("ClimbRightHand");
-        // else
-        //     animator.SetTrigger("ClimbLeftHand");
     }
-
-    // Public method to toggle which arm is active
-    public void ToggleArm()
+    
+    private void ToggleArm()
     {
-        right = !right;
+        isRightArm = !isRightArm;
     }
 }

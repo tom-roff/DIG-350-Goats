@@ -931,6 +931,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  leaderboard: 
   playerUI: {fileID: 2052465398}
 --- !u!4 &631611859
 Transform:
@@ -1610,7 +1611,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1367769692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2229,8 +2230,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  reachThreshold: 0.8
+  grabThreshold: -20
+  climbAmount: 0.5
+  rotationThreshold: 30
+  cooldownTime: 0.5
   climbingManager: {fileID: 631611858}
-  playerUI: {fileID: 2052465398}
 --- !u!114 &1719460154
 MonoBehaviour:
   m_ObjectHideFlags: 0
