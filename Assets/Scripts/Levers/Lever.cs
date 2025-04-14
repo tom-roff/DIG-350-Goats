@@ -5,6 +5,7 @@ public class Lever : NetworkBehaviour
 {
     private Animator animator;
     private CameraController cameraController;
+    private bool hasBeenPulled = false;
 
     public int leverIndex;
 
@@ -25,10 +26,10 @@ public class Lever : NetworkBehaviour
         Input.gyro.enabled = true;
     }
 
-    /*void Update() REAL TRACK TOUCH FUNCTION FOR PHONE
+    /*void Update() REAL TRACK ROTATION FUNCTION FOR PHONE
     {
         // Only run this on the client that owns the lever
-        if (!IsOwner) return;
+        if (!IsOwner || hasBeenPulled) return;
         Quaternion rotation = Input.gyro.attitude;
         rotation = Quaternion.Euler(90f, 0f, 0f) * (new Quaternion(-rotation.x, -rotation.y, rotation.z, rotation.w)); // Convert to Unity coordinates
 
@@ -40,10 +41,8 @@ public class Lever : NetworkBehaviour
         if (zTilt < -30f) // Pull-back detected (tweak threshold as needed)
         {
             Debug.Log($"Phone pulled for lever {leverIndex} (zTilt = {zTilt})");
+            hasBeenPulled = true;
             PullLeverServerRpc(leverIndex);
-
-            // Optionally disable this script or add cooldown so it doesn't repeat
-            enabled = false;
         }
     }*/
 
@@ -66,9 +65,14 @@ public class Lever : NetworkBehaviour
 
     void CheckLeverHit(Ray ray)
     {
+        if (hasBeenPulled)
+        {
+            return;
+        }
         if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
         {
             Debug.Log($"Lever {leverIndex} clicked or tapped!");
+            hasBeenPulled = true;
             PullLeverServerRpc(leverIndex);
         }
     }
