@@ -43,21 +43,15 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     void CreatePlayerQueue()
     {
-        int playerCount = GameManager.Instance.OurNetwork.playerIdToClientIdMap.Count;
+        int playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count;
         GameManager.Instance.MapManager.players = new MapPlayer[playerCount]; // replace with # of players in lobby
 
         int i = 0;
-        foreach (KeyValuePair<string, ulong> entry in GameManager.Instance.OurNetwork.playerIdToClientIdMap)
+        foreach (PlayerInfo entry in GameManager.Instance.OurNetwork.playerInfoList)
         {
-            // do something with entry.Value or entry.Key
-            if (entry.Value != clientId)
-            {
-                GameManager.Instance.MapManager.players[i] = new MapPlayer(entry.Value);
-            }
-            else
-            {
-                Debug.Log("host found?");
-            }
+            
+            GameManager.Instance.MapManager.players[i] = new MapPlayer((ulong)i+1,entry.playerColor.colorRGB);
+            
             i++;
         }
 
@@ -135,7 +129,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         playerInstance.name = "player";
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-        playerInstance.GetComponent<Image>().color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        playerInstance.GetComponent<Image>().color = player.color;
         player.body = playerInstance;
         player.SetPosition(startPosition);
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
