@@ -205,6 +205,16 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    public void Map()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+    }
+
+    public void MicrophoneMinigame()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+    }
+
 
     // Public method to get local player's ID
     public string GetLocalPlayerId()
