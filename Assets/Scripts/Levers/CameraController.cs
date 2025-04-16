@@ -119,8 +119,9 @@ public class CameraController : NetworkBehaviour
 
     void OnWrongLeverPulled()
     {
-        Debug.Log("Incorrect lever pulled! Resetting sequence or allow retries.");
-        currentLeverIndex = 0;
+        Debug.Log("Incorrect lever pulled! Player " + currentLeverIndex + " pulled the wrong lever");
+        var wrongLeverMessage = FindFirstObjectByType<WrongLeverMessage>();
+        wrongLeverMessage.ShowMessageForClient(currentLeverIndex);   
         // logic to reset or provide retries
     }
 }
