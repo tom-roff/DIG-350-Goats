@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using System;
 
 public class OurNetwork : NetworkBehaviour
 {
@@ -21,14 +22,20 @@ public class OurNetwork : NetworkBehaviour
     public Dictionary<string, ulong> playerIdToClientIdMap = new Dictionary<string, ulong>();
 
 
-
-    public async void Initialize(MenuManager manager)
-    {
-        menuManager = manager;
-
-        await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+    public override void OnNetworkSpawn() {
+        if (IsClient) {
+            playerInfoList.OnListChanged += OnPlayerInfoListChanged;
+        }
     }
+
+    private void OnPlayerInfoListChanged(NetworkListEvent<PlayerInfo> changeEvent)
+    {
+        playerInfoList.OnListChanged += change => {
+            Debug.Log($"[Client] ChangeType: {change.Type}, Player: {change.Value.playerName}, Color: {change.Value.playerColor.colorRGB}");
+        };
+    }
+
+
 
     
 
@@ -51,10 +58,15 @@ public class OurNetwork : NetworkBehaviour
 
     [Rpc(SendTo.Server)]
     public void UpdatePlayerNameRpc(int clientId, string name){
-        PlayerInfo updatedInfo = playerInfoList[clientId - 1];
+        PlayerInfo updatedInfo = playerInfoList[clientId];
         updatedInfo.playerName = name;
-        playerInfoList[clientId - 1] = updatedInfo;
-        menuManager.playerEntries[playerInfoList.Count - 1].SetNameAndColor(name, playerInfoList[playerInfoList.Count - 1].playerColor);
+        playerInfoList[clientId] = updatedInfo;
+        menuManager = FindObjectOfType<MenuManager>();
+        if(menuManager != null){
+            Debug.Log("Setting Client ID " + clientId + "To name: "+name);
+            menuManager.playerEntries[clientId - 1].SetNameAndColor(name, playerInfoList[clientId].playerColor);
+        }
+        
     }
 
     [Rpc(SendTo.Server)]
@@ -70,6 +82,8 @@ public class OurNetwork : NetworkBehaviour
         updatedInfo.treasuresCollected = scoreToSet;
         playerInfoList[clientId] = updatedInfo;
     }
+
+    
 
     // [Unity.Netcode.ClientRpc]
     // public void RpcVibratePhoneClientRpc(ClientRpcParams clientRpcParams)

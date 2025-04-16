@@ -36,7 +36,6 @@ public struct PlayerInfo : INetworkSerializable, IEquatable<PlayerInfo>{
     public PlayerColor playerColor;
     public int treasuresCollected;
 
-
     public PlayerInfo(String name, PlayerColor color, int treasures){
 
         playerName = name;
@@ -47,7 +46,7 @@ public struct PlayerInfo : INetworkSerializable, IEquatable<PlayerInfo>{
 
     public bool Equals(PlayerInfo other)
     {
-        throw new NotImplementedException();
+        return playerName.Equals(other.playerName) && treasuresCollected == other.treasuresCollected;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
