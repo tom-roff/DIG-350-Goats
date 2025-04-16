@@ -42,9 +42,9 @@ public class LaserUI : NetworkBehaviour
             {
                 if (laserManager.IsAlive(clientId))
                 {
-                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Alive :)";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId - 1].playerName}: Alive :)";
                 } else {
-                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Dead :(";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId - 1].playerName}: Dead :(";
                 }
                 playerIndex++;
             }

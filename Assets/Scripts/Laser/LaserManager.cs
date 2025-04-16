@@ -7,6 +7,8 @@ public class LaserManager : NetworkBehaviour
     public List<ulong> leaderboard = new List<ulong>();
     public Dictionary<ulong, int> scores = new Dictionary<ulong, int>();
     public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
+    [SerializeField] private GameObject gameUI;
+    [SerializeField] private GameObject endUI;
 
     public GameObject laserPrefab;
     private float yPosition = 2f;
@@ -17,7 +19,16 @@ public class LaserManager : NetworkBehaviour
     public float maxSpawnInterval = 1.5f;
     private float nextSpawnTime;
     private ulong hostId;
-
+    
+    // Sudden death mode variables
+    private float gameTimer = 0f;
+    private bool suddenDeathActive = false;
+    public float suddenDeathStartTime = 20f;  // Time in seconds when sudden death begins
+    public float suddenDeathSpeedupInterval = 1.5f;  // How often to increase spawn rate during sudden death
+    private float suddenDeathTimer = 0f;
+    public float suddenDeathSpeedupRate = 0.9f;  // Rate to multiply spawn intervals by (lower = faster spawns)
+    private bool gameOver = false;
+    
     public override void OnNetworkSpawn()
     {
         if (!IsServer)
@@ -35,6 +46,11 @@ public class LaserManager : NetworkBehaviour
                 alive[clientId] = true;
             }
         }
+        
+        // Initialize timers
+        gameTimer = 0f;
+        suddenDeathTimer = 0f;
+        SetNextSpawnTime();
     }
 
     private void Update()
@@ -44,11 +60,60 @@ public class LaserManager : NetworkBehaviour
             return;
         }
 
+        if (gameOver)
+        {
+            return;
+        }
+
+        // Update game timer
+        gameTimer += Time.deltaTime;
+        
+        // Check if it's time to activate sudden death mode
+        if (!suddenDeathActive && gameTimer >= suddenDeathStartTime)
+        {
+            ActivateSuddenDeath();
+        }
+        
+        // Handle sudden death progression
+        if (suddenDeathActive)
+        {
+            suddenDeathTimer += Time.deltaTime;
+            
+            // Periodically increase spawn rate during sudden death
+            if (suddenDeathTimer >= suddenDeathSpeedupInterval)
+            {
+                IncreaseLaserSpawnRate();
+                suddenDeathTimer = 0f;
+            }
+        }
+
         if (Time.time >= nextSpawnTime)
         {
             SpawnLaser();
             SetNextSpawnTime();
         }
+    }
+
+    private void ActivateSuddenDeath()
+    {
+        suddenDeathActive = true;
+        suddenDeathTimer = 0f;
+        Debug.Log("SUDDEN DEATH MODE ACTIVATED!");
+        
+        // You could add visual effects or sounds here to indicate sudden death mode
+    }
+    
+    private void IncreaseLaserSpawnRate()
+    {
+        // Decrease the spawn intervals to make lasers spawn faster
+        minSpawnInterval *= suddenDeathSpeedupRate;
+        maxSpawnInterval *= suddenDeathSpeedupRate;
+        
+        // Set minimum limits to prevent too rapid spawning that might break the game
+        minSpawnInterval = Mathf.Max(minSpawnInterval, 0.05f);
+        maxSpawnInterval = Mathf.Max(maxSpawnInterval, 0.1f);
+        
+        Debug.Log($"Laser spawn rate increased! Interval: {minSpawnInterval:F2}s - {maxSpawnInterval:F2}s");
     }
 
     private void SpawnLaser()
@@ -96,10 +161,19 @@ public class LaserManager : NetworkBehaviour
     {
         alive[ClientId] = false;
         leaderboard.Add(ClientId);
+        if (alive.ContainsValue(true) == false)
+        {
+            EndGame();
+        }
     }
 
     private void EndGame()
     {
         leaderboard.Reverse();
+        Debug.Log(leaderboard);
+        endUI.SetActive(true);
+        gameUI.SetActive(false);
+        gameOver = true;
+        // Send Data to GameManager
     }
 }
