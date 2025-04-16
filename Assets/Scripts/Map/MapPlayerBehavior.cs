@@ -35,27 +35,26 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (!host)
         {
             GameManager.Instance.MapManager.Play();
+            mapUI.DisableRerolling();
             return;
         }
-        if (GameManager.Instance.MapManager.players == null)
-            CreatePlayerQueue();
+
+        if (GameManager.Instance.MapManager.players == null) CreatePlayerQueue();
+
         SpawnPlayers();
         GameManager.Instance.MapManager.Play();
         GameManager.Instance.MapManager.NextPlayer();
         mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
-        // SendCurrentPlayerRpc(currentPlayerId);
-
-
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
     }
 
     public override void OnNetworkSpawn()
     {
-        if (!host)
-            AskForCurrentPlayerRpc();
-        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
-        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
-        SendCurrentPlayerRpc(currentPlayerId);
         CheckHost();
+        if (!host)
+            return;
+
+        AskForCurrentPlayerRpc();
         base.OnNetworkSpawn();
     }
 
@@ -160,16 +159,13 @@ public class MapPlayerBehavior : NetworkBehaviour
 
             GameManager.Instance.MapManager.moves--;
             mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-            RerollUnavailableRpc();
 
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
                 mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
                 mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-
-
-                SendCurrentPlayerRpc(currentPlayerId);
+                AskForCurrentPlayerRpc(); 
             }
         }
     }
@@ -187,24 +183,29 @@ public class MapPlayerBehavior : NetworkBehaviour
     public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
         this.currentPlayerId = currentPlayerId;
-        if (currentPlayerId == clientId && GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].rerolls > 0)
-        {
-            RerollAvailable();
-        }
     }
 
     [Rpc(SendTo.NotServer)]
-    public void RerollUnavailableRpc()
+    public void CheckRerollsRpc(int rerolls)
     {
-        rerollAvailable = false;
-        mapUI.DisableRerolling();
+        if (currentPlayerId == clientId && rerolls > 0)
+        {
+            rerollAvailable = true;
+            mapUI.EnableRerolling();
+            mapUI.SetRerollText(rerolls);
+        }
+        else
+        {
+            Debug.Log("unavailable");
+            rerollAvailable = false;
+            mapUI.DisableRerolling();
+            mapUI.SetRerollText(rerolls);
+
+        }
+
     }
 
-    public void RerollAvailable()
-    {
-        rerollAvailable = true;
-        mapUI.EnableRerolling();
-    }
+
 
     [Rpc(SendTo.Server)]
     public void AskForCurrentPlayerRpc()
@@ -212,6 +213,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls);
     }
 
 
@@ -230,10 +232,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
         currentPlayer.AddRerolls(-1);
         mapUI.DisplayText("Rerolled moves: " + GameManager.Instance.MapManager.moves);
-        if (currentPlayer.rerolls < 1)
-        {
-            RerollUnavailableRpc();
-        }
+        CheckRerollsRpc(currentPlayer.rerolls);
     }
 
     public void Reroll()

@@ -24,7 +24,7 @@ public class MapUI : MonoBehaviour
 
     public void SetMovesText(int moves)
     {
-        rerollText.text = "Moves: " + moves;
+        movesText.text = "Moves: " + moves;
     }
 
     public void DisableRerolling()
