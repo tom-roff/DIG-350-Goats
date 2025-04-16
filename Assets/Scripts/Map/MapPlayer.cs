@@ -7,29 +7,31 @@ using UnityEngine.SceneManagement;
 public class MapPlayer
 {
     public ulong playerID { get; set; }
+    public string name { get; set; }
+    public PlayerInfo playerInfo { get; set; }
     public Vector2 position { get; set; }
     public GameObject body { get; set; }
     public Color32 color { get; set; }
+    public int rerolls { get; set; }
 
 
-    public MapPlayer(ulong playerID)
+
+    public MapPlayer(ulong playerID, PlayerInfo playerInfo)
     {
         this.playerID = playerID;
+        this.playerInfo = playerInfo;
+
+        name = playerInfo.playerName.ToString();
         this.position = Vector2.positiveInfinity;
+        this.color = playerInfo.playerColor.colorRGB;
+        rerolls = 0;
     }
 
-    public MapPlayer(ulong playerID, Color32 color)
-    {
-        this.playerID = playerID;
-        this.position = Vector2.positiveInfinity;
-        this.color = color;
-    }
-
-    public MapPlayer(ulong playerID, Vector2 position)
-    {
-        this.playerID = playerID;
-        this.position = position;
-    }
+    // public MapPlayer(ulong playerID, Vector2 position)
+    // {
+    //     this.playerID = playerID;
+    //     this.position = position;
+    // }
 
     public void SetPosition(Vector2 position)
     {
@@ -39,5 +41,10 @@ public class MapPlayer
     public void SetBody(GameObject body)
     {
         this.body = body;
+    }
+
+    public void AddRerolls(int inc)
+    {
+        rerolls += inc;
     }
 }

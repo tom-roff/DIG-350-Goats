@@ -15,16 +15,49 @@ public class MapPlayerBehavior : NetworkBehaviour
     public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
+    [SerializeField] public MapUI mapUI;
+    
     public ulong currentPlayerId = ulong.MinValue;
     int mapWidth;
     int mapHeight;
+    public bool rerollAvailable = false;
 
 
     void OnEnable()
     {
         mapWidth = GameManager.Instance.MapManager.MapWidth();
         mapHeight = GameManager.Instance.MapManager.MapHeight();
-    } 
+    }
+
+    public void StartMap()
+    {
+        CheckHost();
+        if (!host)
+        {
+            GameManager.Instance.MapManager.Play();
+            return;
+        }
+        if (GameManager.Instance.MapManager.players == null)
+            CreatePlayerQueue();
+        SpawnPlayers();
+        GameManager.Instance.MapManager.Play();
+        GameManager.Instance.MapManager.NextPlayer();
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
+        // SendCurrentPlayerRpc(currentPlayerId);
+
+
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (!host)
+            AskForCurrentPlayerRpc();
+        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
+        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
+        SendCurrentPlayerRpc(currentPlayerId);
+        CheckHost();
+        base.OnNetworkSpawn();
+    }
 
     void CheckHost()
     {
@@ -50,7 +83,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         foreach (PlayerInfo entry in GameManager.Instance.OurNetwork.playerInfoList)
         {
             
-            GameManager.Instance.MapManager.players[i] = new MapPlayer((ulong)i+1,entry.playerColor.colorRGB);
+            GameManager.Instance.MapManager.players[i] = new MapPlayer((ulong)i+1,entry);
             
             i++;
         }
@@ -58,34 +91,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
     }
 
-    public void StartMap()
-    {
-        CheckHost();
-        if (!host)
-        {
-            GameManager.Instance.MapManager.Play();
-            return;
-        }
-        if (GameManager.Instance.MapManager.players == null)
-            CreatePlayerQueue();
-        SpawnPlayers();
-        GameManager.Instance.MapManager.Play();
-        GameManager.Instance.MapManager.NextPlayer();
-        // SendCurrentPlayerRpc(currentPlayerId);
-
-
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        if (!host)
-            AskForCurrentPlayerRpc();
-        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
-        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
-        SendCurrentPlayerRpc(currentPlayerId);
-        CheckHost();
-        base.OnNetworkSpawn();
-    }
+   
 
     private Vector2 FindStartPosition()
     {
@@ -126,7 +132,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     void InstantiatePlayer(Vector2 startPosition, MapPlayer player)
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        playerInstance.name = "player";
+        playerInstance.name = player.name;
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = player.color;
@@ -153,11 +159,17 @@ public class MapPlayerBehavior : NetworkBehaviour
             // MapAudioManager.playerMovementAudio.Play();
 
             GameManager.Instance.MapManager.moves--;
+            mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+            RerollUnavailableRpc();
+
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
+                mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
+                mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+
+
                 SendCurrentPlayerRpc(currentPlayerId);
-                // SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
             }
         }
     }
@@ -167,7 +179,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
         {
             GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame; // I think this is needed? 
-            NetworkManager.Singleton.SceneManager.LoadScene("TEST_MapMinigame", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
         }
     }
 
@@ -175,6 +187,23 @@ public class MapPlayerBehavior : NetworkBehaviour
     public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
         this.currentPlayerId = currentPlayerId;
+        if (currentPlayerId == clientId && GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].rerolls > 0)
+        {
+            RerollAvailable();
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void RerollUnavailableRpc()
+    {
+        rerollAvailable = false;
+        mapUI.DisableRerolling();
+    }
+
+    public void RerollAvailable()
+    {
+        rerollAvailable = true;
+        mapUI.EnableRerolling();
     }
 
     [Rpc(SendTo.Server)]
@@ -186,34 +215,30 @@ public class MapPlayerBehavior : NetworkBehaviour
     }
 
 
-    // void Update()
-    // {
-    //     if (GameManager.Instance.MapManager.playing) // && recieve information from player? will it get scrambled if they do it perfectly at the same time?
-    //     {
-
-
-    //         // client does this? 
-    //         if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId)
-    //         {
-    //             if (Input.GetKeyDown(KeyCode.RightArrow)) MovePlayerRpc(0, 1);
-    //             if (Input.GetKeyDown(KeyCode.LeftArrow)) MovePlayerRpc(0, -1);
-    //             if (Input.GetKeyDown(KeyCode.UpArrow)) MovePlayerRpc(1, 0);
-    //             if (Input.GetKeyDown(KeyCode.DownArrow)) MovePlayerRpc(-1, 0);
-    //         }
-    //         else if (currentPlayerId == ulong.MinValue)
-    //         {
-    //             AskForCurrentPlayerRpc();
-    //         }
-
-
-
-    //     }
-    // }
-
     bool InBounds(int i, int j)
     {
         if (i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
         return false;
+    }
+
+
+    [Rpc(SendTo.Server)]
+    void RerollRpc()
+    {
+        System.Random rnd = new System.Random();
+        GameManager.Instance.MapManager.moves = rnd.Next(1, 7);
+        MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+        currentPlayer.AddRerolls(-1);
+        mapUI.DisplayText("Rerolled moves: " + GameManager.Instance.MapManager.moves);
+        if (currentPlayer.rerolls < 1)
+        {
+            RerollUnavailableRpc();
+        }
+    }
+
+    public void Reroll()
+    {
+        RerollRpc();
     }
 
 

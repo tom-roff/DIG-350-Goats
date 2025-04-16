@@ -40,7 +40,7 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        playerCount = GameManager.Instance.OurNetwork.playerIndexMap.Count;
+        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count;
         CheckHost();
         ChangeColor();
         base.OnNetworkSpawn();
@@ -138,7 +138,6 @@ public class MicrophoneBehavior : NetworkBehaviour
             SwitchRpc();
 
             float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
-            Debug.Log("Time until next switch: " + timeUntilSwitch);
             Invoke("SwitchLoudness", timeUntilSwitch);
         }
 
@@ -194,11 +193,18 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public void PrintScores()
     {
-        Dictionary<int,float> sortedScores = finalScores.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-        foreach(KeyValuePair<int, float> score in sortedScores)
+        Dictionary<int, float> sortedScores = finalScores.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        int i = 0;
+        foreach (KeyValuePair<int, float> score in sortedScores)
         {
             Debug.Log("Player " + score.Key + " scored " + score.Value);
+            if (i == 0)
+            {
+                GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(1);
+            }
+            i++;
         }
+        
     }
 
     void StopListening()
