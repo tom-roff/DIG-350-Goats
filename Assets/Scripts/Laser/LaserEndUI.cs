@@ -25,7 +25,7 @@ public class LaserEndUI : NetworkBehaviour
 
         foreach (ulong clientId in laserManager.leaderboard)
         {
-            scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId - 1].playerName}";
+            scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}";
             playerIndex++;
         }
     }

@@ -13,7 +13,7 @@ public class LaserUI : NetworkBehaviour
     {
         if (!IsServer)
         {
-            this.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         hostId = NetworkManager.Singleton.LocalClientId;
@@ -35,16 +35,16 @@ public class LaserUI : NetworkBehaviour
         
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            if (clientId == hostId)
                 continue;
                 
             if (playerIndex < scoreTexts.Length)
             {
                 if (laserManager.IsAlive(clientId))
                 {
-                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId - 1].playerName}: Alive :)";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Alive :)";
                 } else {
-                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId - 1].playerName}: Dead :(";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Dead :(";
                 }
                 playerIndex++;
             }

@@ -9,6 +9,7 @@ public class LaserManager : NetworkBehaviour
     public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
     [SerializeField] private GameObject gameUI;
     [SerializeField] private GameObject endUI;
+    [SerializeField] private GameObject deathUI;
 
     public GameObject laserPrefab;
     private float yPosition = 2f;
@@ -157,13 +158,25 @@ public class LaserManager : NetworkBehaviour
         return alive[clientId];
     }
 
-    public void KillPlayer(ulong ClientId)
+    public void KillPlayer(ulong clientId)
     {
-        alive[ClientId] = false;
-        leaderboard.Add(ClientId);
+        alive[clientId] = false;
+        leaderboard.Add(clientId);
+        ShowDeathUIRpc(clientId);
+
         if (alive.ContainsValue(true) == false)
         {
             EndGame();
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    private void ShowDeathUIRpc(ulong deadClientId)
+    {
+        // Check if this is the client that died
+        if (NetworkManager.Singleton.LocalClientId == deadClientId)
+        {
+            deathUI.SetActive(true);
         }
     }
 
