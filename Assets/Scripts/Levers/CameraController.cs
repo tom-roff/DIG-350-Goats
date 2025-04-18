@@ -6,6 +6,7 @@ public class CameraController : NetworkBehaviour
 {
     private OurNetwork network;
     private VibrationManager vibration;
+    private GameEndManager gameEndManager;
     private ulong playerId;
 
     public GameObject gameCamera;
@@ -33,6 +34,13 @@ public class CameraController : NetworkBehaviour
             return;
         }
 
+        gameEndManager = FindFirstObjectByType<GameEndManager>(); // Find the network script
+        if (gameEndManager == null)
+        {
+            Debug.LogError("GameEndManager instance not found!");
+            return;
+        }
+
         playerId = NetworkManager.Singleton.LocalClientId;
 
         AssignCamera();
@@ -42,8 +50,7 @@ public class CameraController : NetworkBehaviour
 
     void AssignLeverOrder() 
     {
-        // Just as an example – this assumes Start() runs after Awake()
-        int numPlayers = network.playerInfoList.Count;
+        int numPlayers = network.playerInfoList.Count - 1;
         leverOrder = new int[numPlayers];
         for (int i = 0; i < numPlayers; i++)
         {
@@ -96,11 +103,13 @@ public class CameraController : NetworkBehaviour
         {
             Debug.Log($"Lever {pulledLeverIndex} pulled correctly!");
             currentLeverIndex++;
+            Debug.Log($"currentLeverIndex is now {currentLeverIndex}, leverOrder.Length is {leverOrder.Length}");
+
             if (currentLeverIndex >= leverOrder.Length)
             {
                 Debug.Log("All levers pulled correctly! Game complete.");
                 // Trigger win condition
-                OnGameWin();
+                gameEndManager.OnGameWin();
             }
         }
 
@@ -111,17 +120,13 @@ public class CameraController : NetworkBehaviour
         }
     }
 
-    void OnGameWin()
-    {
-        Debug.Log("Congratulations! All levers were pulled in the correct order.");
-        // game end logic
-    }
 
     void OnWrongLeverPulled()
     {
-        Debug.Log("Incorrect lever pulled! Player " + currentLeverIndex + " pulled the wrong lever");
+        Debug.Log("Incorrect lever pulled! It was Player " + currentLeverIndex + " turn to pull");
         var wrongLeverMessage = FindFirstObjectByType<WrongLeverMessage>();
-        wrongLeverMessage.ShowMessageForClient(currentLeverIndex);   
+        wrongLeverMessage.ShowMessageForClient(currentLeverIndex);  
+        gameEndManager.OnGameLose(); 
         // logic to reset or provide retries
     }
 }

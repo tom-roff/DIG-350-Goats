@@ -5,8 +5,8 @@ using System.Collections;
 
 public class VibrationManager : NetworkBehaviour
 {
-    private ulong[] indexToIdArray;
     private OurNetwork network;
+    public GameObject leverBlocker;
 
     void Start()
     {
@@ -68,6 +68,7 @@ public class VibrationManager : NetworkBehaviour
         }
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
+        leverBlocker.SetActive(false);
     }
 
 }
