@@ -15,11 +15,20 @@ EditorBuildSettings:
     path: Assets/Scenes/LaserMinigame.unity
     guid: 3c102c8d7e471d34e977ba57c58b829d
   - enabled: 1
+    path: Assets/Scenes/Map.unity
+    guid: 036cd1f87d87aff4b9815ee66951e7ac
+  - enabled: 1
+    path: Assets/Scenes/TEST_MapMinigame.unity
+    guid: 5ec8ed008d729b54a939f104c3c8116c
+  - enabled: 0
+    path: Assets/Scenes/MapControls.unity
+    guid: e5864d0fe0d1a6043ada4b67b789001d
+  - enabled: 1
     path: Assets/Scenes/LeversMinigame.unity
     guid: 4c2b6da160b9740429e4331ac953801a
   - enabled: 1
-    path: Assets/Scenes/ClimbingMinigame.unity
-    guid: 9b2ccb05065392d48823569b9c37a0de
+    path: Assets/Scenes/MicrophoneMinigame.unity
+    guid: d7124718e66bd0b46aa014c302e0b682
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -82,6 +82,7 @@ public class LobbyManager : MonoBehaviour
             Debug.Log($"Relay allocation created with join code: {joinCode}");
             
             isHost = true;
+            GameManager.Instance.MapManager.hostId = NetworkManager.Singleton.LocalClientId;
             UpdatePlayerCount();
             ourNetwork.playerInfoList.Add(new PlayerInfo("Host", possibleColors[currentPlayerCount], 0));
             menuManager.ShowStartButton(true);
@@ -195,11 +196,8 @@ public class LobbyManager : MonoBehaviour
 
     public void StartGame()
     {
-        if (isHost)
-        {
-            // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("LaserMinigame", LoadSceneMode.Single);
-        }
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        
     }
     public void StartLeverGame()
     {
@@ -232,6 +230,25 @@ public class LobbyManager : MonoBehaviour
             // Use NetworkManager to load the scene on all clients
             NetworkManager.Singleton.SceneManager.LoadScene("HackingMinigame", LoadSceneMode.Single);
         }
+    }
+
+    public void StartMapGame()
+    {
+        if (isHost)
+        {
+            // Use NetworkManager to load the scene on all clients
+            NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        }
+    }
+
+    public void Map()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+    }
+
+    public void MicrophoneMinigame()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
     }
 
 
