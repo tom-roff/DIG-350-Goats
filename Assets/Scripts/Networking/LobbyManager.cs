@@ -9,19 +9,21 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using Unity.Networking.Transport.Relay;
 using Unity.Services.Lobbies.Models;
+using System.Collections;
 
 
 // No longer using Unity Lobbies, just Unity Relay
 public class LobbyManager : MonoBehaviour
 {
     public bool isHost = false;
-    private MenuManager menuManager;
-    private OurNetwork ourNetwork;
+    public MenuManager menuManager;
+    public OurNetwork ourNetwork;
     private string joinCode;
     private int maxPlayers = 6;
     private int currentPlayerCount = 0;
 
     public List<PlayerColor> possibleColors = new List<PlayerColor>();
+    public GameObject ourNetworkPrefab;
 
 
     public Material[] colorMats = new Material[6];
@@ -34,20 +36,15 @@ public class LobbyManager : MonoBehaviour
         possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color32 (255, 215, 0, 255), colorMats[3]));
         possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color32 (30, 156, 255, 255), colorMats[4]));
         possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color32 (0, 225, 0, 255), colorMats[5]));
-    }
 
-    public async void Initialize(MenuManager manager, OurNetwork network)
-    {
-        menuManager = manager;
-        ourNetwork = network;
-
-        await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
     public async void HostGame()
     {
         try {
+            await UnityServices.InitializeAsync();
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
             // Create a Relay allocation
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
             
@@ -57,9 +54,28 @@ public class LobbyManager : MonoBehaviour
             // Set up the Relay connection data on the NetworkManager
             var relayServerData = AllocationUtils.ToRelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            // Set up connection event handlers
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
             
             // Start the host
             NetworkManager.Singleton.StartHost();
+
+            // Spawn ourNetwork object
+            GameObject networkObj = Instantiate(ourNetworkPrefab);
+            NetworkObject netObjComp = networkObj.GetComponent<NetworkObject>();
+            netObjComp.Spawn(true); // true = spawn for all clients
+
+            StartCoroutine(WaitForOurNetwork());
+
+            IEnumerator WaitForOurNetwork() {
+                while (FindObjectOfType<OurNetwork>() == null) {
+                    yield return null; // Wait a frame
+                }
+                ourNetwork = FindObjectOfType<OurNetwork>();
+                menuManager.ourNetwork = ourNetwork;
+            }
             
             // Update UI
             menuManager.UpdateJoinCodeDisplay(joinCode);
@@ -68,12 +84,11 @@ public class LobbyManager : MonoBehaviour
             isHost = true;
             GameManager.Instance.MapManager.hostId = NetworkManager.Singleton.LocalClientId;
             UpdatePlayerCount();
+            ourNetwork.playerInfoList.Add(new PlayerInfo("Host", possibleColors[currentPlayerCount], 0));
             menuManager.ShowStartButton(true);
             menuManager.hostButton.gameObject.SetActive(false);
             
-            // Set up connection event handlers
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
         }
         catch (System.Exception e) {
             Debug.LogError($"Failed to start host: {e.Message}");
@@ -83,6 +98,17 @@ public class LobbyManager : MonoBehaviour
     public void OnNameInput(string name){
         if(name.Length != 0){
             menuManager.nameText.text = name;
+
+            StartCoroutine(WaitForOurNetwork());
+
+            IEnumerator WaitForOurNetwork() {
+                while (FindObjectOfType<OurNetwork>() == null) {
+                    yield return null; // Wait a frame
+                }
+                ourNetwork = FindObjectOfType<OurNetwork>();
+                menuManager.ourNetwork = ourNetwork;
+            }
+
             ourNetwork.UpdatePlayerNameRpc((int)NetworkManager.Singleton.LocalClientId, name);
             menuManager.waitingForHostToStartText.text = "Waiting for host to start game...";
             menuManager.confirmNameButton.gameObject.SetActive(false);
@@ -97,12 +123,19 @@ public class LobbyManager : MonoBehaviour
     public async void JoinGame(string code)
     {
         try {
+            await UnityServices.InitializeAsync();
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
             // Join the Relay allocation using the provided join code
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(code);
             
             // Set up the Relay connection data on the NetworkManager
             var relayServerData = AllocationUtils.ToRelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+
+            // Set up connection event handlers
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
             
             // Start the client
             NetworkManager.Singleton.StartClient();
@@ -111,9 +144,7 @@ public class LobbyManager : MonoBehaviour
             joinCode = code;
             isHost = false;
             
-            // Set up connection event handlers
-            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
 
             menuManager.clientStartUI.SetActive(false);
             menuManager.clientJoinedUI.SetActive(true);
@@ -131,14 +162,19 @@ public class LobbyManager : MonoBehaviour
         UpdatePlayerCount();
 
         // Add the connected player to our playerIndexMap in the ourNetwork script
-        
+        Debug.Log("Client connected!");
 
         // This function updates the UI when a player joins
         if(isHost){
-            ourNetwork.playerInfoList.Add(new PlayerInfo("Player Joining", possibleColors[currentPlayerCount - 1], 0));
-            menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].gameObject.SetActive(true);
-            Debug.Log(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor.colorRGB);
-            menuManager.playerEntries[ourNetwork.playerInfoList.Count - 1].SetNameAndColor(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerName.ToString(), ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor);
+            try{
+                ourNetwork.playerInfoList.Add(new PlayerInfo("Player Joining", possibleColors[currentPlayerCount - 2], 0));
+                menuManager.playerEntries[ourNetwork.playerInfoList.Count - 2].gameObject.SetActive(true);
+                menuManager.playerEntries[ourNetwork.playerInfoList.Count - 2].SetNameAndColor(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerName.ToString(), ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor);
+            }
+            catch (System.Exception e){
+                Debug.Log("Index out of bounds!");
+            }
+            
         }
         
         // You'll need to implement a way to share player IDs and assign indices
@@ -155,7 +191,7 @@ public class LobbyManager : MonoBehaviour
 
     private void UpdatePlayerCount()
     {
-        menuManager.UpdatePlayerCountDisplay(currentPlayerCount, maxPlayers);
+        menuManager.UpdatePlayerCountDisplay(maxPlayers);
     }
 
     public void StartGame()

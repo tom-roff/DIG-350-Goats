@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
 public class MenuManager : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class MenuManager : MonoBehaviour
     public Button startLaserButton;
     public Button startClimbButton;
     public Button startHackButton;
-
+    public Button phoneModeButton;
+    public GameObject hostUI;
     public GameObject clientJoinedUI;
     public GameObject clientStartUI;
     public TMP_InputField nameInput;
@@ -23,23 +25,24 @@ public class MenuManager : MonoBehaviour
     public TMP_Text waitingForHostToStartText;
     public TMP_Text joinText;
     public PlayerUIEntry[] playerEntries = new PlayerUIEntry[6];
-    [SerializeField] private OurNetwork ourNetwork;
+    [SerializeField] public OurNetwork ourNetwork;
     [SerializeField] private LobbyManager lobbyManager;
+    [SerializeField] private GameManager networkPrefab;
 
     private void Start()
     {
-        if (ourNetwork == null)
-        {
-            ourNetwork = FindObjectOfType<OurNetwork>();
-            if (ourNetwork == null)
-            {
-                Debug.LogError("ourNetwork not found in the scene!");
-                return;
-            }
-        }
 
-        ourNetwork.Initialize(this);
-        lobbyManager.Initialize(this, ourNetwork);
+
+
+        // if (ourNetwork == null)
+        // {
+        //     ourNetwork = FindObjectOfType<OurNetwork>();
+        //     if (ourNetwork == null)
+        //     {
+        //         Debug.LogError("ourNetwork not found in the scene!");
+        //         return;
+        //     }
+        // }
 
         hostButton.onClick.AddListener(lobbyManager.HostGame);
         joinButton.onClick.AddListener(() => joinButtonClicked());
@@ -51,6 +54,19 @@ public class MenuManager : MonoBehaviour
         startClimbButton.onClick.AddListener(lobbyManager.StartClimbGame);
         startHackButton.onClick.AddListener(lobbyManager.StartHackGame);
         playerCountText.gameObject.SetActive(false);
+        phoneModeButton.onClick.AddListener(EnterPhoneMode);
+
+    }
+
+    void Update(){
+        if(ourNetwork != null){
+            UpdatePlayerCountDisplay(6);
+        }
+    }
+
+    private void EnterPhoneMode(){
+        hostUI.gameObject.SetActive(false);
+        clientStartUI.gameObject.SetActive(true);
     }
 
     public void UpdateJoinCodeDisplay(string code)
@@ -58,11 +74,16 @@ public class MenuManager : MonoBehaviour
         joinCodeText.text = $"Join Code: {code}";
     }
 
-    public void UpdatePlayerCountDisplay(int currentPlayers, int maxPlayers)
+    public void UpdatePlayerCountDisplay(int maxPlayers)
     {
-        int playersCountRightNow = ourNetwork.playerInfoList.Count;
-        playerCountText.text = $"Players: {playersCountRightNow}/{maxPlayers}";
-        playerCountText.gameObject.SetActive(true);
+        if(ourNetwork != null){
+            int playersCountRightNow = ourNetwork.playerInfoList.Count - 1;
+            playerCountText.text = $"Players: {playersCountRightNow}/{maxPlayers}";
+            playerCountText.gameObject.SetActive(true);
+        }
+        else{
+            Debug.Log("No ourNetwork found!");
+        }
     }
 
     public void ShowStartButton(bool show)

@@ -6,16 +6,19 @@ public class LaserUI : NetworkBehaviour
 {
     [SerializeField] private LaserManager laserManager;
     [SerializeField] private GameObject scoresParent;
+    private OurNetwork ourNetwork;
     private ulong hostId;
 
     public override void OnNetworkSpawn()
     {
         if (!IsServer)
         {
-            this.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         hostId = NetworkManager.Singleton.LocalClientId;
+
+        ourNetwork = GameManager.Instance.OurNetwork;
     }
 
     void Update()
@@ -32,16 +35,16 @@ public class LaserUI : NetworkBehaviour
         
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            if (clientId == hostId)
                 continue;
                 
             if (playerIndex < scoreTexts.Length)
             {
                 if (laserManager.IsAlive(clientId))
                 {
-                    scoreTexts[playerIndex].text = $"Player {clientId}: Alive :)";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Alive :)";
                 } else {
-                    scoreTexts[playerIndex].text = $"Player {clientId}: Dead :(";
+                    scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Dead :(";
                 }
                 playerIndex++;
             }
