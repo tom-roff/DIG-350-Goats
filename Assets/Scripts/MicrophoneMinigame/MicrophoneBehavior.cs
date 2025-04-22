@@ -46,7 +46,7 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count;
+        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count-1;
         CheckHost();
         ChangeColor();
         base.OnNetworkSpawn();
