@@ -2230,11 +2230,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  reachThreshold: 0.8
-  grabThreshold: -20
-  climbAmount: 0.5
-  rotationThreshold: 30
-  cooldownTime: 0.5
   climbingManager: {fileID: 631611858}
 --- !u!114 &1719460154
 MonoBehaviour:
@@ -2321,7 +2316,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 50
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
