@@ -76,13 +76,13 @@ public class MapPlayerBehavior : NetworkBehaviour
     void CreatePlayerQueue()
     {
         int playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count;
-        GameManager.Instance.MapManager.players = new MapPlayer[playerCount]; // replace with # of players in lobby
+        GameManager.Instance.MapManager.players = new MapPlayer[playerCount-1]; // replace with # of players in lobby
 
         int i = 0;
         foreach (PlayerInfo entry in GameManager.Instance.OurNetwork.playerInfoList)
         {
-            
-            GameManager.Instance.MapManager.players[i] = new MapPlayer((ulong)i+1,entry);
+            if(i != 0)
+                GameManager.Instance.MapManager.players[i-1] = new MapPlayer((ulong)i,entry);
             
             i++;
         }
