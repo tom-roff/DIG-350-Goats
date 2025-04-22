@@ -7,6 +7,7 @@ using Unity.Netcode;
 using TMPro;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class MicrophoneBehavior : NetworkBehaviour
 {
@@ -17,13 +18,14 @@ public class MicrophoneBehavior : NetworkBehaviour
     public float quietThreshold = .75f;
     public float loudThreshold = 2f;
 
-    public float listeningTime = 30f;
+    public float listeningTime = 5f;
     public float timeIncorrect = 0f;
     public bool listening = false;
     public bool beLoud = false;
 
     [Header("Canvas Objects")]
     [SerializeField] public GameObject startButton;
+    [SerializeField] public GameObject mapButton;
     [SerializeField] public TMP_Text timeText;
     [SerializeField] public GameObject background;
 
@@ -36,6 +38,10 @@ public class MicrophoneBehavior : NetworkBehaviour
     public int scoresReceived = 0;
 
 
+    public void Start()
+    {
+        mapButton.SetActive(false);
+    }
 
 
     public override void OnNetworkSpawn()
@@ -125,7 +131,6 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public void SwitchLoudness()
     {
-        Debug.Log("Attempt to switch");
         if (listening)
         {
 
@@ -188,7 +193,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         if (scoresReceived == playerCount)
         {
             PrintScores();
-        } 
+        }
     }
 
     public void PrintScores()
@@ -198,13 +203,13 @@ public class MicrophoneBehavior : NetworkBehaviour
         foreach (KeyValuePair<int, float> score in sortedScores)
         {
             Debug.Log("Player " + score.Key + " scored " + score.Value);
-            if (i == 0)
+            if (4 - i > 0)
             {
-                GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(1);
+                GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
             i++;
         }
-        
+
     }
 
     void StopListening()
@@ -213,6 +218,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
         SendFinalScoreRpc((int)NetworkManager.Singleton.LocalClientId, timeIncorrect);
+        mapButton.SetActive(true);
     }
 
     void ChangeColor()
@@ -222,5 +228,16 @@ public class MicrophoneBehavior : NetworkBehaviour
         else
             background.GetComponent<Image>().color = Color.green;
 
+    }
+
+    public void ReturnToMap()
+    {
+        ToMapRpc();
+    }
+
+    [Rpc(SendTo.Server)]
+    public void ToMapRpc()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
     }
 }

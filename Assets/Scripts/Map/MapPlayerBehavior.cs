@@ -159,13 +159,14 @@ public class MapPlayerBehavior : NetworkBehaviour
 
             GameManager.Instance.MapManager.moves--;
             mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+            DisableRerollingRpc();
 
             if (GameManager.Instance.MapManager.moves < 1)
             {
                 GameManager.Instance.MapManager.NextPlayer();
                 mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
                 mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-                AskForCurrentPlayerRpc(); 
+                AskForCurrentPlayerRpc();
             }
         }
     }
@@ -205,6 +206,14 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     }
 
+    [Rpc(SendTo.NotServer)]
+    public void DisableRerollingRpc()
+    {
+        Debug.Log("unavailable");
+        rerollAvailable = false;
+        mapUI.DisableRerolling();
+    }
+
 
 
     [Rpc(SendTo.Server)]
@@ -232,6 +241,8 @@ public class MapPlayerBehavior : NetworkBehaviour
         MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
         currentPlayer.AddRerolls(-1);
         mapUI.DisplayText("Rerolled moves: " + GameManager.Instance.MapManager.moves);
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+
         CheckRerollsRpc(currentPlayer.rerolls);
     }
 
@@ -248,7 +259,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.playing)
         {
             if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, 1);
-            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
         }
     }
 
@@ -257,7 +268,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.playing)
         {
             if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, -1);
-            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
         }
     }
 
@@ -266,7 +277,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.playing)
         {
             if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(1, 0);
-            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
         }
     }
 
@@ -275,7 +286,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.playing)
         {
             if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(-1, 0);
-            else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
         }
     }
 
