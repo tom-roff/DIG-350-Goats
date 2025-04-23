@@ -7,6 +7,8 @@ public class VibrationManager : NetworkBehaviour
 {
     private OurNetwork network;
     public GameObject leverBlocker;
+    public GameObject mobileCheck;
+    public GameObject computerCheck;
 
     void Start()
     {
@@ -17,7 +19,8 @@ public class VibrationManager : NetworkBehaviour
             return;
         }
 
-        int numPlayers = network.playerInfoList.Count;
+        mobileCheck.SetActive(false);
+        computerCheck.SetActive(false);
     }
 
     public void TriggerVibration(ulong clientId)
@@ -43,9 +46,11 @@ public class VibrationManager : NetworkBehaviour
     private void VibratePhoneClientRpc(ClientRpcParams clientRpcParams = default)
     {
         #if UNITY_ANDROID || UNITY_IOS
+            mobileCheck.SetActive(true);
             Handheld.Vibrate();
             Debug.Log("Vibrating phone...");
         #else
+            computerCheck.SetActive(true);
             Debug.Log("Vibration not supported on this platform");
         #endif
     }
