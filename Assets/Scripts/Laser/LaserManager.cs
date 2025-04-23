@@ -37,6 +37,9 @@ public class LaserManager : NetworkBehaviour
             return;
         }
 
+        // Set screen rotation for players
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+
         hostId = NetworkManager.Singleton.LocalClientId;
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)

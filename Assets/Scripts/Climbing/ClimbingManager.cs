@@ -23,6 +23,11 @@ public class ClimbingManager : NetworkBehaviour
                 playerHeights[clientId] = 0f;
             }
         }
+        else
+        {
+            // Set screen rotation for players
+            Screen.orientation = ScreenOrientation.LandscapeLeft;
+        }
     }
 
     // Called by player controllers to update their position
