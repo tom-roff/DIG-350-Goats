@@ -18,7 +18,7 @@ public class MicrophoneBehavior : NetworkBehaviour
     public float quietThreshold = .75f;
     public float loudThreshold = 2f;
 
-    public float listeningTime = 5f;
+    public float listeningTime = 10f;
     public float timeIncorrect = 0f;
     public bool listening = false;
     public bool beLoud = false;
@@ -83,7 +83,6 @@ public class MicrophoneBehavior : NetworkBehaviour
         {
             if (loudness > quietThreshold)
             {
-                Debug.Log("Too loud!: " + loudness);
                 timeIncorrect += deltaTime;
                 SendTimeRpc(deltaTime);
             }
@@ -92,7 +91,6 @@ public class MicrophoneBehavior : NetworkBehaviour
         {
             if (loudness < loudThreshold)
             {
-                Debug.Log("Too quiet!: " + loudness);
                 timeIncorrect += deltaTime;
                 SendTimeRpc(deltaTime);
             }

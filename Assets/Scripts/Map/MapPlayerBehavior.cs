@@ -197,10 +197,9 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
         else
         {
-            Debug.Log("unavailable");
             rerollAvailable = false;
             mapUI.DisableRerolling();
-            mapUI.SetRerollText(rerolls);
+            // mapUI.SetRerollText(rerolls);
 
         }
 
@@ -209,7 +208,6 @@ public class MapPlayerBehavior : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     public void DisableRerollingRpc()
     {
-        Debug.Log("unavailable");
         rerollAvailable = false;
         mapUI.DisableRerolling();
     }
@@ -222,9 +220,27 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
-        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls);
+        SendRerolls();
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls); // make server call to each player
     }
 
+
+    public void SendRerolls()
+    {
+        for (int i = 0; i < GameManager.Instance.MapManager.players.Length; i++)
+        {
+            SendRerollToClientRpc(i + 1, GameManager.Instance.MapManager.players[i].rerolls);
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SendRerollToClientRpc(int client, int rerolls)
+    {
+        if ((ulong)client == clientId)
+        {
+            mapUI.SetRerollText(rerolls);
+        }
+    }
 
     bool InBounds(int i, int j)
     {
