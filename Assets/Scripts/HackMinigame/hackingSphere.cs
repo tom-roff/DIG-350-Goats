@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class hackingSphere : NetworkBehaviour
 {
-   public float forceMultiplier = 10f;
+   public float forceMultiplier = 15f;
     private Rigidbody rb;
     private Gyroscope gyro;
     private bool gyroEnabled;

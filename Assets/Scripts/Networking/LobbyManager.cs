@@ -230,7 +230,7 @@ public class LobbyManager : MonoBehaviour
         if (isHost)
         {
             // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("HackingMinigame", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("HackMinigame", LoadSceneMode.Single);
         }
     }
 
