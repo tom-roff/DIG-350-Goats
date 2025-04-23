@@ -6,9 +6,12 @@ using System.Collections;
 public class VibrationManager : NetworkBehaviour
 {
     private OurNetwork network;
+    public CountdownTimer timer;
+
     public GameObject leverBlocker;
     public GameObject mobileCheck;
     public GameObject computerCheck;
+
 
     void Start()
     {
@@ -74,6 +77,15 @@ public class VibrationManager : NetworkBehaviour
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
         leverBlocker.SetActive(false);
+
+        if (timer != null)
+        {
+            timer.StartTimer(30f);
+        }
+        else
+        {
+            Debug.LogWarning("Timer not assigned in VibrationManager.");
+        }
     }
 
 }
