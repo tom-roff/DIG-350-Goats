@@ -75,3 +75,19 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
+
+
+
+# appeared after Android build
+.utmp 
+
+# Windows
+Thumbs.db
+desktop.ini
+# OS X
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+# node
+node_modules
