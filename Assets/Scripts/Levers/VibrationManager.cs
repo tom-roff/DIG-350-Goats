@@ -80,7 +80,7 @@ public class VibrationManager : NetworkBehaviour
 
         if (timer != null)
         {
-            timer.StartTimer(30f);
+            timer.StartTimer(60f);
         }
         else
         {
