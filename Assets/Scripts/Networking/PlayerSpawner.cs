@@ -6,6 +6,7 @@ public class PlayerSpawner : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform[] spawnPoints;
+    private OurNetwork ourNetwork;
     private int spawnsUsed = 0;
     
     public override void OnNetworkSpawn()
@@ -22,6 +23,8 @@ public class PlayerSpawner : NetworkBehaviour
                 spawnsUsed++;
             }
         }
+
+        ourNetwork = FindObjectOfType<OurNetwork>();
     }
     
     private void SpawnPlayer(ulong clientId, int spawnsUsed)

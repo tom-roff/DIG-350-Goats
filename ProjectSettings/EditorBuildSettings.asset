@@ -21,6 +21,9 @@ EditorBuildSettings:
     path: Assets/Scenes/LeversMinigame.unity
     guid: 4c2b6da160b9740429e4331ac953801a
   - enabled: 1
+    path: Assets/Scenes/HackMinigame.unity
+    guid: 358fbeffd5dae8f49ae230cf18c3e4a9
+  - enabled: 1
     path: Assets/Scenes/ClimbingMinigame.unity
     guid: 9b2ccb05065392d48823569b9c37a0de
   - enabled: 1
