@@ -24,7 +24,7 @@ public class MicrophoneBehavior : NetworkBehaviour
     public bool beLoud = false;
 
     [Header("Canvas Objects")]
-    [SerializeField] public GameObject startButton;
+    [SerializeField] public GameObject tutorialObjects;
     [SerializeField] public GameObject mapButton;
     [SerializeField] public TMP_Text timeText;
     [SerializeField] public GameObject background;
@@ -57,7 +57,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         if (clientId == GameManager.Instance.MapManager.hostId) // main screen
         {
-            startButton.SetActive(false);
+            tutorialObjects.SetActive(false);
             host = true;
         }
         else
@@ -172,7 +172,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         if (!listening && !host)
         {
             SendReadyRpc();
-            startButton.SetActive(false);
+            tutorialObjects.SetActive(false);
 
         }
     }
