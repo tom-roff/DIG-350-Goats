@@ -3,6 +3,8 @@ using UnityEngine;
 public class GameEndManager : MonoBehaviour
 {
     private CameraController cameraController;
+    public GameObject winCanvas;
+    public GameObject loseCanvas;
 
     void Start()
     {
@@ -16,12 +18,12 @@ public class GameEndManager : MonoBehaviour
 
     public void OnGameWin()
     {
-        
+        winCanvas.SetActive(true);
     }
 
     public void OnGameLose()
     {
-        
+        loseCanvas.SetActive(true);
     }
 
 }
