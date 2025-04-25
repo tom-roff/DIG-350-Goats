@@ -67,7 +67,8 @@ public class MapManager : NetworkBehaviour
     //               { Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall},
     //               { Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.UnexploredItem}};
 
-    public List<string> minigameScenes = new List<string>{ "MicrophoneMinigame", "LeversMinigame", "ClimbingMinigame", "LaserMinigame" };
+    public List<string> minigameScenes = new List<string>{ "MicrophoneMinigame", "LeversMinigame", "ClimbingMinigame", "LaserMinigame"};
+    
     private int nextMinigame = -1;
 
     void Start()
@@ -130,5 +131,6 @@ public class MapManager : NetworkBehaviour
     {
         nextMinigame++;
         NetworkManager.Singleton.SceneManager.LoadScene(minigameScenes[nextMinigame], LoadSceneMode.Single);
+        // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
     }
 }

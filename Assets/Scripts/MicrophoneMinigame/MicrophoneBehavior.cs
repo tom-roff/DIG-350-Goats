@@ -16,7 +16,7 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public float loudnessSensitivity = 100;
     public float quietThreshold = .75f;
-    public float loudThreshold = 2f;
+    public float loudThreshold = 1.25f;
 
     public float listeningTime = 10f;
     public float timeIncorrect = 0f;
@@ -26,6 +26,7 @@ public class MicrophoneBehavior : NetworkBehaviour
     [Header("Canvas Objects")]
     [SerializeField] public GameObject tutorialObjects;
     [SerializeField] public TMP_Text timeText;
+    [SerializeField] public TMP_Text finalScoreText;
     [SerializeField] public GameObject background;
 
     [Header("Host")]
@@ -193,17 +194,21 @@ public class MicrophoneBehavior : NetworkBehaviour
     {
         Dictionary<int, float> sortedScores = finalScores.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
         int i = 0;
+        string finalResults = "";
         foreach (KeyValuePair<int, float> score in sortedScores)
         {
-            Debug.Log(score.Key + " scored " + score.Value);
+            finalResults += GameManager.Instance.MapManager.players[score.Key - 1].name + " got " + (10-i) + " points <br>";
             if (4 - i > 0)
             {
                 GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
+            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key, 10-i);
             i++;
         }
 
-        // call something to show leaderboard on host
+    
+        timeText.text = "";
+        finalScoreText.text = finalResults;
         GameManager.Instance.MapManager.TimedReturnToMap();
 
     }
