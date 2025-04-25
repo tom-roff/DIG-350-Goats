@@ -4,9 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 
-public class MapManager : MonoBehaviour
+public class MapManager : NetworkBehaviour
 {
 
 
@@ -103,6 +104,20 @@ public class MapManager : MonoBehaviour
             Debug.Log("Player " + players[currentPlayer].playerID + " rolled a " + moves);
         }
     }
-    
-    
+
+    public void TimedReturnToMap(float time = 5f)
+    {
+        Invoke("ReturnToMap", time);
+    }
+
+    void ReturnToMap()
+    {
+        MapSceneChangeRpc();
+    }
+
+    [Rpc(SendTo.Server)]
+    public void MapSceneChangeRpc()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+    }
 }

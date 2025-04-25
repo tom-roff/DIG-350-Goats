@@ -25,7 +25,6 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     [Header("Canvas Objects")]
     [SerializeField] public GameObject tutorialObjects;
-    [SerializeField] public GameObject mapButton;
     [SerializeField] public TMP_Text timeText;
     [SerializeField] public GameObject background;
 
@@ -38,10 +37,6 @@ public class MicrophoneBehavior : NetworkBehaviour
     public int scoresReceived = 0;
 
 
-    public void Start()
-    {
-        mapButton.SetActive(false);
-    }
 
 
     public override void OnNetworkSpawn()
@@ -200,13 +195,16 @@ public class MicrophoneBehavior : NetworkBehaviour
         int i = 0;
         foreach (KeyValuePair<int, float> score in sortedScores)
         {
-            Debug.Log("Player " + score.Key + " scored " + score.Value);
+            Debug.Log(score.Key + " scored " + score.Value);
             if (4 - i > 0)
             {
                 GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
             i++;
         }
+
+        // call something to show leaderboard on host
+        GameManager.Instance.MapManager.TimedReturnToMap();
 
     }
 
@@ -216,7 +214,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
         SendFinalScoreRpc((int)NetworkManager.Singleton.LocalClientId, timeIncorrect);
-        mapButton.SetActive(true);
+        
     }
 
     void ChangeColor()
@@ -228,14 +226,5 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     }
 
-    public void ReturnToMap()
-    {
-        ToMapRpc();
-    }
 
-    [Rpc(SendTo.Server)]
-    public void ToMapRpc()
-    {
-        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
-    }
 }
