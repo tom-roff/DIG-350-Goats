@@ -49,9 +49,9 @@ public class MapManager : NetworkBehaviour
     }
 
     public Tiles[,] map = {{ Tiles.Wall, Tiles.Wall, Tiles.Start,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
-                  { Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
-                  { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored},
-                  { Tiles.UnexploredItem, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
+                  { Tiles.Wall, Tiles.UnexploredMinigame, Tiles.Unexplored,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
+                  { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.UnexploredMinigame},
+                  { Tiles.UnexploredMinigame, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.UnexploredMinigame,Tiles.Wall,Tiles.Wall,Tiles.Wall},
@@ -67,8 +67,13 @@ public class MapManager : NetworkBehaviour
     //               { Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall},
     //               { Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.UnexploredItem}};
 
+    public List<string> minigameScenes = new List<string>{ "MicrophoneMinigame", "LeversMinigame", "ClimbingMinigame", "LaserMinigame" };
+    private int nextMinigame = -1;
 
-
+    void Start()
+    {
+        MapHelpers.Shuffle(minigameScenes);
+    }
 
     public int MapWidth()
     {
@@ -119,5 +124,11 @@ public class MapManager : NetworkBehaviour
     public void MapSceneChangeRpc()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+    }
+
+    public void PlayMinigame()
+    {
+        nextMinigame++;
+        NetworkManager.Singleton.SceneManager.LoadScene(minigameScenes[nextMinigame], LoadSceneMode.Single);
     }
 }

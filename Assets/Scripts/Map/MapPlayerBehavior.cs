@@ -153,8 +153,10 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
 
+            
             CheckSceneChange(i,j);
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
+            
             // MapAudioManager.playerMovementAudio.Play();
 
             GameManager.Instance.MapManager.moves--;
@@ -175,8 +177,9 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
         {
-            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame; // I think this is needed? 
-            NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame;
+            GameManager.Instance.MapManager.PlayMinigame();
+            // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
         }
     }
 

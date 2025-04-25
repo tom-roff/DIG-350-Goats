@@ -117,8 +117,8 @@ public static class MapHelpers
     {
         if (InBounds(map, x + 1, y) && tiles[x + 1, y] != null) CheckSurrounding(map, tiles, new Vector2(x + 1, y)); // above
         if (InBounds(map, x - 1, y) && tiles[x - 1, y] != null) CheckSurrounding(map, tiles, new Vector2(x - 1, y)); // below
-        if (InBounds(map,x, y + 1) && tiles[x, y + 1] != null) CheckSurrounding(map, tiles, new Vector2(x, y + 1)); // left
-        if (InBounds(map,x, y - 1) && tiles[x, y - 1] != null) CheckSurrounding(map, tiles, new Vector2(x, y - 1)); // left
+        if (InBounds(map, x, y + 1) && tiles[x, y + 1] != null) CheckSurrounding(map, tiles, new Vector2(x, y + 1)); // left
+        if (InBounds(map, x, y - 1) && tiles[x, y - 1] != null) CheckSurrounding(map, tiles, new Vector2(x, y - 1)); // left
 
         CheckVisited(map, tiles, new Vector2(x, y));
         ExploredCounter(map, tiles);
@@ -128,6 +128,20 @@ public static class MapHelpers
     {
         if (i > -1 && i < map.GetLength(0) && j > -1 && j < map.GetLength(1)) return true;
         return false;
+    }
+    
+    private static System.Random rng = new System.Random();  
+
+    public static void Shuffle<T>(this IList<T> list)  
+    {  
+        int n = list.Count;  
+        while (n > 1) {  
+            n--;  
+            int k = rng.Next(n + 1);  
+            T value = list[k];  
+            list[k] = list[n];  
+            list[n] = value;  
+        }  
     }
 
 }
