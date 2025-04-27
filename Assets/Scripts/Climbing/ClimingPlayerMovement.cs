@@ -13,18 +13,13 @@ public class ClimbingPlayerMovement : NetworkBehaviour
     
     private void Start()
     {
-        // Enable gyroscope and accelerometer
         Input.gyro.enabled = true;
     }
     
     private void Update()
     {
         
-        // Get device acceleration
         Vector3 acceleration = Input.acceleration;
-        
-        // Debug output
-        // Debug.Log($"Accel X: {acceleration.x:F2}, Y: {acceleration.y:F2}, Z: {acceleration.z:F2}");
         
 
         if (acceleration.x < -0.7 & acceleration.y > -0.8 & isRightArm)
@@ -39,9 +34,9 @@ public class ClimbingPlayerMovement : NetworkBehaviour
 
     private void Climb()
     {
-        // Debug.Log($"Climbed!! Right Arm: {isRightArm}, X: {Input.acceleration.x}, Y: {Input.acceleration.y}");
         transform.position = new Vector3(transform.position.x, transform.position.y + climbAmount, transform.position.z);
         ToggleArm();
+        climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
     }
     
     private void ToggleArm()

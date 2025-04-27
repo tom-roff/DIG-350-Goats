@@ -51,7 +51,7 @@ public class ClimbingManager : NetworkBehaviour
         {
             return playerHeights[clientId];
         }
-        return 0f; // Default value if player not found
+        return 0f;
     }
 
     public float GetFinishHeight()
