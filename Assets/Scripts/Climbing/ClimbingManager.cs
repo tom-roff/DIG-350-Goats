@@ -9,7 +9,6 @@ public class ClimbingManager : NetworkBehaviour
 
     [SerializeField] private GameObject playerUI;
     
-    // Dictionary to track each player's height
     private Dictionary<ulong, float> playerHeights = new Dictionary<ulong, float>();
 
     public override void OnNetworkSpawn()
@@ -25,7 +24,6 @@ public class ClimbingManager : NetworkBehaviour
         }
         else
         {
-            // Set screen rotation for players
             Screen.orientation = ScreenOrientation.LandscapeLeft;
         }
     }
@@ -35,10 +33,7 @@ public class ClimbingManager : NetworkBehaviour
     public void UpdatePlayerHeightRpc(ulong clientId, float height)
     {
         playerHeights[clientId] = height;
-
-        Debug.Log("This was called");
         
-        // Check if player has reached the finish line
         if (height >= finishLine)
         {
             PlayerFinished(clientId);
@@ -51,7 +46,7 @@ public class ClimbingManager : NetworkBehaviour
         {
             return playerHeights[clientId];
         }
-        return 0f; // Default value if player not found
+        return 0f;
     }
 
     public float GetFinishHeight()
