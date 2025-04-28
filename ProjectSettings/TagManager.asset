@@ -8,6 +8,7 @@ TagManager:
   - Cube
   - Pearl
   - Trash
+  - Ground
   layers:
   - Default
   - TransparentFX

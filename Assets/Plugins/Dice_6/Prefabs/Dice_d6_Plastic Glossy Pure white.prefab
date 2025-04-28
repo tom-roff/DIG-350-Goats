@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7098075400793510478}
   - component: {fileID: 5000573049203631748}
   - component: {fileID: 2068225425260951110}
-  - component: {fileID: 999445771951900063}
   m_Layer: 0
   m_Name: Dice_d6_Plastic Glossy Pure white
   m_TagString: Untagged
@@ -109,15 +108,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4, y: 1.4, z: 1.4}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &999445771951900063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6801955793903224657}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 863623aaa383d4703b78049d8e078449, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
