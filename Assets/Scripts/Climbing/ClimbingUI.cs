@@ -49,7 +49,7 @@ public class ClimbingUI : NetworkBehaviour
                 }
                 else {
                     scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}: Finished!";
-                    climbingManager.PlayerFinished(clientId);
+                    // climbingManager.PlayerFinished(clientId);
                 }
                 
                 playerIndex++;

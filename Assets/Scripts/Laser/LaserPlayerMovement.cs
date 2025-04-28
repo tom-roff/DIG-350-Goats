@@ -19,15 +19,34 @@ public class LaserPlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        // Get input
-        horizontalInput = Input.GetAxis("Horizontal");
-
-        // Handle jumping
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        Vector3 acceleration = Input.acceleration;
+        
+        float deadzone = 0.2f;
+        
+        if (acceleration.x < -deadzone)
         {
-            verticalVelocity = jumpForce;
+            horizontalInput = -1;
+        }
+        else if (acceleration.x > deadzone)
+        {
+            horizontalInput = 1;
+        }
+        else
+        {
+            horizontalInput = 0;
+        }
+        
+        if (Input.touchCount > 0 && isGrounded)
+        {
+            Touch touch = Input.GetTouch(0);
+            
+            if (touch.phase == TouchPhase.Began)
+            {
+                verticalVelocity = jumpForce;
+            }
         }
     }
+
 
     void FixedUpdate()
     {
@@ -58,6 +77,10 @@ public class LaserPlayerMovement : NetworkBehaviour
         else if (transform.position.x > 4.75)
         {
             transform.position = new Vector3(4.75f, transform.position.y, transform.position.z);
+        }
+        if (transform.position.y < -100)
+        {
+            transform.position = new Vector3(0, 1f, 0);
         }
     }
 

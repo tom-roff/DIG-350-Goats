@@ -2698,6 +2698,7 @@ MonoBehaviour:
   gameUI: {fileID: 295064562}
   endUI: {fileID: 1473565259}
   deathUI: {fileID: 1985134478}
+  endLevel: {fileID: 1473565266}
   laserPrefab: {fileID: 6333582370754192052, guid: 354cbc3f9833de24ab81975e018cdea2, type: 3}
   minX: -5
   maxX: 5
@@ -3015,12 +3016,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1473565259}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9edeb83e5d53ad34dadba2da8802d4ee, type: 3}
+  m_Script: {fileID: 11500000, guid: 037a7dff786bbd84bbc04ca35c3deff8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  laserManager: {fileID: 1236468199}
   scoresParent: {fileID: 743528485}
+  leaderboard: 
 --- !u!1 &1504625397
 GameObject:
   m_ObjectHideFlags: 0

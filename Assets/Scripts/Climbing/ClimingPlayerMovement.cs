@@ -34,9 +34,15 @@ public class ClimbingPlayerMovement : NetworkBehaviour
 
     private void Climb()
     {
+        ulong clientId = NetworkManager.Singleton.LocalClientId;
+
         transform.position = new Vector3(transform.position.x, transform.position.y + climbAmount, transform.position.z);
         ToggleArm();
-        climbingManager.UpdatePlayerHeightRpc(NetworkManager.Singleton.LocalClientId, transform.position.y);
+        climbingManager.UpdatePlayerHeightRpc(clientId, transform.position.y);
+        if (transform.position.y >= climbingManager.finishLine)
+        {
+            climbingManager.PlayerFinished(clientId);
+        }
     }
     
     private void ToggleArm()
