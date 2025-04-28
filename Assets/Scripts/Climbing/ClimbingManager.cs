@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 public class ClimbingManager : NetworkBehaviour
 {
-    private int finishLine = 30;
+    public int finishLine = 30;
     public List<ulong> leaderboard = new List<ulong>();
 
     [SerializeField] private GameObject playerUI;
     
-    // Dictionary to track each player's height
     private Dictionary<ulong, float> playerHeights = new Dictionary<ulong, float>();
+    [SerializeField] private GameObject endUI;
+    [SerializeField] private GameObject gameUI;
+    [SerializeField] private EndLevel endLevel;
+
 
     public override void OnNetworkSpawn()
     {
@@ -25,7 +28,6 @@ public class ClimbingManager : NetworkBehaviour
         }
         else
         {
-            // Set screen rotation for players
             Screen.orientation = ScreenOrientation.LandscapeLeft;
         }
     }
@@ -35,14 +37,6 @@ public class ClimbingManager : NetworkBehaviour
     public void UpdatePlayerHeightRpc(ulong clientId, float height)
     {
         playerHeights[clientId] = height;
-
-        Debug.Log("This was called");
-        
-        // Check if player has reached the finish line
-        if (height >= finishLine)
-        {
-            PlayerFinished(clientId);
-        }
     }
 
     public float GetPlayerHeight(ulong clientId)
@@ -51,7 +45,7 @@ public class ClimbingManager : NetworkBehaviour
         {
             return playerHeights[clientId];
         }
-        return 0f; // Default value if player not found
+        return 0f;
     }
 
     public float GetFinishHeight()
@@ -72,5 +66,16 @@ public class ClimbingManager : NetworkBehaviour
     public void UpdateScoringRpc(ulong clientId)
     {
         leaderboard.Add(clientId);
+        if (leaderboard.Count == NetworkManager.Singleton.ConnectedClients.Count - 1)
+        {
+            EndGame();
+        }
+    }
+
+    private void EndGame()
+    {
+        endLevel.leaderboard = leaderboard;
+        endUI.SetActive(true);
+        gameUI.SetActive(false);
     }
 }

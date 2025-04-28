@@ -5,11 +5,13 @@ using Unity.Netcode;
 
 public class CountdownTimer : NetworkBehaviour
 {
-    public float timeRemaining = 30f;
+    public float timeRemaining = 60f;
     public bool timerIsRunning = false;
     public TextMeshProUGUI timerText;
+    public GameObject tutorialText;
 
     private ulong playerId;
+    private GameEndManager gameEndManager;
 
     void Start()
     {
@@ -19,6 +21,7 @@ public class CountdownTimer : NetworkBehaviour
         if (playerId != 0)
         {
             timerText.gameObject.SetActive(false);
+            tutorialText.SetActive(false);
     
             this.enabled = false;
             return;
@@ -57,10 +60,8 @@ public class CountdownTimer : NetworkBehaviour
 
     void HandleTimeOut()
     {
-        // You can trigger the punishment here
-        // For example:
         Debug.Log("Players failed to finish in time — punishment triggered.");
-        // YourPunishmentManager.TriggerPunishment();
+        gameEndManager.OnGameLose();
     }
 
     // Optional: Public methods to control the timer externally
