@@ -468,7 +468,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  timeRemaining: 30
+  timeRemaining: 60
   timerIsRunning: 0
   timerText: {fileID: 1026227680}
   tutorialText: {fileID: 898139628}
@@ -2852,8 +2852,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2920,7 +2920,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 25, y: 140}
+  m_AnchoredPosition: {x: 18, y: 140}
   m_SizeDelta: {x: 200, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1037093578
@@ -4300,8 +4300,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e05d212a64b76419190d599a3d81947d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   winCanvas: {fileID: 1120133319}
   loseCanvas: {fileID: 1870927818}
+  countdownTimer: {fileID: 68166383}
 --- !u!4 &1408098235
 Transform:
   m_ObjectHideFlags: 0

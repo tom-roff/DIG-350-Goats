@@ -1,13 +1,14 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class GameEndManager : MonoBehaviour
+public class GameEndManager : NetworkBehaviour
 {
     private CameraController cameraController;
     public GameObject winCanvas;
     public GameObject loseCanvas;
-    private CountdownTimer countdownTimer;
+    [SerializeField] private CountdownTimer countdownTimer;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
         cameraController = FindFirstObjectByType<CameraController>();
         if (cameraController == null)
@@ -16,31 +17,50 @@ public class GameEndManager : MonoBehaviour
             return;
         }
 
-        countdownTimer = FindFirstObjectByType<CountdownTimer>();
-        if (countdownTimer == null)
-        {
-            Debug.LogError("CountdownTimer not found in the scene!");
-        }
+        // countdownTimer = FindFirstObjectByType<CountdownTimer>();
+        // if (countdownTimer == null)
+        // {
+        //     Debug.LogError("CountdownTimer not found in the scene!");
+        // }
     }
 
     public void OnGameWin()
     {
         winCanvas.SetActive(true);
         countdownTimer.StopTimer();
-        foreach (var player in GameManager.Instance.MapManager.players)
+
+        if (GameManager.Instance?.MapManager?.players != null)
         {
-            player.SetRerolls(player.rerolls + 1);
+            foreach (var player in GameManager.Instance.MapManager.players)
+            {
+                player.SetRerolls(player.rerolls + 1);
+            }
         }
+        else
+        {
+            Debug.LogWarning("Players list not ready on win.");
+        }
+
+        GameManager.Instance.MapManager.TimedReturnToMap();
     }
 
     public void OnGameLose()
     {
         loseCanvas.SetActive(true);
         countdownTimer.StopTimer();
-        foreach (var player in GameManager.Instance.MapManager.players)
+
+        if (GameManager.Instance?.MapManager?.players != null)
         {
-            player.SetRerolls(player.rerolls - 1);
+            foreach (var player in GameManager.Instance.MapManager.players)
+            {
+                player.SetRerolls(player.rerolls - 1);
+            }
         }
+        else
+        {
+            Debug.LogWarning("Players list not ready on loss.");
+        }
+
         GameManager.Instance.MapManager.TimedReturnToMap();
     }
 
