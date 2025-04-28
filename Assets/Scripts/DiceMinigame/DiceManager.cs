@@ -115,7 +115,7 @@ public class DiceManager : MonoBehaviour
             // angular motion (so they roll better)
             dice[i].rb.AddTorque(new Vector3(2, 3, 2), ForceMode.Impulse);
         }
-        // wait a bit until reset
+        // wait a bit until reset (this allows the accelerometer to send multiple calls to throw and so faster motion == harder throw)
         Invoke(nameof(Reset), 0.2f);
     }
 
