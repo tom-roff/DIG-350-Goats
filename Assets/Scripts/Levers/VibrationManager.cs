@@ -46,7 +46,7 @@ public class VibrationManager : NetworkBehaviour
         VibratePhoneClientRpc(clientRpcParams);  
     }
     
-    [ClientRpc]
+    [ClientRpc(RequireOwnership = false)]
     private void VibratePhoneClientRpc(ClientRpcParams clientRpcParams = default)
     {
         Debug.Log("We arrived to virbatio rpc");
@@ -60,6 +60,15 @@ public class VibrationManager : NetworkBehaviour
             Debug.Log("Computer check set active");
             Debug.Log("Vibration not supported on this platform");
         #endif
+
+        Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] VibratePhoneClientRpc called");
+        Debug.Log($"Is Mobile Platform: {Application.isMobilePlatform}");
+        Debug.Log($"mobileCheck assigned: {mobileCheck != null}");
+        Debug.Log($"mobileCheck.activeSelf: {mobileCheck?.activeSelf}");
+        Debug.Log($"mobileCheck.activeInHierarchy: {mobileCheck?.activeInHierarchy}");
+        Debug.Log($"computerCheck assigned: {computerCheck != null}");
+        Debug.Log($"computerCheck.activeSelf: {computerCheck?.activeSelf}");
+        Debug.Log($"computerCheck.activeInHierarchy: {computerCheck?.activeInHierarchy}");
     }
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
