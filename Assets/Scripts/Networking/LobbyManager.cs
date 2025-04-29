@@ -68,14 +68,6 @@ public class LobbyManager : MonoBehaviour
             netObjComp.Spawn(true); // true = spawn for all clients
 
             StartCoroutine(WaitForOurNetwork());
-
-            IEnumerator WaitForOurNetwork() {
-                while (FindObjectOfType<OurNetwork>() == null) {
-                    yield return null; // Wait a frame
-                }
-                ourNetwork = FindObjectOfType<OurNetwork>();
-                menuManager.ourNetwork = ourNetwork;
-            }
             
             // Update UI
             menuManager.UpdateJoinCodeDisplay(joinCode);
@@ -95,19 +87,24 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+	// Moved to class scope and improved performance -Owen
+	IEnumerator WaitForOurNetwork()
+	{
+		bool found = false;
+		while (!found)
+		{
+			ourNetwork = FindAnyObjectByType<OurNetwork>();
+			found = ourNetwork != null;
+			yield return null; // Wait a frame
+		}                 
+		menuManager.ourNetwork = ourNetwork;
+	}
+
     public void OnNameInput(string name){
         if(name.Length != 0){
             menuManager.nameText.text = name;
 
             StartCoroutine(WaitForOurNetwork());
-
-            IEnumerator WaitForOurNetwork() {
-                while (FindObjectOfType<OurNetwork>() == null) {
-                    yield return null; // Wait a frame
-                }
-                ourNetwork = FindObjectOfType<OurNetwork>();
-                menuManager.ourNetwork = ourNetwork;
-            }
 
             ourNetwork.UpdatePlayerNameRpc((int)NetworkManager.Singleton.LocalClientId, name);
             menuManager.waitingForHostToStartText.text = "Waiting for host to start game...";
@@ -172,7 +169,7 @@ public class LobbyManager : MonoBehaviour
                 menuManager.playerEntries[ourNetwork.playerInfoList.Count - 2].SetNameAndColor(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerName.ToString(), ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1].playerColor);
             }
             catch (System.Exception e){
-                Debug.Log("Index out of bounds!");
+                Debug.Log($"Index out of bounds! {e}");
             }
             
         }
@@ -228,7 +225,7 @@ public class LobbyManager : MonoBehaviour
         if (isHost)
         {
             // Use NetworkManager to load the scene on all clients
-            NetworkManager.Singleton.SceneManager.LoadScene("HackingMinigame", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("HackMinigame", LoadSceneMode.Single);
         }
     }
 

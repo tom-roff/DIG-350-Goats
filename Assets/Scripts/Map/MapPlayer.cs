@@ -47,4 +47,9 @@ public class MapPlayer
     {
         rerolls += inc;
     }
+
+    public void SetRerolls(int newRerolls)
+    {
+        rerolls = newRerolls;
+    }
 }

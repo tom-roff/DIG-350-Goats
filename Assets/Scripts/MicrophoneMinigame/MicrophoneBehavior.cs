@@ -16,17 +16,17 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public float loudnessSensitivity = 100;
     public float quietThreshold = .75f;
-    public float loudThreshold = 2f;
+    public float loudThreshold = 1.25f;
 
-    public float listeningTime = 5f;
+    public float listeningTime = 10f;
     public float timeIncorrect = 0f;
     public bool listening = false;
     public bool beLoud = false;
 
     [Header("Canvas Objects")]
-    [SerializeField] public GameObject startButton;
-    [SerializeField] public GameObject mapButton;
+    [SerializeField] public GameObject tutorialObjects;
     [SerializeField] public TMP_Text timeText;
+    [SerializeField] public TMP_Text finalScoreText;
     [SerializeField] public GameObject background;
 
     [Header("Host")]
@@ -38,10 +38,6 @@ public class MicrophoneBehavior : NetworkBehaviour
     public int scoresReceived = 0;
 
 
-    public void Start()
-    {
-        mapButton.SetActive(false);
-    }
 
 
     public override void OnNetworkSpawn()
@@ -57,7 +53,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         if (clientId == GameManager.Instance.MapManager.hostId) // main screen
         {
-            startButton.SetActive(false);
+            tutorialObjects.SetActive(false);
             host = true;
         }
         else
@@ -83,7 +79,6 @@ public class MicrophoneBehavior : NetworkBehaviour
         {
             if (loudness > quietThreshold)
             {
-                Debug.Log("Too loud!: " + loudness);
                 timeIncorrect += deltaTime;
                 SendTimeRpc(deltaTime);
             }
@@ -92,7 +87,6 @@ public class MicrophoneBehavior : NetworkBehaviour
         {
             if (loudness < loudThreshold)
             {
-                Debug.Log("Too quiet!: " + loudness);
                 timeIncorrect += deltaTime;
                 SendTimeRpc(deltaTime);
             }
@@ -174,7 +168,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         if (!listening && !host)
         {
             SendReadyRpc();
-            startButton.SetActive(false);
+            tutorialObjects.SetActive(false);
 
         }
     }
@@ -200,15 +194,22 @@ public class MicrophoneBehavior : NetworkBehaviour
     {
         Dictionary<int, float> sortedScores = finalScores.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
         int i = 0;
+        string finalResults = "";
         foreach (KeyValuePair<int, float> score in sortedScores)
         {
-            Debug.Log("Player " + score.Key + " scored " + score.Value);
+            finalResults += GameManager.Instance.MapManager.players[score.Key - 1].name + " got " + (10-i) + " points <br>";
             if (4 - i > 0)
             {
                 GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
+            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key, 10-i);
             i++;
         }
+
+    
+        timeText.text = "";
+        finalScoreText.text = finalResults;
+        GameManager.Instance.MapManager.TimedReturnToMap();
 
     }
 
@@ -218,7 +219,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
         SendFinalScoreRpc((int)NetworkManager.Singleton.LocalClientId, timeIncorrect);
-        mapButton.SetActive(true);
+        
     }
 
     void ChangeColor()
@@ -230,14 +231,5 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     }
 
-    public void ReturnToMap()
-    {
-        ToMapRpc();
-    }
 
-    [Rpc(SendTo.Server)]
-    public void ToMapRpc()
-    {
-        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
-    }
 }

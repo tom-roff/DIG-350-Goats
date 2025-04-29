@@ -153,8 +153,10 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
             GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
 
+            
             CheckSceneChange(i,j);
             MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
+            
             // MapAudioManager.playerMovementAudio.Play();
 
             GameManager.Instance.MapManager.moves--;
@@ -175,8 +177,9 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
         {
-            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame; // I think this is needed? 
-            NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame;
+            GameManager.Instance.MapManager.PlayMinigame();
+            // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
         }
     }
 
@@ -197,10 +200,9 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
         else
         {
-            Debug.Log("unavailable");
             rerollAvailable = false;
             mapUI.DisableRerolling();
-            mapUI.SetRerollText(rerolls);
+            // mapUI.SetRerollText(rerolls);
 
         }
 
@@ -209,7 +211,6 @@ public class MapPlayerBehavior : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     public void DisableRerollingRpc()
     {
-        Debug.Log("unavailable");
         rerollAvailable = false;
         mapUI.DisableRerolling();
     }
@@ -222,9 +223,27 @@ public class MapPlayerBehavior : NetworkBehaviour
         if (GameManager.Instance.MapManager.currentPlayer == -1) return;
         ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
         SendCurrentPlayerRpc(currentPlayerId);
-        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls);
+        SendRerolls();
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls); // make server call to each player
     }
 
+
+    public void SendRerolls()
+    {
+        for (int i = 0; i < GameManager.Instance.MapManager.players.Length; i++)
+        {
+            SendRerollToClientRpc(i + 1, GameManager.Instance.MapManager.players[i].rerolls);
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SendRerollToClientRpc(int client, int rerolls)
+    {
+        if ((ulong)client == clientId)
+        {
+            mapUI.SetRerollText(rerolls);
+        }
+    }
 
     bool InBounds(int i, int j)
     {

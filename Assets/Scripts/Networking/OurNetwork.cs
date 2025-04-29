@@ -62,7 +62,7 @@ public class OurNetwork : NetworkBehaviour
         PlayerInfo updatedInfo = playerInfoList[clientId];
         updatedInfo.playerName = name;
         playerInfoList[clientId] = updatedInfo;
-        menuManager = FindObjectOfType<MenuManager>();
+        menuManager = FindAnyObjectByType<MenuManager>();
         if(menuManager != null){
             Debug.Log("Setting Client ID " + clientId + "To name: "+name);
             menuManager.playerEntries[clientId - 1].SetNameAndColor(name, playerInfoList[clientId].playerColor);

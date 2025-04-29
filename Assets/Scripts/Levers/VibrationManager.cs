@@ -6,7 +6,12 @@ using System.Collections;
 public class VibrationManager : NetworkBehaviour
 {
     private OurNetwork network;
-    public GameObject leverBlocker;
+    public CountdownTimer timer;
+
+    public GameObject introText;
+    public GameObject mobileCheck;
+    public GameObject computerCheck;
+
 
     void Start()
     {
@@ -17,7 +22,8 @@ public class VibrationManager : NetworkBehaviour
             return;
         }
 
-        int numPlayers = network.playerInfoList.Count;
+        mobileCheck.SetActive(false);
+        computerCheck.SetActive(false);
     }
 
     public void TriggerVibration(ulong clientId)
@@ -36,18 +42,33 @@ public class VibrationManager : NetworkBehaviour
             }
         };
         
+        Debug.Log("About to call the vibration rpc function");
         VibratePhoneClientRpc(clientRpcParams);  
     }
     
-    [ClientRpc]
+    [ClientRpc(RequireOwnership = false)]
     private void VibratePhoneClientRpc(ClientRpcParams clientRpcParams = default)
     {
+        Debug.Log("We arrived to virbatio rpc");
         #if UNITY_ANDROID || UNITY_IOS
+            mobileCheck.SetActive(true);
+            Debug.Log("Mobile check set active");
             Handheld.Vibrate();
             Debug.Log("Vibrating phone...");
         #else
+            computerCheck.SetActive(true);
+            Debug.Log("Computer check set active");
             Debug.Log("Vibration not supported on this platform");
         #endif
+
+        Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] VibratePhoneClientRpc called");
+        Debug.Log($"Is Mobile Platform: {Application.isMobilePlatform}");
+        Debug.Log($"mobileCheck assigned: {mobileCheck != null}");
+        Debug.Log($"mobileCheck.activeSelf: {mobileCheck?.activeSelf}");
+        Debug.Log($"mobileCheck.activeInHierarchy: {mobileCheck?.activeInHierarchy}");
+        Debug.Log($"computerCheck assigned: {computerCheck != null}");
+        Debug.Log($"computerCheck.activeSelf: {computerCheck?.activeSelf}");
+        Debug.Log($"computerCheck.activeInHierarchy: {computerCheck?.activeInHierarchy}");
     }
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
@@ -68,7 +89,16 @@ public class VibrationManager : NetworkBehaviour
         }
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
-        leverBlocker.SetActive(false);
+        introText.SetActive(false);
+
+        if (timer != null)
+        {
+            timer.StartTimer(60f);
+        }
+        else
+        {
+            Debug.LogWarning("Timer not assigned in VibrationManager.");
+        }
     }
 
 }

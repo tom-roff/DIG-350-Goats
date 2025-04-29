@@ -90,9 +90,8 @@ public class CameraController : NetworkBehaviour
     // Sends vibration to the correct player
     void StartVibrationSequence()
     {
-
+        if (!IsServer) return;
         StartCoroutine(vibration.StartVibrationSequence(new List<int>(leverOrder)));
-
     }
     
 
@@ -124,9 +123,6 @@ public class CameraController : NetworkBehaviour
     void OnWrongLeverPulled()
     {
         Debug.Log("Incorrect lever pulled! It was Player " + currentLeverIndex + " turn to pull");
-        var wrongLeverMessage = FindFirstObjectByType<WrongLeverMessage>();
-        wrongLeverMessage.ShowMessageForClient(currentLeverIndex);  
         gameEndManager.OnGameLose(); 
-        // logic to reset or provide retries
     }
 }

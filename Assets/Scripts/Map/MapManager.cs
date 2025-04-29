@@ -4,9 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 
-public class MapManager : MonoBehaviour
+public class MapManager : NetworkBehaviour
 {
 
 
@@ -48,9 +49,9 @@ public class MapManager : MonoBehaviour
     }
 
     public Tiles[,] map = {{ Tiles.Wall, Tiles.Wall, Tiles.Start,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
-                  { Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
-                  { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored},
-                  { Tiles.UnexploredItem, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
+                  { Tiles.Wall, Tiles.UnexploredMinigame, Tiles.Unexplored,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
+                  { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.UnexploredMinigame},
+                  { Tiles.UnexploredMinigame, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.UnexploredMinigame,Tiles.Wall,Tiles.Wall,Tiles.Wall},
@@ -66,8 +67,14 @@ public class MapManager : MonoBehaviour
     //               { Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall},
     //               { Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.UnexploredItem}};
 
+    public List<string> minigameScenes = new List<string>{ "MicrophoneMinigame", "LeversMinigame", "ClimbingMinigame", "LaserMinigame"};
+    
+    private int nextMinigame = -1;
 
-
+    void Start()
+    {
+        MapHelpers.Shuffle(minigameScenes);
+    }
 
     public int MapWidth()
     {
@@ -103,6 +110,27 @@ public class MapManager : MonoBehaviour
             Debug.Log("Player " + players[currentPlayer].playerID + " rolled a " + moves);
         }
     }
-    
-    
+
+    public void TimedReturnToMap(float time = 5f)
+    {
+        Invoke("ReturnToMap", time);
+    }
+
+    void ReturnToMap()
+    {
+        MapSceneChangeRpc();
+    }
+
+    [Rpc(SendTo.Server)]
+    public void MapSceneChangeRpc()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+    }
+
+    public void PlayMinigame()
+    {
+        nextMinigame++;
+        NetworkManager.Singleton.SceneManager.LoadScene(minigameScenes[nextMinigame], LoadSceneMode.Single);
+        // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+    }
 }

@@ -10,6 +10,7 @@ public class LaserManager : NetworkBehaviour
     [SerializeField] private GameObject gameUI;
     [SerializeField] private GameObject endUI;
     [SerializeField] private GameObject deathUI;
+    [SerializeField] private EndLevel endLevel;
 
     public GameObject laserPrefab;
     private float yPosition = 2f;
@@ -34,8 +35,12 @@ public class LaserManager : NetworkBehaviour
     {
         if (!IsServer)
         {
+            Screen.orientation = ScreenOrientation.LandscapeLeft;
             return;
         }
+
+        // Set screen rotation for players
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
 
         hostId = NetworkManager.Singleton.LocalClientId;
 
@@ -183,7 +188,7 @@ public class LaserManager : NetworkBehaviour
     private void EndGame()
     {
         leaderboard.Reverse();
-        Debug.Log(leaderboard);
+        endLevel.leaderboard = leaderboard;
         endUI.SetActive(true);
         gameUI.SetActive(false);
         gameOver = true;
