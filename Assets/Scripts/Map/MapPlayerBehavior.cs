@@ -15,6 +15,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
+    [SerializeField] public GameObject playerBackground;
     [SerializeField] public MapUI mapUI;
     
     public ulong currentPlayerId = ulong.MinValue;
@@ -69,6 +70,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         else
         {
             hostUI.SetActive(false);
+            playerBackground.GetComponent<Image>().color = GameManager.Instance.MapManager.players[clientId - 1].color;
             host = false;
         }
     }
@@ -132,11 +134,10 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         GameObject playerInstance = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         playerInstance.name = player.name;
-        playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
-        playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = player.color;
         player.body = playerInstance;
         player.SetPosition(startPosition);
+        GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].GetComponent<MapTileBehavior>().AddPlayer(playerInstance);
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
     }
 
@@ -148,10 +149,9 @@ public class MapPlayerBehavior : NetworkBehaviour
         int j = (int)currentPlayerPosition.y + y;
         if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
         {
-            int currentPlayer = GameManager.Instance.MapManager.currentPlayer;
-            GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
-            GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-            GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
+            // call move player from maptilebehavior
+            GameManager.Instance.MapManager.tiles[i-x, j-y].GetComponent<MapTileBehavior>().RemovePlayer();
+            GameManager.Instance.MapManager.tiles[i, j].GetComponent<MapTileBehavior>().AddPlayer(i, j);
 
             
             CheckSceneChange(i,j);
