@@ -44,8 +44,8 @@ public class MapManager : NetworkBehaviour
         PeakedItem,
         ExploredItem,
         Start,
-        UnexploredEnd,
-        PeakedEnd
+        CoveredEnd,
+        UncoveredEnd
     }
 
     public Tiles[,] map = {{ Tiles.Wall, Tiles.Wall, Tiles.Start,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
@@ -55,7 +55,7 @@ public class MapManager : NetworkBehaviour
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Wall,Tiles.Wall,Tiles.Unexplored,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall},
                   { Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored,Tiles.Unexplored,Tiles.Unexplored,Tiles.UnexploredMinigame,Tiles.Wall,Tiles.Wall,Tiles.Wall},
-                  { Tiles.Wall, Tiles.Wall, Tiles.UnexploredEnd,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall}};
+                  { Tiles.Wall, Tiles.Wall, Tiles.CoveredEnd,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall,Tiles.Wall}};
 
     // public Tiles[,] map = {{ Tiles.Unexplored, Tiles.UnexploredItem, Tiles.Wall, Tiles.Start, Tiles.Wall, Tiles.UnexploredEnd, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall},
     //               { Tiles.Unexplored, Tiles.Wall, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall},
@@ -67,13 +67,17 @@ public class MapManager : NetworkBehaviour
     //               { Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.Wall},
     //               { Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Unexplored, Tiles.Wall, Tiles.Wall, Tiles.Unexplored, Tiles.UnexploredItem}};
 
-    public List<string> minigameScenes = new List<string>{ "MicrophoneMinigame", "LeversMinigame", "ClimbingMinigame", "LaserMinigame"};
-    
+    public List<string> minigameSceneNames = new List<string> { "MicrophoneMinigame", "LaserMinigame", "ClimbingMinigame", "LeversMinigame"};
+
     private int nextMinigame = -1;
 
     void Start()
     {
-        MapHelpers.Shuffle(minigameScenes);
+        MapHelpers.Shuffle(minigameSceneNames);
+        foreach (string game in minigameSceneNames)
+        {
+            Debug.Log(game);
+        }
     }
 
     public int MapWidth()
@@ -111,6 +115,7 @@ public class MapManager : NetworkBehaviour
         }
     }
 
+
     public void TimedReturnToMap(float time = 5f)
     {
         Invoke("ReturnToMap", time);
@@ -130,7 +135,26 @@ public class MapManager : NetworkBehaviour
     public void PlayMinigame()
     {
         nextMinigame++;
-        NetworkManager.Singleton.SceneManager.LoadScene(minigameScenes[nextMinigame], LoadSceneMode.Single);
+        if (nextMinigame == minigameSceneNames.Count - 1)
+        {
+            RevealEnd();
+        }
+        NetworkManager.Singleton.SceneManager.LoadScene(minigameSceneNames[nextMinigame], LoadSceneMode.Single);
         // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+    }
+
+    void RevealEnd()
+    {
+        for (int i = 0; i < map.GetLength(0); i++)
+        {
+            for (int j = 0; j < map.GetLength(1); j++)
+            {
+                if (map[i, j] == Tiles.CoveredEnd)
+                {
+                    map[i, j] = Tiles.UncoveredEnd;
+                    tiles[i,j].GetComponent<Image>().color = Color.red;
+                }
+            }
+        }
     }
 }
