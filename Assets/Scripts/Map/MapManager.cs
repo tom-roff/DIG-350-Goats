@@ -20,6 +20,18 @@ public class MapManager : NetworkBehaviour
     public int moves;
     public bool playing;
 
+    public enum States
+    {
+        None,
+        Building,
+        Preparing,
+        Rolling,
+        Moving,
+        End
+    }
+
+    public States currentState = States.None;
+
 
     /*
         Old Map Syntax:
@@ -74,10 +86,6 @@ public class MapManager : NetworkBehaviour
     void Start()
     {
         MapHelpers.Shuffle(minigameSceneNames);
-        foreach (string game in minigameSceneNames)
-        {
-            Debug.Log(game);
-        }
     }
 
     public int MapWidth()
@@ -90,15 +98,6 @@ public class MapManager : NetworkBehaviour
         return map.GetLength(0);
     }
 
-    public void Play()
-    {
-        playing = true;
-    }
-
-    public void Pause()
-    {
-        playing = false;
-    }
 
     public void NextPlayer()
     {
@@ -111,7 +110,6 @@ public class MapManager : NetworkBehaviour
             // roll moves
             System.Random rnd = new System.Random();
             moves = rnd.Next(1, 7);
-            Debug.Log("Player " + players[currentPlayer].playerID + " rolled a " + moves);
         }
     }
 

@@ -14,7 +14,6 @@ public class MapGeneration : MonoBehaviour
     [Header("References")]
     [SerializeField] public GameObject tileParent;
     [SerializeField] public GameObject tilePrefab;
-    [SerializeField] public MapPlayerBehavior mapPlayerBehavior;
 
     [Header("Margins")]
     [SerializeField] public float xMargin = .1f;
@@ -25,11 +24,21 @@ public class MapGeneration : MonoBehaviour
     {
         mapWidth = GameManager.Instance.MapManager.MapWidth();
         mapHeight = GameManager.Instance.MapManager.MapHeight();
-        tileWidth = (1-(xMargin*2)) / mapWidth;
-        tileHeight = (1-(yMargin*2)) / mapHeight;
+        tileWidth = (1 - (xMargin * 2)) / mapWidth;
+        tileHeight = (1 - (yMargin * 2)) / mapHeight;
 
         GameManager.Instance.MapManager.tiles = new GameObject[mapHeight, mapWidth];
+        EventManager.StartListening("Building", Building);
+    }
 
+    void OnDisable()
+    {
+        EventManager.StopListening("Building", Building);
+    }
+
+    public void Building()
+    {
+        Debug.Log("Building");
         GenerateMap();
     }
 
@@ -57,8 +66,7 @@ public class MapGeneration : MonoBehaviour
                 }
             }
         }
-        Debug.Log("about to call start map");
-        mapPlayerBehavior.StartMap();
+        EventManager.TriggerEvent("NextState");
     }
 
     
