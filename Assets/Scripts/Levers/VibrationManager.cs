@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 public class VibrationManager : NetworkBehaviour
 {
@@ -15,12 +16,8 @@ public class VibrationManager : NetworkBehaviour
 
     void Start()
     {
-        network = FindFirstObjectByType<OurNetwork>();
-        if (network == null)
-        {
-            Debug.LogError("OurNetwork instance not found!");
-            return;
-        }
+        network = GameManager.Instance.OurNetwork;
+        
 
         mobileCheck.SetActive(false);
         computerCheck.SetActive(false);
@@ -28,22 +25,29 @@ public class VibrationManager : NetworkBehaviour
 
     public void TriggerVibration(ulong clientId)
     {
-        if (!IsServer)
+        try
         {
-            Debug.LogWarning("TriggerVibration called on a client, but should only be run on the server.");
-            return;
-        }
-
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
+            if (!IsServer)
             {
-                TargetClientIds = new ulong[] { clientId }
+                Debug.LogWarning("TriggerVibration called on a client, but should only be run on the server.");
+                return;
             }
-        };
-        
-        Debug.Log("About to call the vibration rpc function");
-        VibratePhoneClientRpc(clientRpcParams);  
+
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            };
+            
+            Debug.Log($"About to call the vibration rpc function {clientId}");
+            VibratePhoneClientRpc(clientRpcParams);  
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e);
+        }
     }
     
     [ClientRpc(RequireOwnership = false)]
@@ -61,18 +65,11 @@ public class VibrationManager : NetworkBehaviour
             Debug.Log("Vibration not supported on this platform");
         #endif
 
-        Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] VibratePhoneClientRpc called");
-        Debug.Log($"Is Mobile Platform: {Application.isMobilePlatform}");
-        Debug.Log($"mobileCheck assigned: {mobileCheck != null}");
-        Debug.Log($"mobileCheck.activeSelf: {mobileCheck?.activeSelf}");
-        Debug.Log($"mobileCheck.activeInHierarchy: {mobileCheck?.activeInHierarchy}");
-        Debug.Log($"computerCheck assigned: {computerCheck != null}");
-        Debug.Log($"computerCheck.activeSelf: {computerCheck?.activeSelf}");
-        Debug.Log($"computerCheck.activeInHierarchy: {computerCheck?.activeInHierarchy}");
     }
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
+        Debug.Log("Lever Order: " + string.Join(", ", leverOrder));
         foreach (int playerNum in leverOrder)
         {
             if (playerNum == 0)
@@ -82,6 +79,7 @@ public class VibrationManager : NetworkBehaviour
             }
 
             // Vibrate the correct player's phone
+            Debug.Log(playerNum);
             TriggerVibration((ulong)playerNum);
 
             // Delay between vibrations
