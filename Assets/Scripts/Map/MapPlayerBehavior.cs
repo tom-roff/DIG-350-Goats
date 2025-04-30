@@ -90,7 +90,14 @@ public class MapPlayerBehavior : NetworkBehaviour
         Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
     }
 
-   
+    public void SkipPlayer()
+    {
+        GameManager.Instance.MapManager.NextPlayer();
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        AskForCurrentPlayerRpc();
+    }
+
 
     private Vector2 FindStartPosition()
     {
@@ -146,7 +153,8 @@ public class MapPlayerBehavior : NetworkBehaviour
         Vector2 currentPlayerPosition = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position;
         int i = (int)currentPlayerPosition.x + x;
         int j = (int)currentPlayerPosition.y + y;
-        if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
+        if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall
+            && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.CoveredEnd)
         {
             int currentPlayer = GameManager.Instance.MapManager.currentPlayer;
             GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);

@@ -4,14 +4,21 @@ using Unity.Netcode;
 
 public class LaserManager : NetworkBehaviour
 {
-    public List<ulong> leaderboard = new List<ulong>();
-    public Dictionary<ulong, int> scores = new Dictionary<ulong, int>();
-    public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
-    [SerializeField] private GameObject gameUI;
+    // UI Elements
+    [SerializeField] private GameObject hostUI;
+    [SerializeField] private GameObject directionsUI;
+    [SerializeField] private GameObject readyButton;
     [SerializeField] private GameObject endUI;
     [SerializeField] private GameObject deathUI;
     [SerializeField] private EndLevel endLevel;
 
+    // Player and game state data
+    public List<ulong> leaderboard = new List<ulong>();
+    public Dictionary<ulong, int> scores = new Dictionary<ulong, int>();
+    public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
+    private Dictionary<ulong, bool> playersReady = new Dictionary<ulong, bool>();
+
+    // Laser spawning
     public GameObject laserPrefab;
     private float yPosition = 2f;
     private float zPosition = 10f;
@@ -20,79 +27,113 @@ public class LaserManager : NetworkBehaviour
     public float minSpawnInterval = 0.5f;
     public float maxSpawnInterval = 1.5f;
     private float nextSpawnTime;
+
+    // Game timing and state
     private ulong hostId;
-    
-    // Sudden death mode variables
+    private bool gameActive = false;
     private float gameTimer = 0f;
     private bool suddenDeathActive = false;
-    public float suddenDeathStartTime = 20f;  // Time in seconds when sudden death begins
-    public float suddenDeathSpeedupInterval = 1.5f;  // How often to increase spawn rate during sudden death
+    public float suddenDeathStartTime = 20f;
+    public float suddenDeathSpeedupInterval = 1.5f;
     private float suddenDeathTimer = 0f;
-    public float suddenDeathSpeedupRate = 0.9f;  // Rate to multiply spawn intervals by (lower = faster spawns)
-    private bool gameOver = false;
-    
+    public float suddenDeathSpeedupRate = 0.9f;
+
     public override void OnNetworkSpawn()
     {
-        if (!IsServer)
-        {
-            Screen.orientation = ScreenOrientation.LandscapeLeft;
-            return;
-        }
-
-        // Set screen rotation for players
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
+        if (IsServer)
+        {
+            InitializeServer();
+        }
+        else
+        {
+            InitializeClient();
+        }
+    }
+
+    private void InitializeServer()
+    {
         hostId = NetworkManager.Singleton.LocalClientId;
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             if (clientId != hostId)
             {
-                scores[clientId] = 0;
-                alive[clientId] = true;
+                RegisterPlayer(clientId);
             }
         }
-        
-        // Initialize timers
+
         gameTimer = 0f;
         suddenDeathTimer = 0f;
         SetNextSpawnTime();
+
+        hostUI.SetActive(false);
+        directionsUI.SetActive(false);
+        endUI.SetActive(false);
+        deathUI.SetActive(false);
+
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+    }
+
+    private void InitializeClient()
+    {
+        directionsUI.SetActive(true);
+        hostUI.SetActive(false);
+        endUI.SetActive(false);
+        deathUI.SetActive(false);
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        if (IsServer && clientId != hostId)
+        {
+            RegisterPlayer(clientId);
+        }
+    }
+
+    private void RegisterPlayer(ulong clientId)
+    {
+        scores[clientId] = 0;
+        alive[clientId] = true;
+        playersReady[clientId] = false;
     }
 
     private void Update()
     {
-        if (!IsServer)
+        if (!gameActive)
         {
+            CheckAllPlayersReady();
             return;
         }
 
-        if (gameOver)
-        {
-            return;
-        }
+        UpdateGameTimers();
+        HandleLaserSpawning();
+    }
 
-        // Update game timer
+    private void UpdateGameTimers()
+    {
         gameTimer += Time.deltaTime;
-        
-        // Check if it's time to activate sudden death mode
+
         if (!suddenDeathActive && gameTimer >= suddenDeathStartTime)
         {
             ActivateSuddenDeath();
         }
-        
-        // Handle sudden death progression
+
         if (suddenDeathActive)
         {
             suddenDeathTimer += Time.deltaTime;
-            
-            // Periodically increase spawn rate during sudden death
+
             if (suddenDeathTimer >= suddenDeathSpeedupInterval)
             {
                 IncreaseLaserSpawnRate();
                 suddenDeathTimer = 0f;
             }
         }
+    }
 
+    private void HandleLaserSpawning()
+    {
         if (Time.time >= nextSpawnTime)
         {
             SpawnLaser();
@@ -100,25 +141,77 @@ public class LaserManager : NetworkBehaviour
         }
     }
 
+    public void PlayerReady()
+    {
+        PlayerReadyRpc(NetworkManager.Singleton.LocalClientId);
+        readyButton.SetActive(false);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void PlayerReadyRpc(ulong clientId)
+    {
+        if (playersReady.ContainsKey(clientId))
+        {
+            playersReady[clientId] = true;
+        }
+    }
+
+    private void CheckAllPlayersReady()
+    {
+        bool allReady = true;
+        foreach (var kvp in playersReady)
+        {
+            if (!kvp.Value)
+            {
+                allReady = false;
+                break;
+            }
+        }
+
+        if (allReady && playersReady.Count > 0)
+        {
+            StartGame();
+        }
+    }
+
+    private void StartGame()
+    {
+        gameActive = true;
+        gameTimer = 0f;
+
+        if (directionsUI != null)
+            directionsUI.SetActive(false);
+        if (hostUI != null)
+            hostUI.SetActive(true);
+
+        StartGameRpc();
+    }
+
+    [Rpc(SendTo.NotServer)]
+    private void StartGameRpc()
+    {
+        if (IsServer) return;
+
+        if (directionsUI != null)
+            directionsUI.SetActive(false);
+        if (hostUI != null)
+            hostUI.SetActive(true);
+    }
+
     private void ActivateSuddenDeath()
     {
         suddenDeathActive = true;
         suddenDeathTimer = 0f;
-        Debug.Log("SUDDEN DEATH MODE ACTIVATED!");
-        
-        // You could add visual effects or sounds here to indicate sudden death mode
     }
-    
+
     private void IncreaseLaserSpawnRate()
     {
-        // Decrease the spawn intervals to make lasers spawn faster
         minSpawnInterval *= suddenDeathSpeedupRate;
         maxSpawnInterval *= suddenDeathSpeedupRate;
-        
-        // Set minimum limits to prevent too rapid spawning that might break the game
+
         minSpawnInterval = Mathf.Max(minSpawnInterval, 0.05f);
         maxSpawnInterval = Mathf.Max(maxSpawnInterval, 0.1f);
-        
+
         Debug.Log($"Laser spawn rate increased! Interval: {minSpawnInterval:F2}s - {maxSpawnInterval:F2}s");
     }
 
@@ -126,7 +219,7 @@ public class LaserManager : NetworkBehaviour
     {
         float randomX = Random.Range(minX, maxX);
         Vector3 spawnPosition = new Vector3(randomX, yPosition, zPosition);
-        
+
         GameObject laser = Instantiate(laserPrefab, spawnPosition, Quaternion.identity);
         NetworkObject networkObject = laser.GetComponent<NetworkObject>();
         networkObject.Spawn();
@@ -139,10 +232,7 @@ public class LaserManager : NetworkBehaviour
 
     public void UpdateScores()
     {
-        if (!IsServer)
-        {
-            return;
-        }
+        if (!IsServer) return;
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
@@ -153,15 +243,9 @@ public class LaserManager : NetworkBehaviour
         }
     }
 
-    public int GetScore(ulong clientId)
-    {
-        return scores[clientId];
-    }
+    public int GetScore(ulong clientId) => scores[clientId];
 
-    public bool IsAlive(ulong clientId)
-    {
-        return alive[clientId];
-    }
+    public bool IsAlive(ulong clientId) => alive[clientId];
 
     public void KillPlayer(ulong clientId)
     {
@@ -169,7 +253,7 @@ public class LaserManager : NetworkBehaviour
         leaderboard.Add(clientId);
         ShowDeathUIRpc(clientId);
 
-        if (alive.ContainsValue(true) == false)
+        if (!alive.ContainsValue(true))
         {
             EndGame();
         }
@@ -178,7 +262,6 @@ public class LaserManager : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     private void ShowDeathUIRpc(ulong deadClientId)
     {
-        // Check if this is the client that died
         if (NetworkManager.Singleton.LocalClientId == deadClientId)
         {
             deathUI.SetActive(true);
@@ -190,8 +273,7 @@ public class LaserManager : NetworkBehaviour
         leaderboard.Reverse();
         endLevel.leaderboard = leaderboard;
         endUI.SetActive(true);
-        gameUI.SetActive(false);
-        gameOver = true;
-        // Send Data to GameManager
+        hostUI.SetActive(false);
+        gameActive = false;
     }
 }

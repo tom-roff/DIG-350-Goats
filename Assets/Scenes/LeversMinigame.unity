@@ -5822,6 +5822,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  network: {fileID: 0}
+  vibration: {fileID: 1407276530}
+  gameEndManager: {fileID: 1408098234}
   gameCamera: {fileID: 237132158}
   playerCameraPositions:
   - {fileID: 1661004965}
