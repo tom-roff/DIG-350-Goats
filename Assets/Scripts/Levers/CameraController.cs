@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class CameraController : NetworkBehaviour
 {
-    private OurNetwork network;
-    private VibrationManager vibration;
-    private GameEndManager gameEndManager;
+    public OurNetwork network;
+    public VibrationManager vibration;
+    public GameEndManager gameEndManager;
     private ulong playerId;
 
     public GameObject gameCamera;
@@ -18,28 +18,9 @@ public class CameraController : NetworkBehaviour
 
     void Start()
     {
-        network = FindFirstObjectByType<OurNetwork>(); // Find the network script
-        if (network == null)
-        {
-            Debug.LogError("OurNetwork instance not found!");
-            return;
-        }
+        network = GameManager.Instance.OurNetwork;
 
         AssignLeverOrder();
-
-        vibration = FindFirstObjectByType<VibrationManager>();
-        if (vibration == null)
-        {
-            Debug.LogError("VibrationManager not found in the scene!");
-            return;
-        }
-
-        gameEndManager = FindFirstObjectByType<GameEndManager>(); // Find the network script
-        if (gameEndManager == null)
-        {
-            Debug.LogError("GameEndManager instance not found!");
-            return;
-        }
 
         playerId = NetworkManager.Singleton.LocalClientId;
 
@@ -52,8 +33,9 @@ public class CameraController : NetworkBehaviour
     {
         int numPlayers = network.playerInfoList.Count - 1;
         leverOrder = new int[numPlayers];
-        for (int i = 0; i < numPlayers; i++)
+        for (int i = 1; i <= numPlayers; i++)
         {
+            Debug.Log("Current Player = " + i.ToString());
             leverOrder[i] = i;
         }
     }
@@ -91,6 +73,7 @@ public class CameraController : NetworkBehaviour
     void StartVibrationSequence()
     {
         if (!IsServer) return;
+        Debug.Log("Lever Order pre VibrationSeqence Function Call: " + string.Join(", ", leverOrder));
         StartCoroutine(vibration.StartVibrationSequence(new List<int>(leverOrder)));
     }
     

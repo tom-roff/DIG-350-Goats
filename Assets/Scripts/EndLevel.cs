@@ -38,6 +38,10 @@ public class EndLevel : NetworkBehaviour
 
     private void BackToMap()
     {
+        if (!IsServer)
+        {
+            Screen.orientation = ScreenOrientation.Portrait;
+        }
         NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
     }
 }

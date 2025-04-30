@@ -35,7 +35,7 @@ public static class MapHelpers
             case MapManager.Tiles.Start:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.green;
                 break;
-            case MapManager.Tiles.PeakedEnd:
+            case MapManager.Tiles.UncoveredEnd:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.red;
                 break;
             default:
@@ -103,9 +103,6 @@ public static class MapHelpers
                 break;
             case MapManager.Tiles.UnexploredItem:
                 map[(int)pos.x, (int)pos.y] = MapManager.Tiles.PeakedItem;
-                break;
-            case MapManager.Tiles.UnexploredEnd:
-                map[(int)pos.x, (int)pos.y] = MapManager.Tiles.PeakedEnd;
                 break;
             default:
                 break;
