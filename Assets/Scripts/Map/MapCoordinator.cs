@@ -2,14 +2,6 @@ using UnityEngine;
 
 public class MapCoordinator : MonoBehaviour
 {
-    // public enum States
-    // {
-    //     Building,
-    //     Preparing,
-    //     Rolling,
-    //     Moving
-    // }
-
     void OnEnable()
     {
         EventManager.StartListening("NextState", NextState);
