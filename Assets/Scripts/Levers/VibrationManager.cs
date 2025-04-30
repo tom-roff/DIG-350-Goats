@@ -67,19 +67,13 @@ public class VibrationManager : NetworkBehaviour
                 continue;
             }
 
-            // Vibrate the correct player's phone
-            Debug.Log(playerNum);
-                    // Vibrate the correct player's phone (i + 1) times
-            for (int j = 0; j < i + 1; j++)
-            {
-                Debug.Log($"{playerNum} will vibrate {i} times");
-                TriggerVibration((ulong)playerNum);
-                yield return new WaitForSeconds(0.75f); // Shorter delay between multi-vibrations
-            }
-
-            // Delay between vibrations
-            yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty
+            // Start a coroutine for each player to vibrate (i + 1) times
+            StartCoroutine(VibratePlayerMultipleTimes((ulong)playerNum, i + 1));
         }
+
+        // Wait long enough to ensure all vibrations are likely complete
+        float totalWaitTime = leverOrder.Count * 0.75f + 1.5f;
+        yield return new WaitForSeconds(totalWaitTime);
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
         introText.SetActive(false);
@@ -93,5 +87,17 @@ public class VibrationManager : NetworkBehaviour
             Debug.LogWarning("Timer not assigned in VibrationManager.");
         }
     }
+
+    private IEnumerator VibratePlayerMultipleTimes(ulong clientId, int vibrationCount)
+    {
+        Debug.Log($"{clientId} will vibrate {vibrationCount} times");
+
+        for (int j = 0; j < vibrationCount; j++)
+        {
+            TriggerVibration(clientId);
+            yield return new WaitForSeconds(0.75f);
+        }
+    }
+
 
 }
