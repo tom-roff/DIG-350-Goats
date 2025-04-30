@@ -101,6 +101,8 @@ public class LaserManager : NetworkBehaviour
 
     private void Update()
     {
+        if (!IsServer) return;
+        
         if (!gameActive)
         {
             CheckAllPlayersReady();

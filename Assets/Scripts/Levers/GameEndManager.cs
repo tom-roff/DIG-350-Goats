@@ -53,7 +53,10 @@ public class GameEndManager : NetworkBehaviour
         {
             foreach (var player in GameManager.Instance.MapManager.players)
             {
-                player.SetRerolls(player.rerolls - 1);
+                if(player.rerolls > 0)
+                {
+                    player.SetRerolls(player.rerolls - 1);
+                }
             }
         }
         else
