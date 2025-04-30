@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 public class VibrationManager : NetworkBehaviour
 {
@@ -9,84 +10,70 @@ public class VibrationManager : NetworkBehaviour
     public CountdownTimer timer;
 
     public GameObject introText;
-    public GameObject mobileCheck;
-    public GameObject computerCheck;
 
 
     void Start()
     {
-        network = FindFirstObjectByType<OurNetwork>();
-        if (network == null)
-        {
-            Debug.LogError("OurNetwork instance not found!");
-            return;
-        }
-
-        mobileCheck.SetActive(false);
-        computerCheck.SetActive(false);
+        network = GameManager.Instance.OurNetwork;
     }
 
     public void TriggerVibration(ulong clientId)
     {
-        if (!IsServer)
+        try
         {
-            Debug.LogWarning("TriggerVibration called on a client, but should only be run on the server.");
-            return;
-        }
-
-        ClientRpcParams clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
+            if (!IsServer)
             {
-                TargetClientIds = new ulong[] { clientId }
+                Debug.LogWarning("TriggerVibration called on a client, but should only be run on the server.");
+                return;
             }
-        };
-        
-        Debug.Log("About to call the vibration rpc function");
-        VibratePhoneClientRpc(clientRpcParams);  
+
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            };
+            
+            VibratePhoneClientRpc(clientRpcParams);  
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e);
+        }
     }
     
     [ClientRpc(RequireOwnership = false)]
     private void VibratePhoneClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("We arrived to virbatio rpc");
         #if UNITY_ANDROID || UNITY_IOS
-            mobileCheck.SetActive(true);
-            Debug.Log("Mobile check set active");
             Handheld.Vibrate();
             Debug.Log("Vibrating phone...");
         #else
-            computerCheck.SetActive(true);
-            Debug.Log("Computer check set active");
             Debug.Log("Vibration not supported on this platform");
         #endif
 
-        Debug.Log($"[Client {NetworkManager.Singleton.LocalClientId}] VibratePhoneClientRpc called");
-        Debug.Log($"Is Mobile Platform: {Application.isMobilePlatform}");
-        Debug.Log($"mobileCheck assigned: {mobileCheck != null}");
-        Debug.Log($"mobileCheck.activeSelf: {mobileCheck?.activeSelf}");
-        Debug.Log($"mobileCheck.activeInHierarchy: {mobileCheck?.activeInHierarchy}");
-        Debug.Log($"computerCheck assigned: {computerCheck != null}");
-        Debug.Log($"computerCheck.activeSelf: {computerCheck?.activeSelf}");
-        Debug.Log($"computerCheck.activeInHierarchy: {computerCheck?.activeInHierarchy}");
     }
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
-        foreach (int playerNum in leverOrder)
+        for (int i = 0; i < leverOrder.Count; i++)
         {
+            int playerNum = leverOrder[i];
+
             if (playerNum == 0)
             {
                 Debug.Log("Skipped the host for vibration");
                 continue;
             }
 
-            // Vibrate the correct player's phone
-            TriggerVibration((ulong)playerNum);
-
-            // Delay between vibrations
-            yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty
+            // Start a coroutine for each player to vibrate (i + 1) times
+            StartCoroutine(VibratePlayerMultipleTimes((ulong)playerNum, i + 1));
         }
+
+        // Wait long enough to ensure all vibrations are likely complete
+        float totalWaitTime = leverOrder.Count * 0.75f + 1.5f;
+        yield return new WaitForSeconds(totalWaitTime);
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
         introText.SetActive(false);
@@ -100,5 +87,17 @@ public class VibrationManager : NetworkBehaviour
             Debug.LogWarning("Timer not assigned in VibrationManager.");
         }
     }
+
+    private IEnumerator VibratePlayerMultipleTimes(ulong clientId, int vibrationCount)
+    {
+        Debug.Log($"{clientId} will vibrate {vibrationCount} times");
+
+        for (int j = 0; j < vibrationCount; j++)
+        {
+            TriggerVibration(clientId);
+            yield return new WaitForSeconds(0.75f);
+        }
+    }
+
 
 }

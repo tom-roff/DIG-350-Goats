@@ -28,6 +28,7 @@ public class ReturnToMap : NetworkBehaviour
 
     public void BackToMap()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
         NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
     }
 }
