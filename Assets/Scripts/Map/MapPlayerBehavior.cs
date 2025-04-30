@@ -15,6 +15,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
     [SerializeField] public MapUI mapUI;
+    [SerializeField] public GameObject playerBackground;
 
     [Header("Status")]
     public ulong currentPlayerId = ulong.MinValue;
@@ -66,6 +67,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         else
         {
             hostUI.SetActive(false);
+            playerBackground.GetComponent<Image>().color = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerColor.colorRGB;
             host = false;
         }
     }

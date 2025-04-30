@@ -101,16 +101,12 @@ public class MapManager : NetworkBehaviour
 
     public void NextPlayer()
     {
-        // if (moves < 1) // necessary when called from StartMap()
-        // {
             if (currentPlayer + 1 == players.GetLength(0)) currentPlayer = 0;
             else currentPlayer++;
-
 
             // roll moves
             System.Random rnd = new System.Random();
             moves = rnd.Next(1, 7);
-        // }
     }
 
 
