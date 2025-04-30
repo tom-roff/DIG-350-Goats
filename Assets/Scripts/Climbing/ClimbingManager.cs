@@ -65,7 +65,10 @@ public class ClimbingManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void UpdateScoringRpc(ulong clientId)
     {
-        leaderboard.Add(clientId);
+        if (!leaderboard.ContainsValue(clientId))
+        {
+            leaderboard.Add(clientId);
+        }
         if (leaderboard.Count == NetworkManager.Singleton.ConnectedClients.Count - 1)
         {
             EndGame();
