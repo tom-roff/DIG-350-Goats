@@ -3,7 +3,12 @@ guid: 90c40cef9d534c24d975372b286b6d3a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BarGrate
+    second: {fileID: 2100000, guid: 93ef9f5673ae6974380cb42d7615fab2, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
