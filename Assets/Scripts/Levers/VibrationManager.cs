@@ -10,17 +10,11 @@ public class VibrationManager : NetworkBehaviour
     public CountdownTimer timer;
 
     public GameObject introText;
-    public GameObject mobileCheck;
-    public GameObject computerCheck;
 
 
     void Start()
     {
         network = GameManager.Instance.OurNetwork;
-        
-
-        mobileCheck.SetActive(false);
-        computerCheck.SetActive(false);
     }
 
     public void TriggerVibration(ulong clientId)
@@ -41,7 +35,6 @@ public class VibrationManager : NetworkBehaviour
                 }
             };
             
-            Debug.Log($"About to call the vibration rpc function {clientId}");
             VibratePhoneClientRpc(clientRpcParams);  
         }
         catch(Exception e)
@@ -53,15 +46,10 @@ public class VibrationManager : NetworkBehaviour
     [ClientRpc(RequireOwnership = false)]
     private void VibratePhoneClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("We arrived to virbatio rpc");
         #if UNITY_ANDROID || UNITY_IOS
-            mobileCheck.SetActive(true);
-            Debug.Log("Mobile check set active");
             Handheld.Vibrate();
             Debug.Log("Vibrating phone...");
         #else
-            computerCheck.SetActive(true);
-            Debug.Log("Computer check set active");
             Debug.Log("Vibration not supported on this platform");
         #endif
 
@@ -69,9 +57,10 @@ public class VibrationManager : NetworkBehaviour
 
     public IEnumerator StartVibrationSequence(List<int> leverOrder)
     {
-        Debug.Log("Lever Order: " + string.Join(", ", leverOrder));
-        foreach (int playerNum in leverOrder)
+        for (int i = 0; i < leverOrder.Count; i++)
         {
+            int playerNum = leverOrder[i];
+
             if (playerNum == 0)
             {
                 Debug.Log("Skipped the host for vibration");
@@ -80,7 +69,13 @@ public class VibrationManager : NetworkBehaviour
 
             // Vibrate the correct player's phone
             Debug.Log(playerNum);
-            TriggerVibration((ulong)playerNum);
+                    // Vibrate the correct player's phone (i + 1) times
+            for (int j = 0; j < i + 1; j++)
+            {
+                Debug.Log($"{playerNum} will vibrate {i} times");
+                TriggerVibration((ulong)playerNum);
+                yield return new WaitForSeconds(0.75f); // Shorter delay between multi-vibrations
+            }
 
             // Delay between vibrations
             yield return new WaitForSeconds(1.5f); // Adjust delay based on difficulty
