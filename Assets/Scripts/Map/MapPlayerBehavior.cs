@@ -175,6 +175,9 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     void ResumeTurn()
     {
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " has " + GameManager.Instance.MapManager.moves + " remaining moves");
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
         SendRerolls();
     }
 

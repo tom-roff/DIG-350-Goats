@@ -22,7 +22,8 @@ public class MapCoordinator : MonoBehaviour
 
     void Start()
     {
-        NextState();
+        GameManager.Instance.MapManager.currentState = MapManager.States.Building;
+        EventManager.TriggerEvent("Building");
     }
 
     void NextState()
