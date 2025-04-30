@@ -65,7 +65,7 @@ public class ClimbingManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void UpdateScoringRpc(ulong clientId)
     {
-        if (!leaderboard.ContainsValue(clientId))
+        if (!leaderboard.Contains(clientId))
         {
             leaderboard.Add(clientId);
         }
