@@ -33,10 +33,11 @@ public class CameraController : NetworkBehaviour
     {
         int numPlayers = network.playerInfoList.Count - 1;
         leverOrder = new int[numPlayers];
-        for (int i = 1; i <= numPlayers; i++)
+        Debug.Log($"Num players = {numPlayers}");
+        for (int i = 0; i < numPlayers; i++)
         {
-            Debug.Log("Current Player = " + i.ToString());
-            leverOrder[i] = i;
+            Debug.Log("Current Player = " + (i + 1).ToString());
+            leverOrder[i] = i + 1; // Players start from 1 (since 0 is host)
         }
     }
 
