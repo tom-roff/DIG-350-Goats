@@ -7,55 +7,56 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using Unity.Netcode.Transports.UTP;
+using TMPro;
 
 public class MapPlayerBehavior : NetworkBehaviour
 {
+    [Header("References")]
     [SerializeField] public GameObject playerPrefab;
-    public ulong clientId;
-    public bool host = false;
     [SerializeField] public GameObject hostUI;
     [SerializeField] public GameObject playerUI;
     [SerializeField] public MapUI mapUI;
+    [SerializeField] public GameObject playerBackground;
+    [SerializeField] public TMP_Text playerName;
+
+    [Header("Status")]
     public PlayerUIEntry[] leaderboardEntries = new PlayerUIEntry[6];
     
     public ulong currentPlayerId = ulong.MinValue;
+    public bool rerollAvailable = false;
+    public bool host;
+
+    // other references used locally 
     int mapWidth;
     int mapHeight;
-    public bool rerollAvailable = false;
+    ulong clientId;
 
 
+
+
+    //////////////////////////////////////////////////////
+    //////////////////// ASSIGN REFS /////////////////////
+    //////////////////////////////////////////////////////
     void OnEnable()
     {
         mapWidth = GameManager.Instance.MapManager.MapWidth();
         mapHeight = GameManager.Instance.MapManager.MapHeight();
+
+        EventManager.StartListening("Preparing", Preparing);
+        EventManager.StartListening("Rolling", Rolling);
+        EventManager.StartListening("Moving", Moving);
     }
 
-    public void StartMap()
+    void OnDisable()
     {
-        CheckHost();
-        if (!host)
-        {
-            GameManager.Instance.MapManager.Play();
-            mapUI.DisableRerolling();
-            return;
-        }
-
-        if (GameManager.Instance.MapManager.players == null) CreatePlayerQueue();
-
-        SpawnPlayers();
-        GameManager.Instance.MapManager.Play();
-        GameManager.Instance.MapManager.NextPlayer();
-        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
-        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        EventManager.StopListening("Preparing", Preparing);
+        EventManager.StopListening("Rolling", Rolling);
+        EventManager.StopListening("Moving", Moving);
     }
 
     public override void OnNetworkSpawn()
     {
         CheckHost();
-        if (!host)
-            return;
-
-        AskForCurrentPlayerRpc();
         base.OnNetworkSpawn();
         SetLeaderboard();
     }
@@ -80,49 +81,47 @@ public class MapPlayerBehavior : NetworkBehaviour
         else
         {
             hostUI.SetActive(false);
+            playerBackground.GetComponent<Image>().color = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerColor.colorRGB;
+            playerName.text = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerName.ToString();
+            GameObject.Find("Leaderboard").SetActive(false);
             host = false;
         }
+    }
+
+
+
+
+    //////////////////////////////////////////////////////
+    ///////////////////// PREPARING //////////////////////
+    ////////////////////////////////////////////////////// 
+    public void Preparing()
+    {
+        if (!host)
+        {
+            EventManager.TriggerEvent("NextState");
+            return;
+        }
+
+        if (GameManager.Instance.MapManager.players == null) CreatePlayerQueue();
+        SpawnPlayers();
+        EventManager.TriggerEvent("NextState");
     }
 
     void CreatePlayerQueue()
     {
         int playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count;
-        GameManager.Instance.MapManager.players = new MapPlayer[playerCount-1]; // replace with # of players in lobby
+        GameManager.Instance.MapManager.players = new MapPlayer[playerCount - 1]; // replace with # of players in lobby
 
         int i = 0;
         foreach (PlayerInfo entry in GameManager.Instance.OurNetwork.playerInfoList)
         {
-            if(i != 0)
-                GameManager.Instance.MapManager.players[i-1] = new MapPlayer((ulong)i,entry);
-            
+            if (i != 0)
+                GameManager.Instance.MapManager.players[i - 1] = new MapPlayer((ulong)i, entry);
+
             i++;
         }
 
         Debug.Log("Players in queue: " + GameManager.Instance.MapManager.players.Length);
-    }
-
-    public void SkipPlayer()
-    {
-        GameManager.Instance.MapManager.NextPlayer();
-        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
-        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-        AskForCurrentPlayerRpc();
-    }
-
-
-    private Vector2 FindStartPosition()
-    {
-        for (int i = 0; i < mapHeight; i++)
-        {
-            for (int j = 0; j < mapWidth; j++)
-            {
-                if (GameManager.Instance.MapManager.map[i, j] == MapManager.Tiles.Start)
-                {
-                    return new Vector2(i, j);
-                }
-            }
-        }
-        return Vector2.positiveInfinity;
     }
 
     void SpawnPlayers()
@@ -144,7 +143,20 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
     }
 
-
+    private Vector2 FindStartPosition()
+    {
+        for (int i = 0; i < mapHeight; i++)
+        {
+            for (int j = 0; j < mapWidth; j++)
+            {
+                if (GameManager.Instance.MapManager.map[i, j] == MapManager.Tiles.Start)
+                {
+                    return new Vector2(i, j);
+                }
+            }
+        }
+        return Vector2.positiveInfinity;
+    }
 
     void InstantiatePlayer(Vector2 startPosition, MapPlayer player)
     {
@@ -153,59 +165,40 @@ public class MapPlayerBehavior : NetworkBehaviour
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = player.color;
+        playerInstance.GetComponentInChildren<TMP_Text>().text = player.name.Substring(0,1);
         player.body = playerInstance;
         player.SetPosition(startPosition);
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
     }
 
-    [Rpc(SendTo.Server)]
-    public void MovePlayerRpc(int x, int y)
+
+
+    //////////////////////////////////////////////////////
+    ////////////////////// ROLLING ///////////////////////
+    ////////////////////////////////////////////////////// 
+    public void Rolling()
     {
-        Vector2 currentPlayerPosition = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position;
-        int i = (int)currentPlayerPosition.x + x;
-        int j = (int)currentPlayerPosition.y + y;
-        if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall
-            && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.CoveredEnd)
+        if (!host) return;
+        if (GameManager.Instance.MapManager.moves > 0)
         {
-            int currentPlayer = GameManager.Instance.MapManager.currentPlayer;
-            GameManager.Instance.MapManager.players[currentPlayer].body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
-            GameManager.Instance.MapManager.players[currentPlayer].body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-            GameManager.Instance.MapManager.players[currentPlayer].SetPosition(new Vector2(i, j));
-
-            
-            CheckSceneChange(i,j);
-            MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
-            
-            // MapAudioManager.playerMovementAudio.Play();
-
-            GameManager.Instance.MapManager.moves--;
-            mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-            DisableRerollingRpc();
-
-            if (GameManager.Instance.MapManager.moves < 1)
-            {
-                GameManager.Instance.MapManager.NextPlayer();
-                mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
-                mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
-                AskForCurrentPlayerRpc();
-            }
+            ResumeTurn();
+            return;
         }
+
+        Debug.Log("rolling");
+        GameManager.Instance.MapManager.NextPlayer();
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].rerolls);
     }
 
-    void CheckSceneChange(int x, int y)
+    void ResumeTurn()
     {
-        if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
-        {
-            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame;
-            GameManager.Instance.MapManager.PlayMinigame();
-            // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
-        }
-    }
-
-    [Rpc(SendTo.NotServer)]
-    public void SendCurrentPlayerRpc(ulong currentPlayerId)
-    {
-        this.currentPlayerId = currentPlayerId;
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " has " + GameManager.Instance.MapManager.moves + " remaining moves");
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
+        SendRerolls();
     }
 
     [Rpc(SendTo.NotServer)]
@@ -221,55 +214,15 @@ public class MapPlayerBehavior : NetworkBehaviour
         {
             rerollAvailable = false;
             mapUI.DisableRerolling();
-            // mapUI.SetRerollText(rerolls);
-
-        }
-
-    }
-
-    [Rpc(SendTo.NotServer)]
-    public void DisableRerollingRpc()
-    {
-        rerollAvailable = false;
-        mapUI.DisableRerolling();
-    }
-
-
-
-    [Rpc(SendTo.Server)]
-    public void AskForCurrentPlayerRpc()
-    {
-        if (GameManager.Instance.MapManager.currentPlayer == -1) return;
-        ulong currentPlayerId = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID;
-        SendCurrentPlayerRpc(currentPlayerId);
-        SendRerolls();
-        CheckRerollsRpc(GameManager.Instance.MapManager.players[(int)currentPlayerId-1].rerolls); // make server call to each player
-    }
-
-
-    public void SendRerolls()
-    {
-        for (int i = 0; i < GameManager.Instance.MapManager.players.Length; i++)
-        {
-            SendRerollToClientRpc(i + 1, GameManager.Instance.MapManager.players[i].rerolls);
-        }
-    }
-
-    [Rpc(SendTo.NotServer)]
-    public void SendRerollToClientRpc(int client, int rerolls)
-    {
-        if ((ulong)client == clientId)
-        {
             mapUI.SetRerollText(rerolls);
         }
     }
 
-    bool InBounds(int i, int j)
+    [Rpc(SendTo.NotServer)]
+    public void SendCurrentPlayerRpc(ulong currentPlayerId)
     {
-        if (i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
-        return false;
+        this.currentPlayerId = currentPlayerId;
     }
-
 
     [Rpc(SendTo.Server)]
     void RerollRpc()
@@ -289,44 +242,145 @@ public class MapPlayerBehavior : NetworkBehaviour
         RerollRpc();
     }
 
+    public void SendRerolls()
+    {
+        for (int i = 0; i < GameManager.Instance.MapManager.players.Length; i++)
+        {
+            SendRerollToClientRpc(i + 1, GameManager.Instance.MapManager.players[i].rerolls);
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void SendRerollToClientRpc(int client, int rerolls)
+    {
+        if ((ulong)client == clientId)
+        {
+            mapUI.SetRerollText(rerolls);
+        }
+    }
 
 
-    // BUTTON ARROW KEY AREA
+    //////////////////////////////////////////////////////
+    ////////////////////// MOVING ////////////////////////
+    ////////////////////////////////////////////////////// 
+
+    public void Moving()
+    {
+        rerollAvailable = false;
+    }
+    
     public void MoveRight()
     {
-        if (GameManager.Instance.MapManager.playing)
+        if (currentPlayerId == clientId)
         {
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, 1);
-            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            if (GameManager.Instance.MapManager.currentState == MapManager.States.Rolling)
+            {
+                EventManager.TriggerEvent("NextState");
+                MovePlayerRpc(0, 1);
+            }
+            else if (GameManager.Instance.MapManager.currentState == MapManager.States.Moving) MovePlayerRpc(0, 1);
         }
     }
 
     public void MoveLeft()
     {
-        if (GameManager.Instance.MapManager.playing)
+        if (currentPlayerId == clientId)
         {
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(0, -1);
-            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            if (GameManager.Instance.MapManager.currentState == MapManager.States.Rolling)
+            {
+                EventManager.TriggerEvent("NextState");
+                MovePlayerRpc(0, -1);
+            }
+            else if (GameManager.Instance.MapManager.currentState == MapManager.States.Moving) MovePlayerRpc(0, -1);
         }
     }
 
     public void MoveUp()
     {
-        if (GameManager.Instance.MapManager.playing)
+        if (currentPlayerId == clientId)
         {
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(1, 0);
-            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            if (GameManager.Instance.MapManager.currentState == MapManager.States.Rolling)
+            {
+                EventManager.TriggerEvent("NextState");
+                MovePlayerRpc(1, 0);
+            }
+            else if (GameManager.Instance.MapManager.currentState == MapManager.States.Moving) MovePlayerRpc(1, 0);
         }
     }
 
     public void MoveDown()
     {
-        if (GameManager.Instance.MapManager.playing)
+        if (currentPlayerId == clientId)
         {
-            if (currentPlayerId != ulong.MinValue && currentPlayerId == clientId) MovePlayerRpc(-1, 0);
-            // else if (currentPlayerId == ulong.MinValue) AskForCurrentPlayerRpc();
+            if (GameManager.Instance.MapManager.currentState == MapManager.States.Rolling)
+            {
+                EventManager.TriggerEvent("NextState");
+                MovePlayerRpc(-1, 0);
+            }
+            else if (GameManager.Instance.MapManager.currentState == MapManager.States.Moving) MovePlayerRpc(-1, 0);
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void MovePlayerRpc(int x, int y)
+    {
+        Vector2 currentPlayerPosition = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].position;
+        int i = (int)currentPlayerPosition.x + x;
+        int j = (int)currentPlayerPosition.y + y;
+
+        if (InBounds(i, j) && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall
+            && GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.CoveredEnd)
+        {
+            MapPlayer currentPlayer = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer];
+            currentPlayer.body.transform.SetParent(GameManager.Instance.MapManager.tiles[i, j].transform);
+            currentPlayer.body.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
+            currentPlayer.SetPosition(new Vector2(i, j));
+
+            CheckSceneChange(i, j);
+            MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, i, j);
+
+            // MapAudioManager.playerMovementAudio.Play();
+
+            GameManager.Instance.MapManager.moves--;
+            mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+
+            if (GameManager.Instance.MapManager.moves < 1) 
+            {
+                GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
+                Rolling();
+
+                // EventManager.TriggerEvent("NextState");
+            }
+        }
+    }
+
+     bool InBounds(int i, int j)
+    {
+        if (i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
+        return false;
+    }
+
+    void CheckSceneChange(int x, int y)
+    {
+        if (GameManager.Instance.MapManager.map[x, y] == MapManager.Tiles.PeakedMinigame)
+        {
+            GameManager.Instance.MapManager.map[x, y] = MapManager.Tiles.ExploredMinigame;
+            GameManager.Instance.MapManager.PlayMinigame();
         }
     }
 
 
+
+    //////////////////////////////////////////////////////
+    ///////////////////// FUNCTIONS //////////////////////
+    //////////////////////////////////////////////////////
+
+    public void SkipPlayer()
+    {
+        GameManager.Instance.MapManager.NextPlayer();
+        mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
+        mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].rerolls);
+    }
 }

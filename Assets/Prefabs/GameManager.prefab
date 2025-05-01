@@ -101,7 +101,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18447aa89bf901438e5ed2e5f07cbb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   hostId: 0
   currentPlayer: -1
   moves: 0
   playing: 0
+  currentState: 0
+  minigameSceneNames:
+  - MicrophoneMinigame
+  - LaserMinigame
+  - ClimbingMinigame
+  - LeversMinigame
