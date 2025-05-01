@@ -40,7 +40,6 @@ public class MapCoordinator : MonoBehaviour
                 break;
             case MapManager.States.Moving:
                 GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
-                Debug.Log("rolling trigger in coordinator");
                 EventManager.TriggerEvent("Rolling");
                 break;
         }

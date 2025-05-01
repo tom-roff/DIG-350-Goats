@@ -83,6 +83,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             hostUI.SetActive(false);
             playerBackground.GetComponent<Image>().color = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerColor.colorRGB;
             playerName.text = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerName.ToString();
+            GameObject.Find("Leaderboard").SetActive(false);
             host = false;
         }
     }
@@ -343,9 +344,12 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.moves--;
             mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
 
-            if (GameManager.Instance.MapManager.moves < 2) // i have no idea why this is working instead of < 1
+            if (GameManager.Instance.MapManager.moves < 1) // i have no idea why this is working instead of < 1
             {
-                EventManager.TriggerEvent("NextState");
+                GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
+                Rolling();
+
+                // EventManager.TriggerEvent("NextState");
             }
         }
     }
