@@ -344,7 +344,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.moves--;
             mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
 
-            if (GameManager.Instance.MapManager.moves < 1) // i have no idea why this is working instead of < 1
+            if (GameManager.Instance.MapManager.moves < 1) 
             {
                 GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
                 Rolling();
