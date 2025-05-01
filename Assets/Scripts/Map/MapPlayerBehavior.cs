@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using Unity.Netcode.Transports.UTP;
+using TMPro;
 
 public class MapPlayerBehavior : NetworkBehaviour
 {
@@ -16,6 +17,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public GameObject playerUI;
     [SerializeField] public MapUI mapUI;
     [SerializeField] public GameObject playerBackground;
+    [SerializeField] public TMP_Text playerName;
 
     [Header("Status")]
     public ulong currentPlayerId = ulong.MinValue;
@@ -68,6 +70,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         {
             hostUI.SetActive(false);
             playerBackground.GetComponent<Image>().color = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerColor.colorRGB;
+            playerName.text = GameManager.Instance.OurNetwork.playerInfoList[(int)clientId].playerName.ToString();
             host = false;
         }
     }
@@ -149,6 +152,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         playerInstance.transform.SetParent(GameManager.Instance.MapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = player.color;
+        playerInstance.GetComponentInChildren<TMP_Text>().text = player.name.Substring(0,1);
         player.body = playerInstance;
         player.SetPosition(startPosition);
         MapHelpers.CheckPosition(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, (int)startPosition.x, (int)startPosition.y);
@@ -168,6 +172,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             return;
         }
 
+        Debug.Log("rolling");
         GameManager.Instance.MapManager.NextPlayer();
         mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
         mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
@@ -326,7 +331,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             GameManager.Instance.MapManager.moves--;
             mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
 
-            if (GameManager.Instance.MapManager.moves < 1)
+            if (GameManager.Instance.MapManager.moves < 2) // i have no idea why this is working instead of < 1
             {
                 EventManager.TriggerEvent("NextState");
             }
@@ -348,8 +353,8 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
     }
 
-   
-    
+
+
     //////////////////////////////////////////////////////
     ///////////////////// FUNCTIONS //////////////////////
     //////////////////////////////////////////////////////
@@ -359,5 +364,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         GameManager.Instance.MapManager.NextPlayer();
         mapUI.DisplayText(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + " rolled a " + GameManager.Instance.MapManager.moves);
         mapUI.SetMovesText(GameManager.Instance.MapManager.moves);
+        SendCurrentPlayerRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].playerID);
+        CheckRerollsRpc(GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].rerolls);
     }
 }
