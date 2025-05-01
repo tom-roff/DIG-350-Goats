@@ -20,6 +20,8 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public TMP_Text playerName;
 
     [Header("Status")]
+    public PlayerUIEntry[] leaderboardEntries = new PlayerUIEntry[6];
+    
     public ulong currentPlayerId = ulong.MinValue;
     public bool rerollAvailable = false;
     public bool host;
@@ -56,6 +58,16 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         CheckHost();
         base.OnNetworkSpawn();
+        SetLeaderboard();
+    }
+
+    void SetLeaderboard(){
+
+        for(int i = 1; i < GameManager.Instance.OurNetwork.playerInfoList.Count; i++){
+            leaderboardEntries[i-1].gameObject.SetActive(true);
+            //...this code might be inefficient.
+            leaderboardEntries[i-1].SetNameAndColorAndPoints(GameManager.Instance.OurNetwork.playerInfoList[i].playerName.ToString(), GameManager.Instance.OurNetwork.playerInfoList[i].playerColor, GameManager.Instance.OurNetwork.playerInfoList[i].treasuresCollected);
+        }
     }
 
     void CheckHost()

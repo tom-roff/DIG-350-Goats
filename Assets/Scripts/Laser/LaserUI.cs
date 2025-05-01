@@ -19,6 +19,17 @@ public class LaserUI : NetworkBehaviour
         hostId = NetworkManager.Singleton.LocalClientId;
 
         ourNetwork = GameManager.Instance.OurNetwork;
+
+        SetColors();
+    }
+
+    void SetColors(){
+        UnityEngine.UI.Image[] colorTexts = scoresParent.GetComponentsInChildren<UnityEngine.UI.Image>();
+
+        for(int i = 1; i < GameManager.Instance.OurNetwork.playerInfoList.Count; i++){
+            colorTexts[i-1].gameObject.SetActive(true);
+            colorTexts[i-1].color = ourNetwork.playerInfoList[i].playerColor.colorRGB;
+        }
     }
 
     void Update()
