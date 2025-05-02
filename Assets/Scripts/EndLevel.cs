@@ -16,7 +16,7 @@ public class EndLevel : NetworkBehaviour
     {
         hostId = NetworkManager.Singleton.LocalClientId;
         ourNetwork = GameManager.Instance.OurNetwork;
-        UpdateUI();
+        Invoke("UpdateUI", 0.1f);
         Invoke("BackToMap", 10f);
     }
 
@@ -31,6 +31,7 @@ public class EndLevel : NetworkBehaviour
             {
                 continue;
             }
+            Debug.Log($"Player: {clientId}, place: {playerIndex + 1}");
             scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}";
             playerIndex++;
         }

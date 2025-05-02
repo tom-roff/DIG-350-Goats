@@ -24,7 +24,6 @@ public class Laser : NetworkBehaviour
         {
             if (hitObject.CompareTag("Player"))
             {
-                Debug.Log("hit player");
                 ulong playerId = hitObject.OwnerClientId;
                 
                 hitObject.Despawn(true);

@@ -2,21 +2,18 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Netcode;
 
-public class LaserManager : NetworkBehaviour
+public class LaserManager : ManagerBase
 {
     // UI Elements
     [SerializeField] private GameObject hostUI;
-    [SerializeField] private GameObject directionsUI;
-    [SerializeField] private GameObject readyButton;
-    [SerializeField] private GameObject endUI;
     [SerializeField] private GameObject deathUI;
+    [SerializeField] private GameObject endUI;
     [SerializeField] private EndLevel endLevel;
 
     // Player and game state data
     public List<ulong> leaderboard = new List<ulong>();
     public Dictionary<ulong, int> scores = new Dictionary<ulong, int>();
     public Dictionary<ulong, bool> alive = new Dictionary<ulong, bool>();
-    private Dictionary<ulong, bool> playersReady = new Dictionary<ulong, bool>();
 
     // Laser spawning
     public GameObject laserPrefab;
@@ -30,7 +27,6 @@ public class LaserManager : NetworkBehaviour
 
     // Game timing and state
     private ulong hostId;
-    private bool gameActive = false;
     private float gameTimer = 0f;
     private bool suddenDeathActive = false;
     public float suddenDeathStartTime = 20f;
@@ -40,6 +36,9 @@ public class LaserManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        // Call base implementation first to set up ReadySystem
+        base.OnNetworkSpawn();
+        
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
         if (IsServer)
@@ -64,24 +63,21 @@ public class LaserManager : NetworkBehaviour
             }
         }
 
-        gameTimer = 0f;
-        suddenDeathTimer = 0f;
         SetNextSpawnTime();
-
+        
         hostUI.SetActive(false);
-        directionsUI.SetActive(false);
-        endUI.SetActive(false);
         deathUI.SetActive(false);
+        endUI.SetActive(false);
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
     private void InitializeClient()
     {
-        directionsUI.SetActive(true);
         hostUI.SetActive(false);
-        endUI.SetActive(false);
         deathUI.SetActive(false);
+        endUI.SetActive(false);
+        readySystem.GetDirectionsUI().SetActive(true);
     }
 
     private void OnClientConnected(ulong clientId)
@@ -96,19 +92,34 @@ public class LaserManager : NetworkBehaviour
     {
         scores[clientId] = 0;
         alive[clientId] = true;
-        playersReady[clientId] = false;
     }
 
-    private void Update()
+    protected override void OnGameStart()
     {
-        if (!IsServer) return;
+        Debug.Log("On game start called");
         
-        if (!gameActive)
-        {
-            CheckAllPlayersReady();
-            return;
-        }
+        // Initialize game state
+        gameTimer = 0f;
+        suddenDeathTimer = 0f;
+        
+        if (hostUI != null)
+            hostUI.SetActive(true);
+    }
 
+    protected override void OnGameEnd()
+    {
+        leaderboard.Reverse();
+        endLevel.leaderboard = leaderboard;
+        
+        if (endUI != null)
+            endUI.SetActive(true);
+        if (hostUI != null)
+            hostUI.SetActive(false);
+    }
+
+    // Replace Update with GameUpdate for game-specific logic
+    protected override void GameUpdate()
+    {
         UpdateGameTimers();
         HandleLaserSpawning();
     }
@@ -141,63 +152,6 @@ public class LaserManager : NetworkBehaviour
             SpawnLaser();
             SetNextSpawnTime();
         }
-    }
-
-    public void PlayerReady()
-    {
-        PlayerReadyRpc(NetworkManager.Singleton.LocalClientId);
-        readyButton.SetActive(false);
-    }
-
-    [Rpc(SendTo.Server)]
-    private void PlayerReadyRpc(ulong clientId)
-    {
-        if (playersReady.ContainsKey(clientId))
-        {
-            playersReady[clientId] = true;
-        }
-    }
-
-    private void CheckAllPlayersReady()
-    {
-        bool allReady = true;
-        foreach (var kvp in playersReady)
-        {
-            if (!kvp.Value)
-            {
-                allReady = false;
-                break;
-            }
-        }
-
-        if (allReady && playersReady.Count > 0)
-        {
-            StartGame();
-        }
-    }
-
-    private void StartGame()
-    {
-        gameActive = true;
-        gameTimer = 0f;
-
-        if (directionsUI != null)
-            directionsUI.SetActive(false);
-        if (hostUI != null)
-            hostUI.SetActive(true);
-
-        StartGameRpc();
-    }
-
-    [Rpc(SendTo.NotServer)]
-    private void StartGameRpc()
-    {
-        if (IsServer) return;
-
-        if (directionsUI != null)
-            directionsUI.SetActive(false);
-        if (hostUI != null)
-            hostUI.SetActive(true);
     }
 
     private void ActivateSuddenDeath()
@@ -270,12 +224,9 @@ public class LaserManager : NetworkBehaviour
         }
     }
 
-    private void EndGame()
+    // Changed to protected to explicitly match the base class method
+    protected override void EndGame()
     {
-        leaderboard.Reverse();
-        endLevel.leaderboard = leaderboard;
-        endUI.SetActive(true);
-        hostUI.SetActive(false);
-        gameActive = false;
+        base.EndGame();
     }
 }

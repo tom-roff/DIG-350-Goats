@@ -27,7 +27,9 @@ public class LaserPlayerMovement : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        gameObject.GetComponent<Renderer>().material = colorMaterials[NetworkManager.Singleton.LocalClientId - 1];
+        if (!IsServer){
+            gameObject.GetComponent<Renderer>().material = colorMaterials[NetworkManager.Singleton.LocalClientId - 1];
+        }
         ConfigureCollisions();
     }
     
