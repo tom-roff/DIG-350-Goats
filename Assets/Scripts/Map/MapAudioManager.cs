@@ -5,7 +5,7 @@ public class MapAudioManager : MonoBehaviour
     public static AudioSource stepAudio;
     public static AudioSource collectItemAudio;
 
-    void Awake(){
+    void OnEnable(){
         AudioSource[] audioSources = GetComponents<AudioSource>();
         foreach (AudioSource source in audioSources)
         {

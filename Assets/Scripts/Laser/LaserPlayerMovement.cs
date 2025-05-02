@@ -19,6 +19,7 @@ public class LaserPlayerMovement : NetworkBehaviour
     [SerializeField] private Rigidbody rb;
     private float deadzone = 0.1f;
     private float maxTilt = 0.6f;
+    [SerializeField] private Material[] colorMaterials = new Material[6];
 
     private void Start() {
         if (!rb) rb = GetComponent<Rigidbody>();
@@ -26,6 +27,9 @@ public class LaserPlayerMovement : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (!IsServer){
+            gameObject.GetComponent<Renderer>().material = colorMaterials[NetworkManager.Singleton.LocalClientId - 1];
+        }
         ConfigureCollisions();
     }
     

@@ -27,12 +27,6 @@ public class MapPlayer
         rerolls = 0;
     }
 
-    // public MapPlayer(ulong playerID, Vector2 position)
-    // {
-    //     this.playerID = playerID;
-    //     this.position = position;
-    // }
-
     public void SetPosition(Vector2 position)
     {
         this.position = position;
@@ -45,6 +39,12 @@ public class MapPlayer
 
     public void AddRerolls(int inc)
     {
+        if (rerolls + inc < 0)
+        {
+            rerolls = 0;
+            return;
+        }
+            
         rerolls += inc;
     }
 

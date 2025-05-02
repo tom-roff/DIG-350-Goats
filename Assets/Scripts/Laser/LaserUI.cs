@@ -6,6 +6,7 @@ public class LaserUI : NetworkBehaviour
 {
     [SerializeField] private LaserManager laserManager;
     [SerializeField] private GameObject scoresParent;
+    [SerializeField] private UnityEngine.UI.Image[] colorTexts;
     private OurNetwork ourNetwork;
     private ulong hostId;
 
@@ -19,6 +20,17 @@ public class LaserUI : NetworkBehaviour
         hostId = NetworkManager.Singleton.LocalClientId;
 
         ourNetwork = GameManager.Instance.OurNetwork;
+
+        SetColors();
+    }
+
+    void SetColors(){
+        
+
+        for(int i = 1; i < GameManager.Instance.OurNetwork.playerInfoList.Count; i++){
+            colorTexts[i-1].gameObject.SetActive(true);
+            colorTexts[i-1].color = ourNetwork.playerInfoList[i].playerColor.colorRGB;
+        }
     }
 
     void Update()

@@ -478,7 +478,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &270901909
 RectTransform:
   m_ObjectHideFlags: 0
@@ -799,7 +799,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Heist \nHustle"
+  m_text: Pillage Party
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fd9ecfa2b0a6e7941a1570b3a35f2364, type: 2}
   m_sharedMaterial: {fileID: -1762255795043717151, guid: fd9ecfa2b0a6e7941a1570b3a35f2364, type: 2}
@@ -1916,7 +1916,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &699908813
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3228,6 +3228,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 1966683839}
   nameTextObj: {fileID: 472937036}
+  pointsObj: {fileID: 0}
 --- !u!114 &1054107000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3867,6 +3868,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 1786025592}
   nameTextObj: {fileID: 1609885328}
+  pointsObj: {fileID: 0}
 --- !u!1 &1163449855
 GameObject:
   m_ObjectHideFlags: 0
@@ -4752,6 +4754,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 1240479817}
   nameTextObj: {fileID: 1633329535}
+  pointsObj: {fileID: 0}
 --- !u!1 &1404354773
 GameObject:
   m_ObjectHideFlags: 0
@@ -4872,6 +4875,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 466547181}
   nameTextObj: {fileID: 791411772}
+  pointsObj: {fileID: 0}
 --- !u!1 &1413059146
 GameObject:
   m_ObjectHideFlags: 0
@@ -6189,6 +6193,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 1626288665}
   nameTextObj: {fileID: 588136235}
+  pointsObj: {fileID: 0}
 --- !u!1 &1736458728
 GameObject:
   m_ObjectHideFlags: 0
@@ -7355,6 +7360,7 @@ MonoBehaviour:
   name: 
   colorImage: {fileID: 927342005}
   nameTextObj: {fileID: 1333678662}
+  pointsObj: {fileID: 0}
 --- !u!1 &2049350399
 GameObject:
   m_ObjectHideFlags: 0
