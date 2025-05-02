@@ -10,6 +10,7 @@ public class MapGeneration : MonoBehaviour
     float tileHeight;
     int mapWidth;
     int mapHeight;
+    MapManager mapManager;
 
     [Header("References")]
     [SerializeField] public GameObject tileParent;
@@ -22,12 +23,13 @@ public class MapGeneration : MonoBehaviour
 
     void OnEnable()
     {
-        mapWidth = GameManager.Instance.MapManager.MapWidth();
-        mapHeight = GameManager.Instance.MapManager.MapHeight();
+        mapManager = GameManager.Instance.MapManager;
+        mapWidth = mapManager.MapWidth();
+        mapHeight = mapManager.MapHeight();
         tileWidth = (1 - (xMargin * 2)) / mapWidth;
         tileHeight = (1 - (yMargin * 2)) / mapHeight;
 
-        GameManager.Instance.MapManager.tiles = new GameObject[mapHeight, mapWidth];
+        mapManager.tiles = new GameObject[mapHeight, mapWidth];
         EventManager.StartListening("Building", Building);
     }
 
@@ -48,7 +50,7 @@ public class MapGeneration : MonoBehaviour
         {
             for (int j = 0; j < mapWidth; j++)
             {
-                if (GameManager.Instance.MapManager.map[i, j] != MapManager.Tiles.Wall)
+                if (mapManager.map[i, j] != MapManager.Tiles.Wall)
                 {
                     float xStart = xMargin + (j * tileWidth);
                     float yStart = yMargin + (i * tileHeight);
@@ -60,9 +62,9 @@ public class MapGeneration : MonoBehaviour
                     tileInstance.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
                     tileInstance.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
                     tileInstance.name = i + ", " + j;
-                    GameManager.Instance.MapManager.tiles[i, j] = tileInstance;
+                    mapManager.tiles[i, j] = tileInstance;
 
-                    MapHelpers.ChangeColor(GameManager.Instance.MapManager.map, GameManager.Instance.MapManager.tiles, new Vector2(i, j));
+                    MapHelpers.ChangeColor(mapManager.map, mapManager.tiles, new Vector2(i, j));
                 }
             }
         }

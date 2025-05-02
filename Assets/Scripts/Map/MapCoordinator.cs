@@ -2,9 +2,14 @@ using UnityEngine;
 
 public class MapCoordinator : MonoBehaviour
 {
+    MapManager mapManager;
+    OurNetwork ourNetwork;
+
     void OnEnable()
     {
         EventManager.StartListening("NextState", NextState);
+        mapManager = GameManager.Instance.MapManager;
+        ourNetwork = GameManager.Instance.OurNetwork;
     }
 
     void OnDisable()
@@ -14,32 +19,32 @@ public class MapCoordinator : MonoBehaviour
 
     void Start()
     {
-        GameManager.Instance.MapManager.currentState = MapManager.States.Building;
+        mapManager.currentState = MapManager.States.Building;
         EventManager.TriggerEvent("Building");
     }
 
     void NextState()
     {
-        switch (GameManager.Instance.MapManager.currentState)
+        switch (mapManager.currentState)
         {
             case MapManager.States.None:
-                GameManager.Instance.MapManager.currentState = MapManager.States.Building;
+                mapManager.currentState = MapManager.States.Building;
                 EventManager.TriggerEvent("Building");
                 break;
             case MapManager.States.Building:
-                GameManager.Instance.MapManager.currentState = MapManager.States.Preparing;
+                mapManager.currentState = MapManager.States.Preparing;
                 EventManager.TriggerEvent("Preparing");
                 break;
             case MapManager.States.Preparing:
-                GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
+                mapManager.currentState = MapManager.States.Rolling;
                 EventManager.TriggerEvent("Rolling");
                 break;
             case MapManager.States.Rolling:
-                GameManager.Instance.MapManager.currentState = MapManager.States.Moving;
+                mapManager.currentState = MapManager.States.Moving;
                 EventManager.TriggerEvent("Moving");
                 break;
             case MapManager.States.Moving:
-                GameManager.Instance.MapManager.currentState = MapManager.States.Rolling;
+                mapManager.currentState = MapManager.States.Rolling;
                 EventManager.TriggerEvent("Rolling");
                 break;
         }

@@ -25,9 +25,8 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     [Header("Canvas Objects")]
     [SerializeField] public GameObject tutorialObjects;
-    [SerializeField] public TMP_Text timeText;
     [SerializeField] public TMP_Text finalScoreText;
-    [SerializeField] public GameObject background;
+    [SerializeField] public Light indicatorLight;
 
     [Header("Host")]
     public bool host = false;
@@ -36,13 +35,21 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     public Dictionary<int, float> finalScores = new Dictionary<int, float>();
     public int scoresReceived = 0;
+    private GameObject[] loudnessMeters;
+    [SerializeField] GameObject loudnessMeterPrefab;
+    [SerializeField] GameObject meterLocation;
+
+    int clientId;
+    
 
 
 
 
     public override void OnNetworkSpawn()
     {
-        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count-1;
+        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count - 1;
+        clientId = (int)NetworkManager.Singleton.LocalClientId;
+        loudnessMeters = new GameObject[playerCount];
         CheckHost();
         ChangeColor();
         base.OnNetworkSpawn();
@@ -53,11 +60,62 @@ public class MicrophoneBehavior : NetworkBehaviour
         ulong clientId = NetworkManager.Singleton.LocalClientId;
         if (clientId == GameManager.Instance.MapManager.hostId) // main screen
         {
-            tutorialObjects.SetActive(false);
+            tutorialObjects.transform.Find("Start").gameObject.SetActive(false);
             host = true;
+            BuildMeters();
         }
         else
             host = false;
+    }
+
+    void BuildMeters()
+    {
+        float anchorOffset = 1f / (float)playerCount;
+        //build all the meter things
+        for (int i = 0; i < playerCount; i++)
+        {
+            GameObject newMeter = Instantiate(loudnessMeterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            newMeter.transform.SetParent(meterLocation.transform);
+            newMeter.GetComponent<RectTransform>().anchorMin = new Vector2(anchorOffset * (float)i, 0);
+            newMeter.GetComponent<RectTransform>().anchorMax = new Vector2(anchorOffset * (float)(i + 1), 0);
+            newMeter.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
+            newMeter.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
+            newMeter.GetComponent<Image>().color = GameManager.Instance.OurNetwork.playerInfoList[i + 1].playerColor.colorRGB;
+
+            loudnessMeters[i] = newMeter;
+        }
+    }
+
+    public void SendReady()
+    {
+        if (!listening && !host)
+        {
+            SendReadyRpc();
+            tutorialObjects.transform.Find("Start").gameObject.SetActive(false);
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SendReadyRpc()
+    {
+        readyCount++;
+        if (playerCount != 0 && readyCount == playerCount)
+        {
+            StartGameRpc();
+            tutorialObjects.SetActive(false);
+            listening = true;
+            float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
+            Invoke("SwitchLoudness", timeUntilSwitch);
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void StartGameRpc()
+    {
+        tutorialObjects.SetActive(false);
+        listening = true;
+        timeIncorrect = 0f;
+        Invoke("StopListening", listeningTime);
     }
 
     void FixedUpdate()
@@ -80,7 +138,6 @@ public class MicrophoneBehavior : NetworkBehaviour
             if (loudness > quietThreshold)
             {
                 timeIncorrect += deltaTime;
-                SendTimeRpc(deltaTime);
             }
         }
         else
@@ -88,39 +145,24 @@ public class MicrophoneBehavior : NetworkBehaviour
             if (loudness < loudThreshold)
             {
                 timeIncorrect += deltaTime;
-                SendTimeRpc(deltaTime);
             }
         }
 
+        SendLoudnessRpc(clientId, loudness);
+
 
     }
 
-    [Rpc(SendTo.Server)]
-    public void SendTimeRpc(float deltaTime)
-    {
-        timeIncorrect += deltaTime;
-        timeText.text = "Total: " + timeIncorrect;
-        SendTimeNotServerRpc(timeIncorrect);
-    }
-
-    [Rpc(SendTo.NotServer)]
-    public void SendTimeNotServerRpc(float totalTime)
-    {
-        timeText.text = "Total: " + totalTime;
-    }
 
     [Rpc(SendTo.Server)]
-    public void SendReadyRpc()
+    public void SendLoudnessRpc(int player, float loudness)
     {
-        readyCount++;
-        if (playerCount != 0 && readyCount == playerCount)
-        {
-            StartGameRpc();
-            listening = true;
-            float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
-            Invoke("SwitchLoudness", timeUntilSwitch);
-        }
+        //loudness meter scale adjustment 
+        Vector2 tempVect = loudnessMeters[player - 1].GetComponent<RectTransform>().anchorMax;
+        loudnessMeters[player - 1].GetComponent<RectTransform>().anchorMax = new Vector2(tempVect.x, loudness);
     }
+
+    
 
 
     public void SwitchLoudness()
@@ -136,7 +178,7 @@ public class MicrophoneBehavior : NetworkBehaviour
             ChangeColor();
             SwitchRpc();
 
-            float timeUntilSwitch = UnityEngine.Random.Range(2f, 5f);
+            float timeUntilSwitch = UnityEngine.Random.Range(.5f, 4f);
             Invoke("SwitchLoudness", timeUntilSwitch);
         }
 
@@ -154,24 +196,10 @@ public class MicrophoneBehavior : NetworkBehaviour
         ChangeColor();
     }
 
-    [Rpc(SendTo.NotServer)]
-    public void StartGameRpc()
-    {
-        listening = true;
-        timeIncorrect = 0f;
-        Invoke("StopListening", listeningTime);
-    }
+    
 
 
-    public void StartListening()
-    {
-        if (!listening && !host)
-        {
-            SendReadyRpc();
-            tutorialObjects.SetActive(false);
-
-        }
-    }
+   
 
     [Rpc(SendTo.Server)]
     public void StopListeningRpc()
@@ -182,7 +210,7 @@ public class MicrophoneBehavior : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void SendFinalScoreRpc(int player, float score)
     {
-        finalScores.Add(player, score);
+        finalScores.Add(player, listeningTime-score); //time correct? idk 
         scoresReceived++;
         if (scoresReceived == playerCount)
         {
@@ -207,7 +235,6 @@ public class MicrophoneBehavior : NetworkBehaviour
         }
 
     
-        timeText.text = "";
         finalScoreText.text = finalResults;
         GameManager.Instance.MapManager.TimedReturnToMap();
 
@@ -225,9 +252,9 @@ public class MicrophoneBehavior : NetworkBehaviour
     void ChangeColor()
     {
         if (!beLoud)
-            background.GetComponent<Image>().color = Color.red;
+            indicatorLight.color = Color.red;
         else
-            background.GetComponent<Image>().color = Color.green;
+            indicatorLight.color = Color.green;
 
     }
 
