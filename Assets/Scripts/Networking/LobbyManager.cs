@@ -30,12 +30,12 @@ public class LobbyManager : MonoBehaviour
 
     private void Start()
     {
-        possibleColors.Add(new PlayerColor(colorEnumerator.DarkBlue, new Color32 (25, 25, 112, 255), colorMats[0]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.DarkGreen, new Color32 (0, 100, 0, 255), colorMats[1]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Fuchsia, new Color32 (190, 0, 255, 255), colorMats[2]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color32 (255, 215, 0, 255), colorMats[3]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color32 (30, 156, 255, 255), colorMats[4]));
-        possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color32 (0, 225, 0, 255), colorMats[5]));
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkBlue, new Color32 (25, 25, 112, 255)));
+        possibleColors.Add(new PlayerColor(colorEnumerator.DarkGreen, new Color32 (0, 100, 0, 255)));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Fuchsia, new Color32 (190, 0, 255, 255)));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Gold, new Color32 (255, 215, 0, 255)));
+        possibleColors.Add(new PlayerColor(colorEnumerator.LightBlue, new Color32 (30, 156, 255, 255)));
+        possibleColors.Add(new PlayerColor(colorEnumerator.Lime, new Color32 (0, 225, 0, 255)));
 
     }
 

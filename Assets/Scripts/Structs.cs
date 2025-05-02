@@ -10,7 +10,7 @@ public struct PlayerColor : INetworkSerializable{
     public colorEnumerator colorEnum;
     public Color32 colorRGB;
 
-    public PlayerColor(colorEnumerator enumer, Color rgb, Material colorMat){
+    public PlayerColor(colorEnumerator enumer, Color rgb){
         colorEnum = enumer;
         colorRGB = rgb;
     }
