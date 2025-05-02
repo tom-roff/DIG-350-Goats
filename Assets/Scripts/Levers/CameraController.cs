@@ -1,10 +1,12 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 public class CameraController : NetworkBehaviour
 {
-    public OurNetwork network;
+    private OurNetwork network;
     public VibrationManager vibration;
     public GameEndManager gameEndManager;
     private ulong playerId;
@@ -13,30 +15,83 @@ public class CameraController : NetworkBehaviour
     public Transform[] playerCameraPositions;
     public Transform[] hostCameraPositions;
 
+    public GameObject readyUpScreen;
+    public GameObject readyButton;
+    private int readyCount = 0;
+    private int playerCount = 0;
+    public TMP_Text readyStatusText;
+
     private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
 
     void Start()
     {
         network = GameManager.Instance.OurNetwork;
-
-        AssignLeverOrder();
-
         playerId = NetworkManager.Singleton.LocalClientId;
 
+        StartTutorial();
+        AssignLeverOrder();
         AssignCamera();
+    }
 
-        StartVibrationSequence();
+    void StartTutorial()
+    {
+        playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count - 1;
+        Debug.Log($"Player Count = {playerCount}");
+
+        if (!IsServer)
+        {
+            readyUpScreen.SetActive(true);
+            readyButton.SetActive(true);
+
+            // Hook up the button click listener
+            readyButton.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                Debug.Log("ReadyButton clicked");
+                SendReady();  // Call local function
+                readyButton.SetActive(false);  // Disable button after clicking
+            });
+        }
+    }
+
+    public void SendReady()
+    {
+        if (!IsServer)
+        {
+            SendReadyRpc();
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SendReadyRpc()
+    {
+        readyCount++;
+
+        if (readyStatusText != null)
+        {
+            readyStatusText.text = $"Players Ready: {readyCount}/{playerCount}";
+        }
+
+        if (readyCount == playerCount && playerCount > 0)
+        {
+            readyUpScreen.SetActive(false);
+            HideReadyUpScreenClientRpc();
+            StartVibrationSequence();       
+        }
+    }
+
+    [ClientRpc]
+    private void HideReadyUpScreenClientRpc()
+    {
+        readyUpScreen.SetActive(false);
     }
 
     void AssignLeverOrder() 
     {
         int numPlayers = network.playerInfoList.Count - 1;
         leverOrder = new int[numPlayers];
-        Debug.Log($"Num players = {numPlayers}");
         for (int i = 0; i < numPlayers; i++)
         {
-            Debug.Log("Current Player = " + (i + 1).ToString());
             leverOrder[i] = i + 1; // Players start from 1 (since 0 is host)
         }
     }
@@ -46,7 +101,6 @@ public class CameraController : NetworkBehaviour
         if(playerId == 0) // host camera position
         {
             int numPlayers = NetworkManager.Singleton.ConnectedClientsIds.Count - 1;
-            Debug.Log(numPlayers);
             Transform desiredHostPos = hostCameraPositions[numPlayers - 2];
             gameCamera.transform.position = desiredHostPos.position;
             return;
@@ -82,6 +136,7 @@ public class CameraController : NetworkBehaviour
     // Called by the lever when it is pulled correctly
     public void OnLeverPulled(int pulledLeverIndex)
     {
+        Debug.Log($"Pulled Lever Index = {pulledLeverIndex} and current lever Index = {currentLeverIndex}");
         if (pulledLeverIndex == leverOrder[currentLeverIndex])
         {
             Debug.Log($"Lever {pulledLeverIndex} pulled correctly!");
