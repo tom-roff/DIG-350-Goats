@@ -24,7 +24,7 @@ public class MapUI : MonoBehaviour
 
     public void SetMovesText(int moves)
     {
-        movesText.text = "Moves: " + moves;
+        movesText.text = GameManager.Instance.MapManager.players[GameManager.Instance.MapManager.currentPlayer].name + ": " + moves + " moves";
     }
 
     public void DisableRerolling()
