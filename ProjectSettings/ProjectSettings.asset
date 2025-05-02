@@ -140,7 +140,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1.6
+  bundleVersion: 0.1.7
   preloadedAssets:
   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   metroInputSource: 0
@@ -173,7 +173,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 6
+  AndroidBundleVersionCode: 7
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
@@ -267,7 +267,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 2
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: /Users/owenmundy/Documents/_code/Unity/_Teaching/student-projects-2025/_signing-keys/android-keystore.keystore
+  AndroidKeystoreName: /Users/owmundy/Documents/_code/Unity/_Teaching/student-projects-dig350/_signing-keys/android-keystore.keystore
   AndroidKeyaliasName: pillagepartyandroidkey
   AndroidEnableArmv9SecurityFeatures: 0
   AndroidEnableArm64MTE: 0
