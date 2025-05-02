@@ -6,16 +6,7 @@ using System;
 
 public class VibrationManager : NetworkBehaviour
 {
-    private OurNetwork network;
     public CountdownTimer timer;
-
-    public GameObject introText;
-
-
-    void Start()
-    {
-        network = GameManager.Instance.OurNetwork;
-    }
 
     public void TriggerVibration(ulong clientId)
     {
@@ -76,7 +67,6 @@ public class VibrationManager : NetworkBehaviour
         yield return new WaitForSeconds(totalWaitTime);
 
         Debug.Log("Vibration sequence complete. Players should now pull levers.");
-        introText.SetActive(false);
 
         if (timer != null)
         {
