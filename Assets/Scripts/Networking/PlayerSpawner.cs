@@ -40,7 +40,20 @@ public class PlayerSpawner : NetworkBehaviour
         //Pretty sure this should be clientId - 1 because clientId starts at 0 (host) but we dont spawn the host.
         playerInstance.GetComponent<Renderer>().material = colorMaterials[(int)clientId - 1];
         NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
-        
         networkObject.SpawnWithOwnership(clientId);
+        NetworkObjectReference objRef = new NetworkObjectReference(playerInstance.GetComponent<NetworkObject>());
+        SetCapsuleColorRpc((int)clientId, objRef);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    void SetCapsuleColorRpc(int clientId, NetworkObjectReference instance){
+
+        if (instance.TryGet(out NetworkObject targetNetObj))
+            {
+                GameObject targetGO = targetNetObj.gameObject;
+                targetGO.GetComponent<Renderer>().material = colorMaterials[clientId - 1];
+                // Apply color change or other logic here
+            }
+
     }
 }
