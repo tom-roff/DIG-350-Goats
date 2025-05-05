@@ -210,7 +210,7 @@ public class MicrophoneBehavior : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void SendFinalScoreRpc(int player, float score)
     {
-        finalScores.Add(player, listeningTime-score); //time correct? idk 
+        finalScores.Add(player, score); 
         scoresReceived++;
         if (scoresReceived == playerCount)
         {
@@ -236,6 +236,7 @@ public class MicrophoneBehavior : NetworkBehaviour
 
     
         finalScoreText.text = finalResults;
+        meterLocation.SetActive(false);
         GameManager.Instance.MapManager.TimedReturnToMap();
 
     }
