@@ -19,15 +19,17 @@ public class DiceManager : MonoBehaviour
     public float failCounter = 0;
 
     [Header("Motion")]
+    public bool useGyro = true;
     public Vector3 accel;
     public float accelThreshold = 3;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        message.text = $"Click to roll.";
-        dice[0].rb.MovePosition(startPos);
-        dice[1].rb.MovePosition(startPos);
+        UpdateMessage("Click to roll.");
+        foreach (Dice d in dice)
+        {
+            d.rb.MovePosition(startPos);
+        }
         // Enable gyroscope and accelerometer
         Input.gyro.enabled = true;
     }
@@ -35,79 +37,93 @@ public class DiceManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.anyKeyDown)
-        {
+
+        if (!inMotion && Input.anyKeyDown)
             Throw();
-        }
 
-        accel = Input.acceleration;
-        if (!playerHasStartedGame && accel.x == 0)
+        // check / store sensor value 
+        if (useGyro)
         {
-            Input.gyro.enabled = true;
-            return;
+            accel = Input.acceleration;
+            if (!playerHasStartedGame && accel.x == 0)
+            {
+                Input.gyro.enabled = true;
+                return;
+            }
         }
 
+        if (useGyro && accel.x > accelThreshold || accel.y > accelThreshold || accel.z > accelThreshold)
+            Throw();
+
+        // check for fail
         if (inMotion && failCounter > 5)
         {
             Debug.Log("Fail! Reroll");
-            message.text = $"Bummer. Roll again.";
+            UpdateMessage("Bummer. Roll again.");
             return;
         }
-        if (!inMotion)
-        {
-            if (accel.x > accelThreshold || accel.y > accelThreshold || accel.z > accelThreshold)
-                Throw();
-        }
+
         // don't check roll until after after first roll
         if (!playerHasStartedGame)
             return;
 
-        if (HasStopped() && GroundCheck())
+        // don't check / change text if a roll is in progress
+        if (!inMotion) return;
+
+        // if dice has stopped and on ground
+        if (AllHaveStopped() && GroundCheck())
         {
             inMotion = false;
+            string msg = "Rolled";
             for (int i = 0; i < dice.Count; i++)
             {
                 diceResults[i] = dice[i].side;
+                if (i > 0)
+                    msg += $" and";
+                msg += $" {dice[i].side}";
             }
-            message.text = $"Rolled {dice[0].side} and {dice[1].side}";
+            UpdateMessage(msg);
         }
-        else if (HasStopped())
-        {
+        else
             failCounter += Time.deltaTime;
-        }
-        else if (GroundCheck())
-        {
-            failCounter += Time.deltaTime;
-        }
     }
 
-    public bool HasStopped()
+    public bool AllHaveStopped()
     {
-        return (
-            dice[0].rb.linearVelocity.magnitude < 0.02f
-            && dice[1].rb.linearVelocity.magnitude < 0.02f
-        );
+        bool result = true;
+        foreach (Dice d in dice)
+        {
+            if (d.rb.linearVelocity.magnitude > 0.02f)
+                result = false;
+        }
+        return result;
     }
 
     public bool GroundCheck()
     {
-        return dice[0].isGrounded && dice[1].isGrounded;
-    }
-
-    public bool FloorCheck()
-    {
-        return (
-            dice[0].boxCollider.bounds.Intersects(floor.bounds)
-            && dice[1].boxCollider.bounds.Intersects(floor.bounds)
-        );
+        bool result = true;
+        foreach (Dice d in dice)
+        {
+            if (!d.isGrounded)
+                result = false;
+        }
+        return result;
     }
 
     public void Throw()
     {
-        message.text = $"Rolling...";
+        UpdateMessage("Rolling...");
         // reset positions
-        dice[0].rb.MovePosition(throwPos + Vector3.left * -.5f);
-        dice[1].rb.MovePosition(throwPos + Vector3.right * -.5f);
+        if (dice.Count <= 1)
+        {
+            dice[0].rb.MovePosition(throwPos);
+        }
+        else if (dice.Count <= 2)
+        {
+            dice[0].rb.MovePosition(throwPos + Vector3.left * -.5f);
+            dice[1].rb.MovePosition(throwPos + Vector3.right * -.5f);
+        }
+
         for (int i = 0; i < dice.Count; i++)
         {
             // forward motion
@@ -124,5 +140,14 @@ public class DiceManager : MonoBehaviour
         playerHasStartedGame = true;
         inMotion = true;
         failCounter = 0;
+    }
+
+    void UpdateMessage(string str, bool append = false)
+    {
+        if (message == null) return;
+        if (append)
+            message.text += str;
+        else
+            message.text = str;
     }
 }
