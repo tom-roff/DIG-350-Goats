@@ -23,7 +23,7 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     [Header("Status")]
     public PlayerUIEntry[] leaderboardEntries = new PlayerUIEntry[6];
-    
+
     public ulong currentPlayerId = ulong.MinValue;
     public bool rerollAvailable = false;
     public bool host;
@@ -42,7 +42,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     void OnEnable()
     {
         mapManager = GameManager.Instance.MapManager;
-        ourNetwork = GameManager.Instance.OurNetwork;;
+        ourNetwork = GameManager.Instance.OurNetwork; ;
         mapWidth = mapManager.MapWidth();
         mapHeight = mapManager.MapHeight();
 
@@ -65,12 +65,12 @@ public class MapPlayerBehavior : NetworkBehaviour
         SetLeaderboard();
     }
 
-    void SetLeaderboard(){
+    void SetLeaderboard() {
 
-        for(int i = 1; i < ourNetwork.playerInfoList.Count; i++){
-            leaderboardEntries[i-1].gameObject.SetActive(true);
+        for (int i = 1; i < ourNetwork.playerInfoList.Count; i++) {
+            leaderboardEntries[i - 1].gameObject.SetActive(true);
             //...this code might be inefficient.
-            leaderboardEntries[i-1].SetNameAndColorAndPoints(ourNetwork.playerInfoList[i].playerName.ToString(), ourNetwork.playerInfoList[i].playerColor, ourNetwork.playerInfoList[i].treasuresCollected);
+            leaderboardEntries[i - 1].SetNameAndColorAndPoints(ourNetwork.playerInfoList[i].playerName.ToString(), ourNetwork.playerInfoList[i].playerColor, ourNetwork.playerInfoList[i].treasuresCollected);
         }
     }
 
@@ -137,14 +137,12 @@ public class MapPlayerBehavior : NetworkBehaviour
             {
                 InstantiatePlayer(startPosition, player);
             }
-            ArrangePlayersOnTile((int)startPosition.x, (int)startPosition.y);
         }
         else
         {
             foreach (var player in mapManager.players)
             {
                 InstantiatePlayer(player.position, player);
-                ArrangePlayersOnTile((int)player.position.x, (int)player.position.y);
             }
         }
     }
@@ -171,10 +169,11 @@ public class MapPlayerBehavior : NetworkBehaviour
         playerInstance.transform.SetParent(mapManager.tiles[(int)startPosition.x, (int)startPosition.y].transform);
         playerInstance.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
         playerInstance.GetComponent<Image>().color = player.color;
-        playerInstance.GetComponentInChildren<TMP_Text>().text = player.name.Substring(0,1);
+        playerInstance.GetComponentInChildren<TMP_Text>().text = player.name.Substring(0, 1);
         player.body = playerInstance;
         player.SetPosition(startPosition);
         MapHelpers.CheckPosition(mapManager.map, mapManager.tiles, (int)startPosition.x, (int)startPosition.y);
+        ArrangePlayersOnTile((int)startPosition.x, (int)startPosition.y);
     }
 
 
@@ -205,6 +204,8 @@ public class MapPlayerBehavior : NetworkBehaviour
         mapUI.SetMovesText(mapManager.moves);
         SendCurrentPlayerRpc(mapManager.players[mapManager.currentPlayer].playerID);
         SendRerolls();
+        Moving();
+        mapManager.currentState = MapManager.States.Moving;
     }
 
     [Rpc(SendTo.NotServer)]
@@ -234,17 +235,27 @@ public class MapPlayerBehavior : NetworkBehaviour
     void RerollRpc()
     {
         System.Random rnd = new System.Random();
-        mapManager.moves = rnd.Next(1, 7);
+        int nextMoves = rnd.Next(1, 7);
         MapPlayer currentPlayer = mapManager.players[mapManager.currentPlayer];
         currentPlayer.AddRerolls(-1);
-        mapUI.DisplayText("Rerolled moves: " + mapManager.moves);
-        mapUI.SetMovesText(mapManager.moves);
+        if (nextMoves > mapManager.moves)
+        {
+            mapManager.moves = nextMoves;
+            mapUI.DisplayText("Rerolled moves: " + mapManager.moves);
+            mapUI.SetMovesText(mapManager.moves);
+        }
+        else
+        {
+            mapUI.DisplayText("Rerolled moves: " + nextMoves + " keeping " + mapManager.moves);
+        }
+        
 
         CheckRerollsRpc(currentPlayer.rerolls);
     }
 
     public void Reroll()
     {
+        if (!rerollAvailable) return;
         RerollRpc();
     }
 
@@ -273,8 +284,15 @@ public class MapPlayerBehavior : NetworkBehaviour
     public void Moving()
     {
         rerollAvailable = false;
+        DisableRerollingRpc();
     }
-    
+
+    [Rpc(SendTo.NotServer)]
+    private void DisableRerollingRpc()
+    {
+        mapUI.DisableRerolling();
+    }
+
     public void MoveRight()
     {
         if (currentPlayerId == clientId)
@@ -364,7 +382,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         }
     }
 
-     bool InBounds(int i, int j)
+    bool InBounds(int i, int j)
     {
         if (i > -1 && i < mapHeight && j > -1 && j < mapWidth) return true;
         return false;
@@ -383,14 +401,23 @@ public class MapPlayerBehavior : NetworkBehaviour
     {
         int playerCount = mapManager.players.Length;
         int playersOnTile = 0;
+        int[] playersOnTileRefs = new int[playerCount];
+
         for (int i = 0; i < playerCount; i++)
         {
             if (mapManager.players[i].position == new Vector2(x, y))
             {
-                // mapManager.players[i].body.transform.position = new Vector3(15f*playerCount, 0, 0);
-                // i have not idea why this line is making them go to a crazy spot
+                playersOnTileRefs[playersOnTile] = i;
                 playersOnTile++;
             }
+        }
+
+        float spacing = 1f / playersOnTile;
+
+        for (int i = 0; i < playersOnTile; i++)
+        {
+            mapManager.players[playersOnTileRefs[i]].body.GetComponent<RectTransform>().anchorMin = new Vector2((spacing*((float)i+1f))-((spacing/2f)), .5f);
+            mapManager.players[playersOnTileRefs[i]].body.GetComponent<RectTransform>().anchorMax = new Vector2((spacing*((float)i+1f))-((spacing/2f)), .5f);
         }
     }
 
