@@ -9,7 +9,7 @@ public class LaserPlayerMovement : NetworkBehaviour
     public float gravity = 10f;
     public float jumpForce = 15f;
     private float bounceForce = 2f;
-    private float bounceDuration = 0.3f;
+    private float bounceDuration = 0.15f;
     private float horizontalInput;
     private float verticalVelocity = 0f;
     private bool isGrounded;

@@ -10,14 +10,20 @@ public class PlayerSpawner : NetworkBehaviour
     
     private OurNetwork ourNetwork;
     private int spawnsUsed = 0;
+    ulong hostId;
     
     
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
 
-        ulong hostId = NetworkManager.Singleton.LocalClientId;
+        hostId = NetworkManager.Singleton.LocalClientId;
 
+        ourNetwork = FindObjectOfType<OurNetwork>();
+    }
+
+    public void SpawnPlayers()
+    {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             if (clientId != hostId)
@@ -26,8 +32,6 @@ public class PlayerSpawner : NetworkBehaviour
                 spawnsUsed++;
             }
         }
-
-        ourNetwork = FindObjectOfType<OurNetwork>();
     }
     
     private void SpawnPlayer(ulong clientId, int spawnsUsed)
