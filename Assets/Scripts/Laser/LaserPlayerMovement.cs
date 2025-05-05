@@ -8,9 +8,8 @@ public class LaserPlayerMovement : NetworkBehaviour
     public float moveSpeed = 5f;
     public float gravity = 10f;
     public float jumpForce = 15f;
-    public float bounceForce = 5f;
-    public float bounceDuration = 0.3f;
-    
+    private float bounceForce = 2f;
+    private float bounceDuration = 0.3f;
     private float horizontalInput;
     private float verticalVelocity = 0f;
     private bool isGrounded;
@@ -33,9 +32,15 @@ public class LaserPlayerMovement : NetworkBehaviour
         ConfigureCollisions();
     }
     
-
     void Update()
     {
+        // Don't process input while bouncing
+        if (isBouncing)
+        {
+            horizontalInput = 0;
+            return;
+        }
+        
         Vector3 acceleration = Input.acceleration;
         
         if (Mathf.Abs(acceleration.x) > deadzone)
@@ -51,8 +56,8 @@ public class LaserPlayerMovement : NetworkBehaviour
             horizontalInput = 0;
         }
         
-        // Jump logic remains unchanged
-        if (Input.touchCount > 0 && isGrounded)
+        // Jump logic - Only allow jumps when not bouncing
+        if (Input.touchCount > 0 && isGrounded && !isBouncing)
         {
             Touch touch = Input.GetTouch(0);
             
@@ -63,13 +68,9 @@ public class LaserPlayerMovement : NetworkBehaviour
         }
     }
 
-
-
     void FixedUpdate()
     {
         if (!IsOwner) return;
-
-        // CheckInBounds();
         
         // Check ground state
         CheckGrounded();
@@ -81,26 +82,6 @@ public class LaserPlayerMovement : NetworkBehaviour
         MoveRpc(horizontalInput, verticalVelocity, bounceVector, isBouncing);
     }
     
-    // private void CheckInBounds()
-    // {
-    //     if (transform.position.y < 0.5)
-    //     {
-    //         transform.position = new Vector3(transform.position.x, 0.5f, transform.position.z);
-    //     }
-    //     if (transform.position.x < -4.75)
-    //     {
-    //         transform.position = new Vector3(-4.75f, transform.position.y, transform.position.z);
-    //     }
-    //     else if (transform.position.x > 4.75)
-    //     {
-    //         transform.position = new Vector3(4.75f, transform.position.y, transform.position.z);
-    //     }
-    //     if (transform.position.y < -100)
-    //     {
-    //         transform.position = new Vector3(0, 1f, 0);
-    //     }
-    // }
-
     private void CheckGrounded()
     {
         // Check if player is on the ground
@@ -120,26 +101,31 @@ public class LaserPlayerMovement : NetworkBehaviour
             verticalVelocity -= gravity * Time.fixedDeltaTime;
         }
     }
-
     
     private void Move(float horizontalInput, float verticalVel, Vector2 bounceVec, bool isBouncing) {
-        // Calculate horizontal force
-        Vector3 moveForce = new Vector3(horizontalInput * moveSpeed, 0, 0);
+        // Calculate horizontal force - but only apply it if not bouncing
+        Vector3 moveForce = Vector3.zero;
         
-        // Apply controlled movement
-        rb.linearVelocity = new Vector3(moveForce.x, rb.linearVelocity.y, 0);
-        
-        // For jumps, apply impulse force
-        if (verticalVel > 0 && verticalVelocity != rb.linearVelocity.y) {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, verticalVel, 0);
+        if (!isBouncing) {
+            moveForce = new Vector3(horizontalInput * moveSpeed, 0, 0);
+            // Apply controlled movement
+            rb.linearVelocity = new Vector3(moveForce.x, rb.linearVelocity.y, 0);
+            
+            // For jumps, apply impulse force
+            if (verticalVel > 0 && verticalVelocity != rb.linearVelocity.y) {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, verticalVel, 0);
+            }
         }
         
         // Add bounce forces if needed
         if (isBouncing) {
             rb.AddForce(new Vector3(bounceVec.x, 0, bounceVec.y) * bounceForce, ForceMode.Impulse);
+            
+            // When bouncing, zero out the x velocity to prevent movement input from interfering
+            // We only modify the x component to keep the bounce and gravity effects
+            rb.linearVelocity = new Vector3(bounceVec.x * bounceForce, rb.linearVelocity.y, 0);
         }
     }
-
     
     [Rpc(SendTo.Server)]
     private void MoveRpc(float horizontalInput, float verticalVel, Vector2 bounceVec, bool isBouncing)
@@ -147,7 +133,7 @@ public class LaserPlayerMovement : NetworkBehaviour
         // Update values on server
         verticalVelocity = verticalVel;
         
-        // Move on server
+        // Move on server - pass the isBouncing state
         Move(horizontalInput, verticalVel, bounceVec, isBouncing);
     }
 
@@ -230,5 +216,4 @@ public class LaserPlayerMovement : NetworkBehaviour
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
     }
-
 }

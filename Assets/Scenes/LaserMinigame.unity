@@ -296,7 +296,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 49077758}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 86571926d79c5466fa991b7abdeac9c3, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -306,7 +306,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 1
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
@@ -1956,8 +1956,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Rotate your device to move your player left and right. Dodge lasers to
-    survive. The last player standing wins.
+  m_text: 'Move your player by tilting your device left and right. Tap on the screen
+    to jump. Dodge lasers to survive. The last player standing wins.
 
 
     Good Luck!'
@@ -2215,7 +2215,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 521270891}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 86571926d79c5466fa991b7abdeac9c3, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -4151,7 +4151,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1023803353}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 86571926d79c5466fa991b7abdeac9c3, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -5219,7 +5219,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1780023879}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 86571926d79c5466fa991b7abdeac9c3, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
