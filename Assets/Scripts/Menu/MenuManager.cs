@@ -56,6 +56,14 @@ public class MenuManager : MonoBehaviour
         playerCountText.gameObject.SetActive(false);
         phoneModeButton.onClick.AddListener(EnterPhoneMode);
 
+        if(Structs.IsComputer == true){
+            hostUI.gameObject.SetActive(true);
+            clientStartUI.gameObject.SetActive(false);
+        }
+        else{
+            hostUI.gameObject.SetActive(false);
+            clientStartUI.gameObject.SetActive(true);
+        }
     }
 
     void Update(){

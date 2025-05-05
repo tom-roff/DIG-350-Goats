@@ -22,7 +22,6 @@ public struct PlayerColor : INetworkSerializable{
     }
 }
 
-
 public enum colorEnumerator
 {
     DarkBlue, DarkGreen, Fuchsia, Gold, LightBlue, LightPink, Lime, Red
@@ -59,5 +58,5 @@ public struct PlayerInfo : INetworkSerializable, IEquatable<PlayerInfo>{
 
 public static class Structs
 {
-    
+    public static bool IsComputer = true;
 }
