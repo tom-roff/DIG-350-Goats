@@ -17,22 +17,20 @@ public class LaserManager : ManagerBase
 
     // Laser spawning
     public GameObject laserPrefab;
+    private float zPosition = 25f;
     private float yPosition = 2f;
-    private float zPosition = 10f;
-    public float minX = -5f;
-    public float maxX = 5f;
-    public float minSpawnInterval = 0.5f;
-    public float maxSpawnInterval = 1.5f;
+    private float minX = -5f;
+    private float maxX = 5f;
+    private int spawnInterval = 3;
     private float nextSpawnTime;
+    
+    // Laser set tracking variables
+    private int currentLaserCount = 1;
+    private int setsSpawnedAtCurrentCount = 0;
 
     // Game timing and state
     private ulong hostId;
     private float gameTimer = 0f;
-    private bool suddenDeathActive = false;
-    public float suddenDeathStartTime = 20f;
-    public float suddenDeathSpeedupInterval = 1.5f;
-    private float suddenDeathTimer = 0f;
-    public float suddenDeathSpeedupRate = 0.9f;
 
     public override void OnNetworkSpawn()
     {
@@ -96,11 +94,9 @@ public class LaserManager : ManagerBase
 
     protected override void OnGameStart()
     {
-        Debug.Log("On game start called");
         
         // Initialize game state
         gameTimer = 0f;
-        suddenDeathTimer = 0f;
         
         if (hostUI != null)
             hostUI.SetActive(true);
@@ -120,70 +116,43 @@ public class LaserManager : ManagerBase
     // Replace Update with GameUpdate for game-specific logic
     protected override void GameUpdate()
     {
-        UpdateGameTimers();
-        HandleLaserSpawning();
-    }
-
-    private void UpdateGameTimers()
-    {
         gameTimer += Time.deltaTime;
-
-        if (!suddenDeathActive && gameTimer >= suddenDeathStartTime)
-        {
-            ActivateSuddenDeath();
-        }
-
-        if (suddenDeathActive)
-        {
-            suddenDeathTimer += Time.deltaTime;
-
-            if (suddenDeathTimer >= suddenDeathSpeedupInterval)
-            {
-                IncreaseLaserSpawnRate();
-                suddenDeathTimer = 0f;
-            }
-        }
+        HandleLaserSpawning();
     }
 
     private void HandleLaserSpawning()
     {
         if (Time.time >= nextSpawnTime)
         {
-            SpawnLaser();
+            SpawnLaserSet();
             SetNextSpawnTime();
         }
     }
 
-    private void ActivateSuddenDeath()
+    private void SpawnLaserSet()
     {
-        suddenDeathActive = true;
-        suddenDeathTimer = 0f;
-    }
+        for (int i = 0; i < currentLaserCount; i++)
+        {
+            float randomX = Random.Range(minX, maxX);
+            Vector3 spawnPosition = new Vector3(randomX, yPosition, zPosition);
 
-    private void IncreaseLaserSpawnRate()
-    {
-        minSpawnInterval *= suddenDeathSpeedupRate;
-        maxSpawnInterval *= suddenDeathSpeedupRate;
+            GameObject laser = Instantiate(laserPrefab, spawnPosition, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            NetworkObject networkObject = laser.GetComponent<NetworkObject>();
+            networkObject.Spawn();
+        }
 
-        minSpawnInterval = Mathf.Max(minSpawnInterval, 0.05f);
-        maxSpawnInterval = Mathf.Max(maxSpawnInterval, 0.1f);
-
-        Debug.Log($"Laser spawn rate increased! Interval: {minSpawnInterval:F2}s - {maxSpawnInterval:F2}s");
-    }
-
-    private void SpawnLaser()
-    {
-        float randomX = Random.Range(minX, maxX);
-        Vector3 spawnPosition = new Vector3(randomX, yPosition, zPosition);
-
-        GameObject laser = Instantiate(laserPrefab, spawnPosition, Quaternion.identity);
-        NetworkObject networkObject = laser.GetComponent<NetworkObject>();
-        networkObject.Spawn();
+        setsSpawnedAtCurrentCount++;
+        
+        if (setsSpawnedAtCurrentCount >= 2)
+        {
+            currentLaserCount++;
+            setsSpawnedAtCurrentCount = 0;
+        }
     }
 
     private void SetNextSpawnTime()
     {
-        nextSpawnTime = Time.time + Random.Range(minSpawnInterval, maxSpawnInterval);
+        nextSpawnTime = Time.time + spawnInterval;
     }
 
     public void UpdateScores()

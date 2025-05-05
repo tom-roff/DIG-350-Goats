@@ -1,20 +1,36 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections;
 
 public class Laser : NetworkBehaviour
 {
-    public float speed = 4f;
+    private float speed = 30f;
     LaserManager laserManager;
+    private bool canMove = false;
 
     public override void OnNetworkSpawn()
     {
         laserManager = FindObjectOfType<LaserManager>();
+        if (IsServer)
+        {
+            StartCoroutine(WaitAndMove());
+        }
     }
-    
-    void Update()
+
+    private IEnumerator WaitAndMove()
     {
-        transform.Translate(-Vector3.forward * speed * Time.deltaTime);
+        yield return new WaitForSeconds(1f);
+        canMove = true;
     }
+
+    void FixedUpdate()
+    {
+        if (IsServer && canMove)
+        {
+            transform.Translate(-Vector3.forward * speed * Time.fixedDeltaTime);
+        }
+    }
+
     
     private void OnTriggerEnter(Collider other)
     {
