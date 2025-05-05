@@ -8,6 +8,7 @@ public class ReadySystem : NetworkBehaviour
     // UI Elements
     [SerializeField] private GameObject directionsUI;
     [SerializeField] private GameObject readyButton;
+    [SerializeField] private PlayerSpawner playerSpawner;
     
     // Events that minigames can subscribe to
     public event Action OnAllPlayersReady;
@@ -101,6 +102,7 @@ public class ReadySystem : NetworkBehaviour
         }
         
         // All players are ready
+        playerSpawner.SpawnPlayers();
         StartGame();
     }
     

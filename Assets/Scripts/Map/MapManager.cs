@@ -83,6 +83,11 @@ public class MapManager : NetworkBehaviour
 
     private int nextMinigame = -1;
 
+    public override void OnNetworkSpawn()
+    {
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+    }
+
     void Start()
     {
         MapHelpers.Shuffle(minigameSceneNames);
