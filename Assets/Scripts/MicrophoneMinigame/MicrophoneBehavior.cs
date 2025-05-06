@@ -38,11 +38,15 @@ public class MicrophoneBehavior : NetworkBehaviour
     private GameObject[] loudnessMeters;
     [SerializeField] GameObject loudnessMeterPrefab;
     [SerializeField] GameObject meterLocation;
+    [SerializeField] GameObject backButton;
 
     int clientId;
-    
 
 
+    void Start()
+    {
+        backButton.SetActive(false);
+    }
 
 
     public override void OnNetworkSpawn()
@@ -225,20 +229,26 @@ public class MicrophoneBehavior : NetworkBehaviour
         string finalResults = "";
         foreach (KeyValuePair<int, float> score in sortedScores)
         {
-            finalResults += GameManager.Instance.MapManager.players[score.Key - 1].name + " got " + (10-i) + " points <br>";
+            finalResults += GameManager.Instance.MapManager.players[score.Key - 1].name + " got " + (10 - i) + " points <br>";
             if (4 - i > 0)
             {
                 GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
-            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key, 10-i);
+            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key, 10 - i);
             i++;
         }
 
-    
+
         finalScoreText.text = finalResults;
         meterLocation.SetActive(false);
-        GameManager.Instance.MapManager.TimedReturnToMap();
+        // GameManager.Instance.MapManager.TimedReturnToMap();
+        
 
+    }
+
+    public void BackToMap()
+    {
+        GameManager.Instance.MapManager.ReturnToMap();
     }
 
     void StopListening()
@@ -247,6 +257,7 @@ public class MicrophoneBehavior : NetworkBehaviour
         StopListeningRpc();
         Debug.Log("Incorrect loudness for: " + timeIncorrect + " seconds");
         SendFinalScoreRpc((int)NetworkManager.Singleton.LocalClientId, timeIncorrect);
+        backButton.SetActive(true);
         
     }
 

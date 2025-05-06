@@ -128,7 +128,7 @@ public class MapManager : NetworkBehaviour
         Invoke("ReturnToMap", time);
     }
 
-    void ReturnToMap()
+    public void ReturnToMap()
     {
         MapSceneChangeRpc();
     }
