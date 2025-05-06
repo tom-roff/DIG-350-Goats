@@ -190,7 +190,6 @@ public class MapPlayerBehavior : NetworkBehaviour
             return;
         }
 
-        Debug.Log("rolling");
         mapManager.NextPlayer();
         mapUI.DisplayText(mapManager.players[mapManager.currentPlayer].name + " rolled a " + mapManager.moves);
         mapUI.SetMovesText(mapManager.moves);
@@ -283,13 +282,13 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     public void Moving()
     {
-        rerollAvailable = false;
         DisableRerollingRpc();
     }
 
     [Rpc(SendTo.NotServer)]
     private void DisableRerollingRpc()
     {
+        rerollAvailable = false;
         mapUI.DisableRerolling();
     }
 
