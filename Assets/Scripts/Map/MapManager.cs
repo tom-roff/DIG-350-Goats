@@ -106,12 +106,20 @@ public class MapManager : NetworkBehaviour
 
     public void NextPlayer()
     {
-            if (currentPlayer + 1 == players.GetLength(0)) currentPlayer = 0;
-            else currentPlayer++;
+        if (currentPlayer + 1 == players.GetLength(0)) currentPlayer = 0;
+        else currentPlayer++;
 
-            // roll moves
-            System.Random rnd = new System.Random();
-            moves = rnd.Next(1, 7);
+        // roll moves
+        System.Random rnd = new System.Random();
+        moves = rnd.Next(1, 7);
+        // SceneManager.LoadScene("Test_DiceReroll", LoadSceneMode.Additive);
+        // make sure it throws immediately
+    }
+
+    public void SendRoll(int roll)
+    {
+        moves = roll;
+        SceneManager.UnloadSceneAsync("Test_DiceReroll");
     }
 
 
@@ -120,7 +128,7 @@ public class MapManager : NetworkBehaviour
         Invoke("ReturnToMap", time);
     }
 
-    void ReturnToMap()
+    public void ReturnToMap()
     {
         MapSceneChangeRpc();
     }

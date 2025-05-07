@@ -13,14 +13,15 @@ public static class MapHelpers
         switch (map[(int)pos.x, (int)pos.y])
         {
             case MapManager.Tiles.Peaked:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.gray;
+                tiles[(int)pos.x, (int)pos.y].SetActive(true);
                 break;
             case MapManager.Tiles.Explored:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.white;
+                // tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.white;
                 // MapAudioManager.stepAudio.Play();
                 break;
             case MapManager.Tiles.PeakedMinigame:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(255, 0, 183);
+                tiles[(int)pos.x, (int)pos.y].SetActive(true);
                 break;
             case MapManager.Tiles.ExploredMinigame:
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(135, 0, 97);
@@ -39,7 +40,8 @@ public static class MapHelpers
                 tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.red;
                 break;
             default:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.black;
+                tiles[(int)pos.x, (int)pos.y].SetActive(false);
+                // tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.black;
                 break;
         }
     }

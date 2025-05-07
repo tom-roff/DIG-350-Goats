@@ -85,7 +85,30 @@ public class LaserPlayerMovement : NetworkBehaviour
     private void CheckGrounded()
     {
         // Check if player is on the ground
-        isGrounded = transform.position.y <= 0.51;
+        if (transform.position.y <= 0.51)
+        {
+            isGrounded = true;
+        }
+        // Middle platform
+        else if (transform.position.y <= 1.51 && transform.position.x <= 1.51 && transform.position.x >= -1.51)
+        {
+            isGrounded = true;
+        }
+
+        // Left platform
+        else if (transform.position.y <= 2.51 && transform.position.x <= -1.99 && transform.position.x >= -6.01)
+        {
+            isGrounded = true;
+        }
+
+        // Right platform
+        else if (transform.position.y <= 2.51 && transform.position.x <= 6.01 && transform.position.x >= 1.99)
+        {
+            isGrounded = true;
+        }
+        else {
+            isGrounded = false;
+        }
     }
     
     private void ApplyGravity()
