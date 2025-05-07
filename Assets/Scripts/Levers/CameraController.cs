@@ -24,10 +24,13 @@ public class CameraController : NetworkBehaviour
     private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
 
+    // private LightBehavior lightController;
+
     void Start()
     {
         network = GameManager.Instance.OurNetwork;
         playerId = NetworkManager.Singleton.LocalClientId;
+        // lightController = GetComponent<LightBehavior>();
 
         StartTutorial();
         AssignLeverOrder();
