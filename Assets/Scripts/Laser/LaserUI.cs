@@ -42,6 +42,9 @@ public class LaserUI : NetworkBehaviour
 
     private void UpdateScoreUI()
     {
+        // so to run scene (and drag laser prefabs in to test sound)
+        if (NetworkManager.Singleton == null) return;
+     
         TMP_Text[] scoreTexts = scoresParent.GetComponentsInChildren<TMP_Text>();
         int playerIndex = 0;
         
