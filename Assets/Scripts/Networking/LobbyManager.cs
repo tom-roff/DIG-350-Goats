@@ -79,6 +79,7 @@ public class LobbyManager : MonoBehaviour
             ourNetwork.playerInfoList.Add(new PlayerInfo("Host", possibleColors[currentPlayerCount], 0));
             menuManager.ShowStartButton(true);
             menuManager.hostButton.gameObject.SetActive(false);
+            menuManager.phoneModeButton.gameObject.SetActive(false);
             
 
         }
