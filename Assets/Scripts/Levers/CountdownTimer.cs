@@ -55,7 +55,7 @@ public class CountdownTimer : NetworkBehaviour
         int seconds = Mathf.FloorToInt(timeToDisplay % 60);
         int minutes = Mathf.FloorToInt(timeToDisplay / 60);
 
-        timerText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     void HandleTimeOut()

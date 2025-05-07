@@ -12,6 +12,8 @@ public class MenuManager : MonoBehaviour
     public TMP_Text playerCountText;
     public Button startGameButton;
     public Button startLeverGameButton;
+
+    public Button startMagnetButton;
     public Button startLaserButton;
     public Button startClimbButton;
     public Button startHackButton;
@@ -53,6 +55,7 @@ public class MenuManager : MonoBehaviour
         startLaserButton.onClick.AddListener(lobbyManager.StartLaserGame);
         startClimbButton.onClick.AddListener(lobbyManager.StartClimbGame);
         startHackButton.onClick.AddListener(lobbyManager.StartHackGame);
+        startMagnetButton.onClick.AddListener(lobbyManager.StartMagnetGame);
         playerCountText.gameObject.SetActive(false);
         phoneModeButton.onClick.AddListener(EnterPhoneMode);
 

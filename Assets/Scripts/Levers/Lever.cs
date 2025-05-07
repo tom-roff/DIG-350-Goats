@@ -100,7 +100,7 @@ public class Lever : NetworkBehaviour
         Debug.Log($"[ClientRpc] Lever {_leverIndex} animation triggered.");
         
         // Play animation and disable collider
-        animator.SetTrigger("LeverPull");
+        animator.SetTrigger("LeverPulled");
     }
 
 
