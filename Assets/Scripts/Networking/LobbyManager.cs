@@ -247,6 +247,10 @@ public class LobbyManager : MonoBehaviour
     {
         NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
     }
+    public void StartMagnetGame()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("Magnets", LoadSceneMode.Single);
+    }
 
 
     // Public method to get local player's ID
