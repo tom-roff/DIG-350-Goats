@@ -20,24 +20,24 @@ public static class MapHelpers
                 // MapAudioManager.stepAudio.Play();
                 break;
             case MapManager.Tiles.PeakedMinigame:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(255, 0, 183);
+                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color32(187,37,42,255);
                 tiles[(int)pos.x, (int)pos.y].SetActive(true);
                 break;
             case MapManager.Tiles.ExploredMinigame:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(135, 0, 97);
+                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color32(187,37,42,255);
                 break;
-            case MapManager.Tiles.PeakedItem:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.yellow;
-                break;
-            case MapManager.Tiles.ExploredItem:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(168, 107, 0);
-                // MapAudioManager.collectItemAudio.Play();
-                break;
+            // case MapManager.Tiles.PeakedItem:
+            //     tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.yellow;
+            //     break;
+            // case MapManager.Tiles.ExploredItem:
+            //     tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color(168, 107, 0);
+            //     // MapAudioManager.collectItemAudio.Play();
+            //     break;
             case MapManager.Tiles.Start:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.green;
+                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color32(234,132,69,255);
                 break;
             case MapManager.Tiles.UncoveredEnd:
-                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = Color.red;
+                tiles[(int)pos.x, (int)pos.y].GetComponent<Image>().color = new Color32(234,132,69,255);
                 break;
             default:
                 tiles[(int)pos.x, (int)pos.y].SetActive(false);
