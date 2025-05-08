@@ -13,6 +13,7 @@ public class ClimbingManager : NetworkBehaviour
     [SerializeField] private GameObject endUI;
     [SerializeField] private GameObject gameUI;
     [SerializeField] private EndLevel endLevel;
+    private OurNetwork ourNetwork;
 
 
     public override void OnNetworkSpawn()
@@ -30,6 +31,13 @@ public class ClimbingManager : NetworkBehaviour
         {
             Screen.orientation = ScreenOrientation.LandscapeLeft;
         }
+
+        ourNetwork = GameManager.Instance.OurNetwork;
+    }
+
+    private void Start()
+    {
+        ourNetwork = GameManager.Instance.OurNetwork;
     }
 
     // Called by player controllers to update their position
@@ -78,6 +86,16 @@ public class ClimbingManager : NetworkBehaviour
     private void EndGame()
     {
         endLevel.leaderboard = leaderboard;
+        int index = 0;
+        if (IsServer)
+        {
+            foreach (ulong clientId in leaderboard)
+            {
+                var updatedInfo = ourNetwork.playerInfoList[(int)clientId];
+                updatedInfo.treasuresCollected = updatedInfo.treasuresCollected + 10 - index;
+                ourNetwork.playerInfoList[(int)clientId] = updatedInfo;
+            }
+        }
         endUI.SetActive(true);
         gameUI.SetActive(false);
     }
