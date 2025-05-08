@@ -7,16 +7,16 @@ public class LaserPlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
     public float gravity = 10f;
-    public float jumpForce = 15f;
-    private float bounceForce = 2f;
-    private float bounceDuration = 0.15f;
+    public float jumpForce = 14f;
+    private float bounceForce = 2.2f;
+    private float bounceDuration = 0.1f;
     private float horizontalInput;
     private float verticalVelocity = 0f;
     private bool isGrounded;
     private Vector2 bounceVector = Vector2.zero;
     private bool isBouncing = false;
     [SerializeField] private Rigidbody rb;
-    private float deadzone = 0.1f;
+    private float deadzone = 0.05f;
     private float maxTilt = 0.6f;
     [SerializeField] private Material[] colorMaterials = new Material[6];
 
@@ -90,10 +90,10 @@ public class LaserPlayerMovement : NetworkBehaviour
             isGrounded = true;
         }
         // Middle platform
-        // else if (transform.position.y <= 1.51 && transform.position.x <= 1.51 && transform.position.x >= -1.51)
-        // {
-        //     isGrounded = true;
-        // }
+        else if (transform.position.y <= 1.51 && transform.position.x <= 1.51 && transform.position.x >= -1.51)
+        {
+            isGrounded = true;
+        }
 
         // Left platform
         else if (transform.position.y <= 2.51 && transform.position.x <= -1.99 && transform.position.x >= -6.01)

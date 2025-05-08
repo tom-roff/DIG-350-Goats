@@ -4,7 +4,7 @@ using System.Collections;
 
 public class Laser : NetworkBehaviour
 {
-    private float speed = 30f;
+    private float speed = 35f;
     LaserManager laserManager;
     private bool canMove = false;
 
