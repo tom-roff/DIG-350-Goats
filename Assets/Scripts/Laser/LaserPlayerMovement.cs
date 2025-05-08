@@ -90,10 +90,10 @@ public class LaserPlayerMovement : NetworkBehaviour
             isGrounded = true;
         }
         // Middle platform
-        else if (transform.position.y <= 1.51 && transform.position.x <= 1.51 && transform.position.x >= -1.51)
-        {
-            isGrounded = true;
-        }
+        // else if (transform.position.y <= 1.51 && transform.position.x <= 1.51 && transform.position.x >= -1.51)
+        // {
+        //     isGrounded = true;
+        // }
 
         // Left platform
         else if (transform.position.y <= 2.51 && transform.position.x <= -1.99 && transform.position.x >= -6.01)
