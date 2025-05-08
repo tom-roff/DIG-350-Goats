@@ -234,7 +234,8 @@ public class MicrophoneBehavior : NetworkBehaviour
             {
                 GameManager.Instance.MapManager.players[score.Key - 1].AddRerolls(3 - i);
             }
-            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key, 10 - i);
+            GameManager.Instance.OurNetwork.SetPlayerScoreRpc(score.Key,
+                GameManager.Instance.OurNetwork.playerInfoList[score.Key].treasuresCollected+(10 - i));
             i++;
         }
 

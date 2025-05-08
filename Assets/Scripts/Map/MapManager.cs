@@ -85,6 +85,7 @@ public class MapManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         Screen.orientation = ScreenOrientation.Portrait;
+        base.OnNetworkSpawn();
     }
 
     void Start()
