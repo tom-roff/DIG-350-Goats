@@ -39,6 +39,7 @@ public class CameraController : NetworkBehaviour
 
     void StartTutorial()
     {
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
         playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count - 1;
         Debug.Log($"Player Count = {playerCount}");
 

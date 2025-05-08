@@ -80,8 +80,6 @@ public class LobbyManager : MonoBehaviour
             menuManager.ShowStartButton(true);
             menuManager.hostButton.gameObject.SetActive(false);
             menuManager.phoneModeButton.gameObject.SetActive(false);
-            
-
         }
         catch (System.Exception e) {
             Debug.LogError($"Failed to start host: {e.Message}");
@@ -112,6 +110,7 @@ public class LobbyManager : MonoBehaviour
             menuManager.confirmNameButton.gameObject.SetActive(false);
             menuManager.nameInput.gameObject.SetActive(false);
             Debug.Log(ourNetwork.playerInfoList[ourNetwork.playerInfoList.Count - 1]);
+            Screen.orientation = ScreenOrientation.Portrait;
         }
         else{
             menuManager.nameText.text = "Please type in a name.";
@@ -142,10 +141,9 @@ public class LobbyManager : MonoBehaviour
             joinCode = code;
             isHost = false;
             
-
-
             menuManager.clientStartUI.SetActive(false);
             menuManager.clientJoinedUI.SetActive(true);
+            Screen.orientation = ScreenOrientation.Portrait;
         }
         catch (System.Exception e) {
             Debug.LogError($"Failed to join game: {e.Message}");
@@ -174,6 +172,7 @@ public class LobbyManager : MonoBehaviour
             }
             
         }
+        Screen.orientation = ScreenOrientation.Portrait;
         
         // You'll need to implement a way to share player IDs and assign indices
         // This could be done with RPCs after connection
