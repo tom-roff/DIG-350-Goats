@@ -7,7 +7,7 @@ public class GyroRotation : NetworkBehaviour
 {
     private Gyroscope gyro;
     private Quaternion initialRotation;
-    private bool gyroAvailable = false;
+    // private bool gyroAvailable = false; // not used?
     private List<Quaternion> gyro_inputs = new List<Quaternion>();
 
     private Quaternion avg;

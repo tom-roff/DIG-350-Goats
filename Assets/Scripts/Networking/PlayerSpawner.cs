@@ -19,7 +19,7 @@ public class PlayerSpawner : NetworkBehaviour
 
         hostId = NetworkManager.Singleton.LocalClientId;
 
-        ourNetwork = FindObjectOfType<OurNetwork>();
+        ourNetwork = FindFirstObjectByType<OurNetwork>();
     }
 
     public void SpawnPlayers()

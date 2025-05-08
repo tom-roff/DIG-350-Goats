@@ -10,7 +10,7 @@ public class Laser : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        laserManager = FindObjectOfType<LaserManager>();
+        laserManager = FindFirstObjectByType<LaserManager>();
         if (IsServer)
         {
             StartCoroutine(WaitAndMove());
