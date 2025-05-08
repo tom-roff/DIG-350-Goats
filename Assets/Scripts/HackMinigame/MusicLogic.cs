@@ -65,7 +65,7 @@ public static class EditorRunMode
             if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
                 return RunMode.Mobile;
             else
-                return ApplicationRunMode.Device;
+                return RunMode.Device;
 #endif
         }
     }
