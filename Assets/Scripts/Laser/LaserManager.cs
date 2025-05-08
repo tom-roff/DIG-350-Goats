@@ -21,7 +21,7 @@ public class LaserManager : ManagerBase
     private float yPosition = 2f;
     private float minX = -5f;
     private float maxX = 5f;
-    private int spawnInterval = 3;
+    private int spawnInterval = 4;
     private float nextSpawnTime;
     
     // Laser set tracking variables
