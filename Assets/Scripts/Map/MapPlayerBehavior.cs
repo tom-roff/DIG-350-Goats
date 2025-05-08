@@ -67,10 +67,29 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     void SetLeaderboard() {
 
-        for (int i = 1; i < ourNetwork.playerInfoList.Count; i++) {
-            leaderboardEntries[i - 1].gameObject.SetActive(true);
-            //...this code might be inefficient.
-            leaderboardEntries[i - 1].SetNameAndColorAndPoints(ourNetwork.playerInfoList[i].playerName.ToString(), ourNetwork.playerInfoList[i].playerColor, ourNetwork.playerInfoList[i].treasuresCollected);
+        // for (int i = 1; i < ourNetwork.playerInfoList.Count; i++) {
+        //     leaderboardEntries[i - 1].gameObject.SetActive(true);
+        //     //...this code might be inefficient.
+        //     leaderboardEntries[i - 1].SetNameAndColorAndPoints(ourNetwork.playerInfoList[i].playerName.ToString(), ourNetwork.playerInfoList[i].playerColor, ourNetwork.playerInfoList[i].treasuresCollected);
+        // }
+
+        // ^ this version leaves dummy text out when there are less than 6
+        for (int i = 0; i < leaderboardEntries.Length; i++)
+        {
+            if (i < ourNetwork.playerInfoList.Count -1 )
+            {
+                leaderboardEntries[i].gameObject.SetActive(true);
+                //...this code might be inefficient.
+                leaderboardEntries[i].SetNameAndColorAndPoints(
+                    ourNetwork.playerInfoList[i + 1].playerName.ToString(),
+                    ourNetwork.playerInfoList[i + 1].playerColor,
+                    ourNetwork.playerInfoList[i + 1].treasuresCollected
+                );
+            }
+            else
+            {
+                leaderboardEntries[i].gameObject.SetActive(false);
+            }
         }
     }
 
@@ -87,7 +106,7 @@ public class MapPlayerBehavior : NetworkBehaviour
             hostUI.SetActive(false);
             playerBackground.GetComponent<Image>().color = ourNetwork.playerInfoList[(int)clientId].playerColor.colorRGB;
             playerName.text = ourNetwork.playerInfoList[(int)clientId].playerName.ToString();
-            GameObject.Find("Leaderboard").SetActive(false);
+            GameObject.Find("Leaderboard_Responsive").SetActive(false);
             host = false;
         }
     }

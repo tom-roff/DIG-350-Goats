@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class MenuManager : MonoBehaviour
 {
@@ -30,12 +31,15 @@ public class MenuManager : MonoBehaviour
     [SerializeField] public OurNetwork ourNetwork;
     [SerializeField] private LobbyManager lobbyManager;
     [SerializeField] private GameManager networkPrefab;
+    public GameObject startMenu;
+
+    void Awake()
+    {
+        OnReturnToStartMenuButton(); // show start menu
+    }
 
     private void Start()
     {
-
-
-
         // if (ourNetwork == null)
         // {
         //     ourNetwork = FindObjectOfType<OurNetwork>();
@@ -75,7 +79,37 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    private void EnterPhoneMode(){
+    void LateUpdate()
+    {
+        // it keeps flipping in the simulator!!        
+        Screen.orientation = ScreenOrientation.Portrait;
+    }
+
+    // Start menu buttons
+    public void StartMenu_OnHostButton()
+    {
+        // set host
+        lobbyManager.isHost = true;
+        Structs.IsComputer = true;
+        startMenu.SetActive(false);
+        lobbyManager.HostGame();
+    }
+    public void StartMenu_OnJoinButton()
+    {
+        // set client
+        lobbyManager.isHost = false;
+        Structs.IsComputer = false;
+        startMenu.SetActive(false);
+        EnterPhoneMode();
+    }
+    public void OnReturnToStartMenuButton()
+    {
+        startMenu.SetActive(true);
+    }
+    // \Start menu buttons
+
+    public void EnterPhoneMode()
+    {
         hostUI.gameObject.SetActive(false);
         clientStartUI.gameObject.SetActive(true);
     }
