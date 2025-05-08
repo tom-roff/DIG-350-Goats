@@ -19,7 +19,6 @@ public class CameraController : NetworkBehaviour
     public GameObject readyButton;
     private int readyCount = 0;
     private int playerCount = 0;
-    public TMP_Text readyStatusText;
 
     private int[] leverOrder; // Array that holds the lever order (0, 1, 2, 3, ...)
     private int currentLeverIndex = 0;
@@ -39,7 +38,7 @@ public class CameraController : NetworkBehaviour
 
     void StartTutorial()
     {
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        Screen.orientation = ScreenOrientation.Portrait;
         playerCount = GameManager.Instance.OurNetwork.playerInfoList.Count - 1;
         Debug.Log($"Player Count = {playerCount}");
 
@@ -70,11 +69,6 @@ public class CameraController : NetworkBehaviour
     private void SendReadyRpc()
     {
         readyCount++;
-
-        if (readyStatusText != null)
-        {
-            readyStatusText.text = $"Players Ready: {readyCount}/{playerCount}";
-        }
 
         if (readyCount == playerCount && playerCount > 0)
         {

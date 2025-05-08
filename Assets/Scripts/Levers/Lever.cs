@@ -4,8 +4,7 @@ using Unity.Netcode;
 public class Lever : NetworkBehaviour
 {
     private Animator animator;
-    private CameraController cameraController;
-    CameraController serverCameraController;
+    private CameraController serverCameraController;
     private bool hasBeenPulled = false;
 
     public int leverIndex;

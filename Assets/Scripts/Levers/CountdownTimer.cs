@@ -9,19 +9,26 @@ public class CountdownTimer : NetworkBehaviour
     public bool timerIsRunning = false;
     public TextMeshProUGUI timerText;
     public GameObject tutorialText;
+    public GameObject clockPanel;
 
     private ulong playerId;
-    private GameEndManager gameEndManager;
+    public GameEndManager gameEndManager;
 
     void Start()
     {
-
+        if (!IsServer)
+        {
+            Screen.orientation = ScreenOrientation.Portrait;
+        }
+        
         playerId = NetworkManager.Singleton.LocalClientId;
 
         if (playerId != 0)
         {
             timerText.gameObject.SetActive(false);
             tutorialText.SetActive(false);
+
+            clockPanel.SetActive(false);
     
             this.enabled = false;
             return;
