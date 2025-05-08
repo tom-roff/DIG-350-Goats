@@ -424,7 +424,7 @@ public class MapPlayerBehavior : NetworkBehaviour
 
     public void EndGame()
         {
-            if(Server){
+
                 int pointsToGive = 5;
 
                 OurNetwork ourNetwork = GameManager.Instance.OurNetwork;
@@ -441,7 +441,7 @@ public class MapPlayerBehavior : NetworkBehaviour
 
                 mapUI.DisplayText(victorName + " is the winner!");
                 tilesObj.SetActive(false);
-            }
+
         }
 
     void ArrangePlayersOnTile(int x, int y) // x and y is tile position
