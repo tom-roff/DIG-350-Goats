@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 787535665203147968}
   - component: {fileID: 7021872445578806933}
   - component: {fileID: 2237193981720686029}
+  - component: {fileID: 5701722127594448736}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -112,3 +113,17 @@ MonoBehaviour:
   - LaserMinigame
   - ClimbingMinigame
   - LeversMinigame
+--- !u!114 &5701722127594448736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7118971492056895449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae3ade6040900954582d91a620941a4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventCount: 0
+  eventNames: []
