@@ -34,7 +34,12 @@ public class EndLevel : NetworkBehaviour
             }
             Debug.Log($"Player: {clientId}, place: {playerIndex + 1}");
             // Change score text
-            scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}";
+            try{
+                scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}";
+            }
+            catch(System.Exception e){
+                Debug.Log(e);
+            }
 
             // Update player score
             var updatedInfo = ourNetwork.playerInfoList[(int)clientId];
