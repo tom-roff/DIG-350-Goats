@@ -425,22 +425,22 @@ public class MapPlayerBehavior : NetworkBehaviour
     public void EndGame()
         {
 
-                int pointsToGive = 5;
+            int pointsToGive = 5;
 
-                OurNetwork ourNetwork = GameManager.Instance.OurNetwork;
-                ourNetwork.SetPlayerScoreRpc(mapManager.currentPlayer, ourNetwork.playerInfoList[mapManager.currentPlayer].treasuresCollected + pointsToGive);
+            OurNetwork ourNetwork = GameManager.Instance.OurNetwork;
+            ourNetwork.SetPlayerScoreRpc(mapManager.currentPlayer, ourNetwork.playerInfoList[mapManager.currentPlayer].treasuresCollected + pointsToGive);
 
-                int topScore = 0;
-                string victorName = "";
-                for(int i = 1; i < ourNetwork.playerInfoList.Count; i++){
-                    if(ourNetwork.playerInfoList[i].treasuresCollected > topScore){
-                        topScore = ourNetwork.playerInfoList[i].treasuresCollected;
-                        victorName = ourNetwork.playerInfoList[i].playerName.ToString();
-                    }
+            int topScore = 0;
+            string victorName = "";
+            for(int i = 1; i < ourNetwork.playerInfoList.Count; i++){
+                if(ourNetwork.playerInfoList[i].treasuresCollected > topScore){
+                    topScore = ourNetwork.playerInfoList[i].treasuresCollected;
+                    victorName = ourNetwork.playerInfoList[i].playerName.ToString();
                 }
+            }
 
-                mapUI.DisplayText(victorName + " is the winner!");
-                tilesObj.SetActive(false);
+            mapUI.DisplayText(victorName + " is the winner!");
+            tilesObj.SetActive(false);
 
         }
 
