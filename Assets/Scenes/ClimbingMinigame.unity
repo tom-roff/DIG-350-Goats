@@ -4773,6 +4773,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   readyUpScreen: {fileID: 2133442690}
   readyButton: {fileID: 2138103659}
+  hostUI: {fileID: 1367769690}
 --- !u!4 &1519071200
 Transform:
   m_ObjectHideFlags: 0

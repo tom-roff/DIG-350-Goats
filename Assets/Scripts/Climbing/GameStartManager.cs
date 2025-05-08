@@ -7,6 +7,7 @@ public class GameStartManager : NetworkBehaviour
 {
     public GameObject readyUpScreen;
     public GameObject readyButton;
+    public GameObject hostUI;
     private int readyCount = 0;
     private int playerCount = 0;
 
@@ -14,7 +15,11 @@ public class GameStartManager : NetworkBehaviour
     void Start()
     {
         Screen.orientation = ScreenOrientation.LandscapeLeft;
-        StartTutorial();
+        if (IsServer)
+        {
+            readyButton.SetActive(false);
+            hostUI.SetActive(true);
+        }
     }
 
     void StartTutorial()
@@ -32,6 +37,11 @@ public class GameStartManager : NetworkBehaviour
                 SendReady();  // Call local function
                 readyButton.SetActive(false);  // Disable button after clicking
             });
+        }
+        if (IsServer)
+        {
+            readyButton.SetActive(false);
+            hostUI.SetActive(true);
         }
     }
     public void SendReady()
