@@ -63,6 +63,7 @@ public class MapPlayerBehavior : NetworkBehaviour
         CheckHost();
         base.OnNetworkSpawn();
         SetLeaderboard();
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 
     void SetLeaderboard() {
