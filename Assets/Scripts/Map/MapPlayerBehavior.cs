@@ -18,6 +18,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public MapUI mapUI;
     [SerializeField] public GameObject playerBackground;
     [SerializeField] public TMP_Text playerName;
+    [SerializeField] public GameObject tilesObj;
     MapManager mapManager;
     OurNetwork ourNetwork;
 
@@ -414,7 +415,34 @@ public class MapPlayerBehavior : NetworkBehaviour
             mapManager.map[x, y] = MapManager.Tiles.ExploredMinigame;
             mapManager.PlayMinigame();
         }
+        // For ending the game
+        if (mapManager.map[x, y] == MapManager.Tiles.UncoveredEnd)
+        {
+            EndGame();
+        }
     }
+
+    public void EndGame()
+        {
+            if(Server){
+                int pointsToGive = 5;
+
+                OurNetwork ourNetwork = GameManager.Instance.OurNetwork;
+                ourNetwork.SetPlayerScoreRpc(mapManager.currentPlayer, ourNetwork.playerInfoList[mapManager.currentPlayer].treasuresCollected + pointsToGive);
+
+                int topScore = 0;
+                string victorName = "";
+                for(int i = 1; i < ourNetwork.playerInfoList.Count; i++){
+                    if(ourNetwork.playerInfoList[i].treasuresCollected > topScore){
+                        topScore = ourNetwork.playerInfoList[i].treasuresCollected;
+                        victorName = ourNetwork.playerInfoList[i].playerName.ToString();
+                    }
+                }
+
+                mapUI.DisplayText(victorName + " is the winner!");
+                tilesObj.SetActive(false);
+            }
+        }
 
     void ArrangePlayersOnTile(int x, int y) // x and y is tile position
     {

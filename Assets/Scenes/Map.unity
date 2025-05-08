@@ -278,7 +278,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30.45
+  m_fontSize: 48.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -562,7 +562,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 57.05
+  m_fontSize: 72
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -940,7 +940,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30.45
+  m_fontSize: 48.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1590,7 +1590,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60.95
+  m_fontSize: 72
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1726,7 +1726,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 91.4
+  m_fontSize: 145
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2442,7 +2442,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 91.4
+  m_fontSize: 145
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2578,7 +2578,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 91.4
+  m_fontSize: 145
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2667,6 +2667,7 @@ MonoBehaviour:
   mapUI: {fileID: 912729928}
   playerBackground: {fileID: 848555454}
   playerName: {fileID: 71188718}
+  tilesObj: {fileID: 895396175}
   leaderboardEntries:
   - {fileID: 1995161518}
   - {fileID: 1995161517}
@@ -2934,7 +2935,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 91.4
+  m_fontSize: 145
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3177,7 +3178,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.6
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_SizeDelta.x
@@ -3185,7 +3186,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: -214
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3221,7 +3222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 107
       objectReference: {fileID: 0}
     - target: {fileID: 5297061518536479354, guid: efbb305b2c14b455cbad39bb94b52115, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3552,7 +3553,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15.7
+  m_fontSize: 38.85
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

@@ -14,7 +14,6 @@ public class MapManager : NetworkBehaviour
     public ulong hostId;
     public GameObject[,] tiles;
 
-
     public MapPlayer[] players = null;
     public int currentPlayer = -1;
     public int moves;
@@ -151,6 +150,15 @@ public class MapManager : NetworkBehaviour
         }
         NetworkManager.Singleton.SceneManager.LoadScene(minigameSceneNames[nextMinigame], LoadSceneMode.Single);
         // NetworkManager.Singleton.SceneManager.LoadScene("MicrophoneMinigame", LoadSceneMode.Single);
+    }
+
+    public void EndGame()
+    {
+        int pointsToGive = 5;
+
+        OurNetwork ourNetwork = GameManager.Instance.OurNetwork;
+        ourNetwork.SetPlayerScoreRpc(currentPlayer, ourNetwork.playerInfoList[currentPlayer].treasuresCollected + pointsToGive);
+
     }
 
     void RevealEnd()
