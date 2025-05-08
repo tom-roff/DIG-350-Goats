@@ -5,6 +5,7 @@ public class Lever : NetworkBehaviour
 {
     private Animator animator;
     private CameraController cameraController;
+    CameraController serverCameraController;
     private bool hasBeenPulled = false;
 
     public int leverIndex;
@@ -17,34 +18,12 @@ public class Lever : NetworkBehaviour
             Debug.LogError("Animator component missing from lever!");
         }
 
-        cameraController = FindFirstObjectByType<CameraController>();
-        if (cameraController == null)
+        serverCameraController = FindFirstObjectByType<CameraController>();
+        if (serverCameraController == null)
         {
             Debug.LogError("CameraController not found in the scene!");
         }
-
-        Input.gyro.enabled = true;
     }
-
-    /*void Update() REAL TRACK ROTATION FUNCTION FOR PHONE
-    {
-        // Only run this on the client that owns the lever
-        if (!IsOwner || hasBeenPulled) return;
-        Quaternion rotation = Input.gyro.attitude;
-        rotation = Quaternion.Euler(90f, 0f, 0f) * (new Quaternion(-rotation.x, -rotation.y, rotation.z, rotation.w)); // Convert to Unity coordinates
-
-        float zTilt = rotation.eulerAngles.z;
-
-        // Normalize Z-axis to handle wrap-around
-        if (zTilt > 180f) zTilt -= 360f;
-
-        if (zTilt < -30f) // Pull-back detected (tweak threshold as needed)
-        {
-            Debug.Log($"Phone pulled for lever {leverIndex} (zTilt = {zTilt})");
-            hasBeenPulled = true;
-            PullLeverServerRpc(leverIndex);
-        }
-    }*/
 
     void Update()
     {
@@ -84,7 +63,7 @@ public class Lever : NetworkBehaviour
         Debug.Log($"[ServerRpc] Lever {_leverIndex} was pulled.");
 
         // Let server check lever logic
-        CameraController serverCameraController = FindFirstObjectByType<CameraController>();
+        
         if (serverCameraController != null)
         {
             serverCameraController.OnLeverPulled(_leverIndex);
