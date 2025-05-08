@@ -85,7 +85,7 @@ public class MapManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 
     void Start()
@@ -126,17 +126,20 @@ public class MapManager : NetworkBehaviour
     public void TimedReturnToMap(float time = 5f)
     {
         Invoke("ReturnToMap", time);
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 
     public void ReturnToMap()
     {
         MapSceneChangeRpc();
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 
     [Rpc(SendTo.Server)]
     public void MapSceneChangeRpc()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("Map", LoadSceneMode.Single);
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 
     public void PlayMinigame()

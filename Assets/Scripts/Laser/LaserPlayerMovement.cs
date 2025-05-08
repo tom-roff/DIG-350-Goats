@@ -228,7 +228,7 @@ public class LaserPlayerMovement : NetworkBehaviour
 
     // Call this periodically from the server, perhaps every 0.5-1 seconds
     private void SyncPositions() {
-        foreach (var player in FindObjectsOfType<LaserPlayerMovement>()) {
+        foreach (var player in FindObjectsByType<LaserPlayerMovement>(FindObjectsSortMode.None)) {
             player.SyncPositionRpc(player.transform.position);
         }
     }

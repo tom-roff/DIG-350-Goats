@@ -25,6 +25,7 @@ public class DiceManager : MonoBehaviour
 
     void Start()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
         UpdateMessage("Click to roll.");
         foreach (Dice d in dice)
         {

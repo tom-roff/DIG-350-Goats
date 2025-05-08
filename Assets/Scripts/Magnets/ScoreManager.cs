@@ -71,7 +71,7 @@ public class ScoreManager : NetworkBehaviour
     [Header("Timer Settings")]
     public float gameDuration = 10f; // seconds
     private float timer;
-    private bool gameEnded = false;
+    // private bool gameEnded = false; // not used?
 
 
 
