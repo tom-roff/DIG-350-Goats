@@ -129,6 +129,7 @@ public class MenuManager : MonoBehaviour
     }
 
     public void joinButtonClicked(){
+        Debug.Log("Join Button Clicked");
         lobbyManager.JoinGame(joinCodeInput.text);
     }
 }

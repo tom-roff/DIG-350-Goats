@@ -119,9 +119,16 @@ public class LobbyManager : MonoBehaviour
 
     public async void JoinGame(string code)
     {
+        Debug.Log("Join Game Function Called");
         try {
-            await UnityServices.InitializeAsync();
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            if (!UnityServices.State.Equals(ServicesInitializationState.Initialized))
+            {
+                await UnityServices.InitializeAsync();
+            }
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
             // Join the Relay allocation using the provided join code
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(code);
             
