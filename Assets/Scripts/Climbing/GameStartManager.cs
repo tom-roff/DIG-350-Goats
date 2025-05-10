@@ -8,6 +8,7 @@ public class GameStartManager : NetworkBehaviour
     public GameObject readyUpScreen;
     public GameObject readyButton;
     public GameObject hostUI;
+    public GameObject player;
     private int readyCount = 0;
     private int playerCount = 0;
 
@@ -20,6 +21,7 @@ public class GameStartManager : NetworkBehaviour
             readyButton.SetActive(false);
             hostUI.SetActive(true);
         }
+        StartTutorial();
     }
 
     void StartTutorial()
@@ -59,14 +61,21 @@ public class GameStartManager : NetworkBehaviour
 
         if (readyCount == playerCount && playerCount > 0)
         {
+            SpawnPlayersRpc();
             readyUpScreen.SetActive(false);
-            HideReadyUpScreenClientRpc();     
+            HideReadyUpScreenRpc();     
         }
     }
 
-    [ClientRpc]
-    private void HideReadyUpScreenClientRpc()
+    [Rpc(SendTo.NotServer)]
+    private void HideReadyUpScreenRpc()
     {
         readyUpScreen.SetActive(false);
+    }
+
+    [Rpc(SendTo.NotServer)]
+    private void SpawnPlayersRpc()
+    {
+        player.SetActive(true);
     }
 }

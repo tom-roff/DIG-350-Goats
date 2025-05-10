@@ -4774,6 +4774,7 @@ MonoBehaviour:
   readyUpScreen: {fileID: 2133442690}
   readyButton: {fileID: 2138103659}
   hostUI: {fileID: 1367769690}
+  player: {fileID: 1719460148}
 --- !u!4 &1519071200
 Transform:
   m_ObjectHideFlags: 0
@@ -5009,7 +5010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.2971698, b: 0.2971698, a: 1}
+  m_Color: {r: 0.14117648, g: 0.14117648, b: 0.14117648, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5189,7 +5190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1719460150
 MeshRenderer:
   m_ObjectHideFlags: 0
