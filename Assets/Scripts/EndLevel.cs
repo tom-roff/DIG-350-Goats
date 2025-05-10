@@ -8,7 +8,6 @@ public class EndLevel : NetworkBehaviour
 {
     [SerializeField] private GameObject scoresParent;
     private OurNetwork ourNetwork;
-    private MapManager mapManager;
     private ulong hostId;
     public List<ulong> leaderboard = new List<ulong>();
 
@@ -35,7 +34,7 @@ public class EndLevel : NetworkBehaviour
             Debug.Log($"Player: {clientId}, place: {playerIndex + 1}");
             // Change score text
             try{
-                scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}";
+                scoreTexts[playerIndex].text = $"{ourNetwork.playerInfoList[(int)clientId].playerName}  +{10-playerIndex} points";
             }
             catch(System.Exception e){
                 Debug.Log(e);
