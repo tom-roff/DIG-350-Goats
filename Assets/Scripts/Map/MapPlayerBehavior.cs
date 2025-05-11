@@ -19,6 +19,7 @@ public class MapPlayerBehavior : NetworkBehaviour
     [SerializeField] public GameObject playerBackground;
     [SerializeField] public TMP_Text playerName;
     [SerializeField] public GameObject tilesObj;
+    [SerializeField] public GameObject skipObj;
     MapManager mapManager;
     OurNetwork ourNetwork;
 
@@ -438,9 +439,10 @@ public class MapPlayerBehavior : NetworkBehaviour
                     victorName = ourNetwork.playerInfoList[i].playerName.ToString();
                 }
             }
-
-            mapUI.DisplayText(victorName + " is the winner!");
+            mapUI.displayText.text = victorName + " is the winner!";
             tilesObj.SetActive(false);
+            mapUI.rerollText.gameObject.SetActive(false);
+            skipObj.gameObject.SetActive(false);
 
         }
 
