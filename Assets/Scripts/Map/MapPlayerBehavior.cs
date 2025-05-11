@@ -439,6 +439,7 @@ public class MapPlayerBehavior : NetworkBehaviour
                     victorName = ourNetwork.playerInfoList[i].playerName.ToString();
                 }
             }
+            SetLeaderboard();
             mapUI.displayText.text = victorName + " is the winner!";
             tilesObj.SetActive(false);
             mapUI.rerollText.gameObject.SetActive(false);
