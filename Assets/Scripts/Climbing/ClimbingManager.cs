@@ -14,6 +14,7 @@ public class ClimbingManager : NetworkBehaviour
     [SerializeField] private GameObject gameUI;
     [SerializeField] private EndLevel endLevel;
     private OurNetwork ourNetwork;
+    private bool hasEnded = false;
 
 
     public override void OnNetworkSpawn()
@@ -85,6 +86,8 @@ public class ClimbingManager : NetworkBehaviour
 
     private void EndGame()
     {
+        if (hasEnded) return;
+        hasEnded = true;
         endLevel.leaderboard = leaderboard;
         int index = 0;
         if (IsServer)

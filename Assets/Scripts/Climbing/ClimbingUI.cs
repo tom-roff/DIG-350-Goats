@@ -23,6 +23,11 @@ public class ClimbingUI : NetworkBehaviour
         
     }
 
+    void Start()
+    {
+        ourNetwork = GameManager.Instance.OurNetwork;
+    }
+
     void Update()
     {
         if (!gameObject.activeSelf) return;

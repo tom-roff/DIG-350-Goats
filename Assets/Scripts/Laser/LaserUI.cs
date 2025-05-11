@@ -24,6 +24,11 @@ public class LaserUI : NetworkBehaviour
         SetColors();
     }
 
+    private void Start()
+    {
+        ourNetwork = GameManager.Instance.OurNetwork;
+    }
+
     void SetColors(){
         
 

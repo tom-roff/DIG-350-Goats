@@ -6,8 +6,8 @@ using Unity.VisualScripting;
 public class LaserPlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5f;
-    public float gravity = 10f;
-    public float jumpForce = 14f;
+    public float gravity = 12f;
+    public float jumpForce = 12f;
     private float bounceForce = 2.2f;
     private float bounceDuration = 0.1f;
     private float horizontalInput;
