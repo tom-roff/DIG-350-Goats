@@ -1,5 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
+using System;
 
 public class GameEndManager : NetworkBehaviour
 {
@@ -7,6 +10,14 @@ public class GameEndManager : NetworkBehaviour
     public GameObject winCanvas;
     public GameObject loseCanvas;
     [SerializeField] private CountdownTimer countdownTimer;
+    private ulong playerId;
+    private OurNetwork network;
+
+    void Start()
+    {
+        network = GameManager.Instance.OurNetwork;
+        playerId = NetworkManager.Singleton.LocalClientId;
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -16,12 +27,6 @@ public class GameEndManager : NetworkBehaviour
             Debug.LogError("CameraController not found in the scene!");
             return;
         }
-
-        // countdownTimer = FindFirstObjectByType<CountdownTimer>();
-        // if (countdownTimer == null)
-        // {
-        //     Debug.LogError("CountdownTimer not found in the scene!");
-        // }
     }
 
     public void OnGameWin()
@@ -34,12 +39,26 @@ public class GameEndManager : NetworkBehaviour
             foreach (var player in GameManager.Instance.MapManager.players)
             {
                 player.SetRerolls(player.rerolls + 1);
+                
             }
         }
         else
         {
             Debug.LogWarning("Players list not ready on win.");
         }
+
+        if(playerId != 0){
+            try
+            {
+                network.IncrementPlayerScoreRpc((int)playerId);
+            }
+            catch(Exception e)
+            {
+                Debug.Log("An error occurred: " + e.Message);
+            }
+
+        }
+        
 
         GameManager.Instance.MapManager.TimedReturnToMap();
     }
