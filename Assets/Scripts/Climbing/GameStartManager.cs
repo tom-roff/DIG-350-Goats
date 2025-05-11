@@ -11,6 +11,7 @@ public class GameStartManager : NetworkBehaviour
     public GameObject player;
     private int readyCount = 0;
     private int playerCount = 0;
+    [SerializeField] public Material[] colorMaterials = new Material[6];
 
 
     void Start()
@@ -76,6 +77,7 @@ public class GameStartManager : NetworkBehaviour
     [Rpc(SendTo.NotServer)]
     private void SpawnPlayersRpc()
     {
+        player.GetComponent<Renderer>().material = colorMaterials[(int)NetworkManager.LocalClientId - 1];
         player.SetActive(true);
     }
 }

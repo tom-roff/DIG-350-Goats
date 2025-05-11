@@ -4775,6 +4775,13 @@ MonoBehaviour:
   readyButton: {fileID: 2138103659}
   hostUI: {fileID: 1367769690}
   player: {fileID: 1719460148}
+  colorMaterials:
+  - {fileID: 2100000, guid: 30aeaf6232cde1146b18eedb5a877f90, type: 2}
+  - {fileID: 2100000, guid: fe301792b9d1a5f4b816ee6ddebc6c5c, type: 2}
+  - {fileID: 2100000, guid: 187d2427ffc4e01418bc4f8452b6a28d, type: 2}
+  - {fileID: 2100000, guid: cb5228d30610031428e5363bc2f45248, type: 2}
+  - {fileID: 2100000, guid: ea62ff06a9dcfcc47812c99bb6a70072, type: 2}
+  - {fileID: 2100000, guid: 4e7c2830243e38d46a5d172ae9979502, type: 2}
 --- !u!4 &1519071200
 Transform:
   m_ObjectHideFlags: 0

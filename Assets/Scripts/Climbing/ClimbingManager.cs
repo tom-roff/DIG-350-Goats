@@ -89,16 +89,6 @@ public class ClimbingManager : NetworkBehaviour
         if (hasEnded) return;
         hasEnded = true;
         endLevel.leaderboard = leaderboard;
-        int index = 0;
-        if (IsServer)
-        {
-            foreach (ulong clientId in leaderboard)
-            {
-                var updatedInfo = ourNetwork.playerInfoList[(int)clientId];
-                updatedInfo.treasuresCollected = updatedInfo.treasuresCollected + 10 - index;
-                ourNetwork.playerInfoList[(int)clientId] = updatedInfo;
-            }
-        }
         endUI.SetActive(true);
         gameUI.SetActive(false);
     }
