@@ -9,6 +9,8 @@ TagManager:
   - Pearl
   - Trash
   - Ground
+  - Magnet
+  - HeliObstacle
   layers:
   - Default
   - TransparentFX
